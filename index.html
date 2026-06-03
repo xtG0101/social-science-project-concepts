@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社会科学 × AI 交互项目 · 概念方案</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3348;
+      --text: #e8eaf0;
+      --muted: #9499b0;
+      --accent1: #6c8cff;
+      --accent1-dim: rgba(108, 140, 255, 0.12);
+      --accent2: #ff8c6c;
+      --accent2-dim: rgba(255, 140, 108, 0.12);
+      --green: #6cffa8;
+      --radius: 14px;
+      --font: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108,140,255,.18), transparent);
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      max-width: 640px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    /* ── Nav tabs ── */
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 0 24px 48px;
+      flex-wrap: wrap;
+    }
+    .nav-tabs a {
+      text-decoration: none;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 14px;
+      transition: all .2s;
+    }
+    .nav-tabs a:hover, .nav-tabs a.active {
+      color: var(--text);
+      border-color: var(--accent1);
+      background: var(--accent1-dim);
+    }
+    .nav-tabs a.tab2:hover, .nav-tabs a.tab2.active {
+      border-color: var(--accent2);
+      background: var(--accent2-dim);
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Project section ── */
+    .project {
+      margin-bottom: 100px;
+      scroll-margin-top: 32px;
+    }
+    .project-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .project-num {
+      flex-shrink: 0;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .p1 .project-num { background: var(--accent1-dim); color: var(--accent1); }
+    .p2 .project-num { background: var(--accent2-dim); color: var(--accent2); }
+
+    .project-title { font-size: clamp(22px, 4vw, 30px); font-weight: 700; line-height: 1.3; }
+    .project-subtitle { color: var(--muted); font-size: 15px; margin-top: 6px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .card h3 {
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h3::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+    .p1 .card h3::before { background: var(--accent1); }
+    .p2 .card h3::before { background: var(--accent2); }
+
+    .card p, .card li { color: #c8cce0; }
+    .card ul, .card ol { padding-left: 20px; }
+    .card li { margin-bottom: 8px; }
+    .card li:last-child { margin-bottom: 0; }
+
+    /* ── Highlight box ── */
+    .highlight {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 15px;
+    }
+    .p1 .highlight { background: var(--accent1-dim); border-left: 3px solid var(--accent1); }
+    .p2 .highlight { background: var(--accent2-dim); border-left: 3px solid var(--accent2); }
+
+    /* ── Flow diagram ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 16px 0;
+    }
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .flow-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 28px;
+    }
+    .flow-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .p1 .flow-dot { background: var(--accent1-dim); color: var(--accent1); border: 1px solid var(--accent1); }
+    .p2 .flow-dot { background: var(--accent2-dim); color: var(--accent2); border: 1px solid var(--accent2); }
+    .flow-connector {
+      width: 2px;
+      flex: 1;
+      min-height: 20px;
+      margin: 4px 0;
+    }
+    .p1 .flow-connector { background: var(--accent1-dim); }
+    .p2 .flow-connector { background: var(--accent2-dim); }
+    .flow-content {
+      padding-bottom: 20px;
+      flex: 1;
+    }
+    .flow-content strong { color: var(--text); display: block; margin-bottom: 4px; }
+    .flow-content span { color: var(--muted); font-size: 14px; }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 12px 0;
+    }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      color: #c8cce0;
+      vertical-align: top;
+    }
+    tr:first-child td { border-top: none; }
+
+    /* ── Timeline ── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tl-item:last-child { border-bottom: none; }
+    .tl-week {
+      font-size: 13px;
+      font-weight: 600;
+      padding-top: 2px;
+    }
+    .p1 .tl-week { color: var(--accent1); }
+    .p2 .tl-week { color: var(--accent2); }
+    .tl-content strong { display: block; margin-bottom: 4px; }
+    .tl-content span { color: var(--muted); font-size: 14px; }
+
+    /* ── Compare strip ── */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+    .compare-box {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 14px;
+    }
+    .compare-box .label {
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .p1 .compare-box .label { color: var(--accent1); }
+    .p2 .compare-box .label { color: var(--accent2); }
+
+    /* ── Stakeholder grid ── */
+    .stakeholders {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .stakeholder {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 14px;
+    }
+    .stakeholder .role {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--accent2);
+    }
+    .stakeholder .feel { color: var(--muted); font-size: 13px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Divider between projects ── */
+    .project-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 auto 100px;
+      max-width: 900px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin: 3px 3px 3px 0;
+    }
+    .p1 .tag { background: var(--accent1-dim); color: var(--accent1); }
+    .p2 .tag { background: var(--accent2-dim); color: var(--accent2); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-tag">社会科学 × AI · 两个月项目 · 概念阶段</div>
+  <h1>交互式网页项目<br>概念方案文档</h1>
+  <p>结合 AI 与搜索引擎，以交互网页（工具/游戏）+ 问卷访谈调研 + 四千字小论文的形式，呈现两个待选社会议题的深度概念设计。</p>
+</section>
+
+<nav class="nav-tabs">
+  <a href="#project1" class="active">方向一 · AI 时代的自我价值</a>
+  <a href="#project2" class="tab2">方向二 · 夹心层的时间困境</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════
+     PROJECT 1
+═══════════════════════════════════════════ -->
+<section class="project p1" id="project1">
+  <div class="project-header">
+    <div class="project-num">01</div>
+    <div>
+      <div class="project-title">AI 时代下，人类应该如何获取自我价值？</div>
+      <div class="project-subtitle">交互形式：「I'm Not a Robot」人类验证网页</div>
+      <div style="margin-top:10px">
+        <span class="tag">存在焦虑</span>
+        <span class="tag">AI 与人性</span>
+        <span class="tag">自主性</span>
+        <span class="tag">验证隐喻</span>
+        <span class="tag">哲学向</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心概念 -->
+  <div class="card">
+    <h3>核心 Concept</h3>
+    <p>当 AI 能够检索一切知识盲区、理解多模态信息（声音、图片、视频），甚至发挥想象力时——<strong>人类存在的意义在哪里？人类还会被需要吗？</strong></p>
+    <div class="highlight">
+      核心隐喻：仿照网络认证时弹出的「I'm not a robot」验证码，做一个反向验证网站——用户的目标是向网页<strong>证明自己不是 robot，而是一个人类</strong>。但在每一关验证中，用户都会发现：AI 同样可以做到。
+    </div>
+    <p style="margin-top:14px">真正区分人与 AI 的关键，不在于「能做什么」，而在于<strong>自主性</strong>：人类会主动热爱、主动创新、主动探索，会主动思考自己存在的意义——<strong>这种「正在追问」本身，就是人类独有的证明。</strong></p>
+  </div>
+
+  <!-- 自主性：核心论点 -->
+  <div class="card">
+    <h3>真正区分人与 AI：自主性</h3>
+    <p>AI 只会接收信息，做被需要做的事情；不需要时，便不吭声——它是工具，不会思考自己是 AI 还是人类。人类则拥有<strong>意志与主动发起的能力</strong>：因热爱而探寻生命的意义，因哲思而追问存在，也因生活的苦恼而尝试、努力。</p>
+    <div class="highlight">
+      人类主动思考「我存在的意义是什么」——这本身就是证明自己是人类的方式。因为 AI 不会问这个问题；AI 不需要知道自己是谁，只需要被调用。
+    </div>
+    <table style="margin-top:16px">
+      <tr>
+        <th></th>
+        <th>AI</th>
+        <th>人类</th>
+      </tr>
+      <tr>
+        <td><strong>驱动力</strong></td>
+        <td>被调用、被输入、被任务触发</td>
+        <td><strong>主动</strong>发起：热爱、好奇、哲思、苦恼与努力</td>
+      </tr>
+      <tr>
+        <td><strong>对「我是谁」</strong></td>
+        <td>不思考自己是 AI 还是人</td>
+        <td><strong>会思考</strong>自己存在的意义</td>
+      </tr>
+      <tr>
+        <td><strong>空闲时</strong></td>
+        <td>不吭声，等待指令</td>
+        <td>仍会内省、追问、尝试赋予意义</td>
+      </tr>
+      <tr>
+        <td><strong>本质</strong></td>
+        <td>接收信息 → 执行</td>
+        <td><strong>意志</strong> → 主动探索 → 赋予意义</td>
+      </tr>
+    </table>
+    <p style="margin-top:14px;color:var(--muted);font-size:14px">创新、记忆、经历——这些都可收束于自主性之下：创新是主动探索未知，经历是主动活在时间里并从中产生感受，哲思是主动追问而非完成被分配的任务。<strong>AI 执行；人类发起。</strong></p>
+  </div>
+
+  <!-- 交互呈现 -->
+  <div class="card">
+    <h3>交互呈现 · 体验流程</h3>
+    <p style="margin-bottom:16px;color:var(--muted);font-size:14px">用户进入网站，面对一个冷峻的「人类身份验证系统」。每一关要求用户证明一项「人类特质」，而系统会同步展示 AI 也能通过同一项测试——验证逻辑逐步失效，问题被推向更深处。</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">1</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>声音验证 · 「证明你能发出声音」</strong>
+          <span>用户通过麦克风说话。系统回应：AI 已能合成语音、克隆任意人的声音。表达 ≠ 存在。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">2</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>动作验证 · 「证明你有身体，能移动」</strong>
+          <span>用户通过摄像头做手势交互。系统回应：AI 已能生成伪造视频，假装拥有实体。形态 ≠ 本质。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">3</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>知识验证 · 「证明你知道答案」</strong>
+          <span>用户回答知识问题。系统回应：AI 已拥有全世界知识的集合，检索即答案。记忆 ≠ 理解。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">4</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>转折关 · 「证明你有自主意志」</strong>
+          <span>系统要求：「请证明你有自主意志。」用户可能愣住——怎么证明？系统回应：「你正在尝试回答这个问题。AI 不会。」AI 不会问「我是不是 robot」；但你在问。验证逻辑在此失效——问题从「你怎么证明」变成「你为什么还在问」。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">✦</div>
+        </div>
+        <div class="flow-content">
+          <strong>结尾 · 对比呈现</strong>
+          <span>左侧：AI 的状态——等待指令，无任务则静默，从不主动追问。右侧：用户刚才的犹豫、追问或开放题回答。配文：<em>「AI 不需要知道自己是谁。你在问——这本身就是答案。」</em>（或：「AI 拥有所有答案，人类拥有所有问题。」）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 概念结构 -->
+  <div class="card">
+    <h3>概念三层结构</h3>
+    <table>
+      <tr>
+        <th>层次</th>
+        <th>内容</th>
+      </tr>
+      <tr>
+        <td><strong>表层</strong></td>
+        <td>「I'm not a robot」验证界面——用户熟悉的日常体验，零学习成本</td>
+      </tr>
+      <tr>
+        <td><strong>中层</strong></td>
+        <td>每一关验证都被 AI 复制——「证明」这套逻辑在 AI 时代失效</td>
+      </tr>
+      <tr>
+        <td><strong>深层</strong></td>
+        <td>人类的价值不在于「能做什么」，而在于<strong>自主性</strong>——主动发起意义追问、主动探索、主动的热爱与苦恼</td>
+      </tr>
+    </table>
+    <div class="compare">
+      <div class="compare-box">
+        <div class="label">AI 的世界</div>
+        被调用 → 接收信息 → 执行 → 静默（循环）
+      </div>
+      <div class="compare-box">
+        <div class="label">人类的世界</div>
+        主动发起 → 热爱 / 哲思 / 苦恼 → 追问意义 → 尝试 → 努力（螺旋）
+      </div>
+    </div>
+  </div>
+
+  <!-- 社会批判 -->
+  <div class="card">
+    <h3>背后的社会问题与批判</h3>
+    <ul>
+      <li><strong>价值危机：</strong>当 AI 能完成人类引以为傲的认知与创造劳动，「学习」「思考」「表达」这些曾定义人类价值的活动，其意义受到根本性质疑。</li>
+      <li><strong>验证逻辑的失效：</strong>图灵测试、CAPTCHA……人类历史上用来区分「人」与「机器」的工具，正在被 AI 逐一破解。我们用什么来确认「我是我」？</li>
+      <li><strong>工具理性的扩张：</strong>社会 increasingly 以「可测量、可验证、可输出」为标准衡量人的价值——AI 恰恰最擅长这个。但<strong>自主性</strong>（主动追问意义、主动发起行动）无法被调用，也无法被验证——这恰恰是人性的核心。</li>
+      <li><strong>自主性与工具化：</strong>AI 是被使用的工具，不需要思考「我是谁」；人类却会主动追问存在意义。当社会 increasingly 用「效率 / 输出」衡量人，人是否还允许自己拥有<strong>无目的的追问、无实用价值的热爱</strong>？</li>
+      <li><strong>核心批判：</strong>问题不是「AI 会不会取代人类」，而是——<em>当一切可被验证的能力都被复制，人类是否还允许自己拥有「主动追问、主动探索」的自主空间？</em></li>
+    </ul>
+  </div>
+
+  <!-- 调研融入 -->
+  <div class="card">
+    <h3>问卷与访谈调研 · 如何融入</h3>
+    <p style="margin-bottom:14px">调研在开发之前进行，回答三个核心问题：<strong>人类的自我价值有没有在消失？背后的影响是什么？具体如何体现？</strong></p>
+
+    <table>
+      <tr>
+        <th>调研层次</th>
+        <th>问什么</th>
+        <th>怎么进网页</th>
+      </tr>
+      <tr>
+        <td>描述层（问卷）</td>
+        <td>AI 出现后，你觉得自己还有价值吗？哪些能力你觉得 AI 替代不了？</td>
+        <td>某一关的验证题目直接来自问卷；或系统台词引用统计数据（「73% 的受访者也有类似感受。这不能证明你是人类。」）</td>
+      </tr>
+      <tr>
+        <td>意义层（访谈）</td>
+        <td>若价值感变弱了，对你意味着什么？你会主动思考「我存在的意义」吗？</td>
+        <td>访谈原话作为系统背景音或最后一关的「自主性」内容（如「我会突然想，我读书还有什么意义」）；用户被邀请回答访谈里用过的开放题</td>
+      </tr>
+      <tr>
+        <td>定轴（分析）</td>
+        <td>哪类价值危机在样本中最突出？受访者如何描述「主动」与「被动」？</td>
+        <td>决定网页强调哪条线（知识焦虑 / 创作焦虑 / 意义追问 / 自主性丧失感）</td>
+      </tr>
+    </table>
+
+    <p style="margin-top:14px;color:var(--muted);font-size:14px"><strong>问卷示例题目：</strong></p>
+    <ul>
+      <li>「如果 AI 能帮你完成所有作业，你还会自己学吗？」</li>
+      <li>「你觉得什么能力是 AI 永远替代不了的？」（开放题）</li>
+      <li>「看到 AI 生成的内容，你会感到威胁还是兴奋？」</li>
+      <li>「你最近一次感到『我作为人类还有独特价值』是什么时候？」（开放题）</li>
+      <li>「你会主动思考自己存在的意义吗？这种思考对你重要吗？」（开放题）</li>
+      <li>「有没有一件事，不是因为被要求、而是因为热爱才去做的？」（开放题）</li>
+    </ul>
+  </div>
+
+  <!-- 项目周期 -->
+  <div class="card">
+    <h3>项目周期 · 八周框架</h3>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-week">第 1–2 周</div>
+        <div class="tl-content">
+          <strong>文献调研 + 问卷设计</strong>
+          <span>阅读 AI 伦理、图灵测试、自主性 / 意识哲学相关文献；设计并发放问卷（目标 30–50 份）</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 3 周</div>
+        <div class="tl-content">
+          <strong>深度访谈</strong>
+          <span>对 5–8 名同龄人进行 20–30 分钟访谈，聚焦价值感、意义追问与自主性的体验</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 4–5 周</div>
+        <div class="tl-content">
+          <strong>交互原型开发</strong>
+          <span>搭建四关验证网页；将调研数据与访谈语句融入各关内容</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 6 周</div>
+        <div class="tl-content">
+          <strong>用户测试</strong>
+          <span>邀请 10–20 人试玩，记录反应，调整「自主意志」转折关的台词与节奏</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 7–8 周</div>
+        <div class="tl-content">
+          <strong>论文撰写 + 最终展示</strong>
+          <span>四千字小论文：问题背景 + 调研发现 + 作品分析 + 结论；准备现场演示或录屏</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 概念风险 -->
+  <div class="card">
+    <h3>概念风险 · 设计时需守住</h3>
+    <ul>
+      <li>❌ 避免做成「CAPTCHA 科普页」——需要体验上的<strong>挫败与转折</strong>，不只是信息陈列</li>
+      <li>❌ 最后一关不能仍是「又一种验证」——应<strong>推翻验证逻辑</strong>，而非叠加</li>
+      <li>❌ 「自主性」不能只在结语出现——前面几关 AI 回应应统一为<strong>高效、准确、从不主动多问</strong>；最后一关才第一次问：「你为什么还在这里？」</li>
+      <li>❌ 主题不能滑向「AI 会不会取代人类」——核心是<strong>价值感</strong>，不是就业焦虑</li>
+    </ul>
+  </div>
+
+</section>
+
+<hr class="project-divider">
+
+<!-- ═══════════════════════════════════════════
+     PROJECT 2
+═══════════════════════════════════════════ -->
+<section class="project p2" id="project2">
+  <div class="project-header">
+    <div class="project-num">02</div>
+    <div>
+      <div class="project-title">夹心层世代的时间困境</div>
+      <div class="project-subtitle">交互形式：上帝视角过家家 · 平面多线任务游戏</div>
+      <div style="margin-top:10px">
+        <span class="tag">夹心层</span>
+        <span class="tag">时间贫困</span>
+        <span class="tag">角色超载</span>
+        <span class="tag">结构批判</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心概念 -->
+  <div class="card">
+    <h3>核心 Concept</h3>
+    <p>夹心层世代——上面有需要照顾的老人，下面有需要管的孩子，中间还有自己的工作岗位——<strong>几乎每天被困在多重角色里，却没有一整块属于自己的时间。</strong></p>
+    <div class="highlight">
+      他们持续告诉自己：「再等一等就可以休息了」「努力一下就能升职了」「多工作一下就能陪伴孩子了」——但那个「等一等」永远不来。没有睡过好觉，也没有时间「做回自己」。
+    </div>
+    <p style="margin-top:14px">时间困境从两个层面体现：<strong>客观</strong>（如每天休息时间不足两小时）与<strong>主观</strong>（每天感到非常疲惫、非常忙，不论实际时长）。</p>
+  </div>
+
+  <!-- 交互呈现 -->
+  <div class="card">
+    <h3>交互呈现 · 体验流程</h3>
+    <p style="margin-bottom:16px;color:var(--muted);font-size:14px">平面过家家游戏，类似「老爹汉堡店」的多线任务机制。用户以<strong>上帝视角</strong>操控家庭中的布偶角色（爸爸、妈妈），在三个场景之间切换，完成不断弹出的任务清单——却发现清单永远做不完，「休息」永远排在最后。</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">1</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>开场 · 你是「管理者」</strong>
+          <span>用户以上帝视角给爸妈分配任务、清理清单，有掌控感。清单不断从上方弹出，场景在工作 / 家庭 / 个人休息之间切换。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">2</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>中期 · 切换 Stakeholder 视角</strong>
+          <span>用户逐一点击不同角色，看见各自的处境——不是同时混乱，而是依次呈现，每一方都在失去什么。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">3</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>循环 · 「再等一等」内心独白</strong>
+          <span>角色台词：「忙完这阵就好了」「再坚持一下」——但清单清空后立即弹出新清单。休息条永远补不满；「做回自己」项永远灰掉、排在最后。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">4</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <strong>转折 · 清单失控</strong>
+          <span>某一时刻，清单自动弹出，用户无法跳过；点击「休息」被系统改成「加班」。揭示：没有真正的上帝——清单才是主人。</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot">✦</div>
+        </div>
+        <div class="flow-content">
+          <strong>结尾 · 玩家自觉</strong>
+          <span>你和我操控的布偶一样，都在完成结构要求的下一项。连「观看者」也是角色之一——社会也期待有人把这一切「管好」。结尾不设通关，或唯一可完成的是一件极小的、私人的事（如「 alone 喝十分钟咖啡」）。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stakeholders -->
+  <div class="card">
+    <h3>Stakeholder 呈现 · 上帝视角看见每一方</h3>
+    <div class="stakeholders">
+      <div class="stakeholder">
+        <div class="role">父母（夹心层）</div>
+        <div class="feel">在多场景中被动切换角色，永远有下一项任务。内心：「再等一等……」</div>
+      </div>
+      <div class="stakeholder">
+        <div class="role">孩子</div>
+        <div class="feel">被忽略后的落寞——对话框变少，画里父母的身影越来越模糊</div>
+      </div>
+      <div class="stakeholder">
+        <div class="role">祖辈</div>
+        <div class="feel">无奈、心疼，有时还有愧疚——想帮忙，但帮不上</div>
+      </div>
+      <div class="stakeholder">
+        <div class="role">玩家（你）</div>
+        <div class="feel">以为在操控，其实也在被清单驱使——「你也是被清单操纵的 stakeholder，只是自己不知道」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 概念三层结构 -->
+  <div class="card">
+    <h3>概念三层结构</h3>
+    <table>
+      <tr>
+        <th>层次</th>
+        <th>内容</th>
+      </tr>
+      <tr>
+        <td><strong>表层</strong></td>
+        <td>过家家 / 上帝视角 → 看见一家里每个人的处境，stakeholder 依次呈现</td>
+      </tr>
+      <tr>
+        <td><strong>中层</strong></td>
+        <td>任务清单 = 社会结构内的权力象征（资本、角色期待）——不是「自然忙」，是被安排忙</td>
+      </tr>
+      <tr>
+        <td><strong>深层</strong></td>
+        <td>玩家以为自己在外控，其实也被清单驱使 → 你也是 stakeholder。连「观看者 / 管理者」也是结构里的角色</td>
+      </tr>
+    </table>
+
+    <p style="margin-top:16px;color:var(--muted);font-size:14px"><strong>两类任务的设计区分：</strong></p>
+    <table>
+      <tr>
+        <th>任务类型</th>
+        <th>来源</th>
+        <th>特点</th>
+      </tr>
+      <tr>
+        <td>结构任务</td>
+        <td>清单下发（上班、接送、陪诊……）</td>
+        <td>不可拒绝，做了也不涨「自我」条</td>
+      </tr>
+      <tr>
+        <td>关系任务</td>
+        <td>家人发起（孩子要求陪伴、老人需要照料）</td>
+        <td>做了缓解某方落寞，但挤占其他角色时间</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 社会批判 -->
+  <div class="card">
+    <h3>背后的社会问题与批判</h3>
+    <ul>
+      <li><strong>时间贫困（Time Poverty）：</strong>夹心层世代面临的不仅是「忙」，而是<strong>结构性没有时间</strong>——多重角色叠加，每一方都是合理需求，但加在一起超过了一个人能给出的总量。</li>
+      <li><strong>角色超载（Role Overload）：</strong>同一个人同时是「妈妈的女儿/儿子」「孩子的父母」「公司的员工/管理者」——<strong>没有任何一个角色允许被忽略</strong>，但也没有一个角色允许被真正做好。</li>
+      <li><strong>「做回自己」的消失：</strong>休息被不断延迟，自我被无限推后。「再等一等」不是懒惰，是结构性的——系统永远有下一项任务在等着。</li>
+      <li><strong>代际影响：</strong>对孩子的陪伴缺失可能造成心理负面影响；夹心层父母自身也承受焦虑、愧疚、耗竭等心理问题——<strong>没有「赢」的角色，只有不同程度的失去</strong>。</li>
+      <li><strong>核心批判：</strong>问题不是「谁没做好」，而是——<em>社会结构把「全部做好」当作默认期待，却从不提供允许「做回自己」的空间。</em>清单（资本逻辑 / 家庭责任 / 社会期待）才是真正的操控者。</li>
+    </ul>
+  </div>
+
+  <!-- 调研融入 -->
+  <div class="card">
+    <h3>问卷与访谈调研 · 如何融入</h3>
+    <p style="margin-bottom:14px">夹心层议题几乎<strong>离不开</strong>问卷 + 访谈，且与游戏咬合比方向一更自然——<strong>调研数据可以直接成为游戏规则本身</strong>。</p>
+
+    <table>
+      <tr>
+        <th>调研问什么</th>
+        <th>怎么进游戏</th>
+      </tr>
+      <tr>
+        <td>每天实际休息多久、承担哪些角色</td>
+        <td>设定时钟速度、任务密度、场景切换频率</td>
+      </tr>
+      <tr>
+        <td>主观疲惫程度、「等一等就好」的自我说服</td>
+        <td>角色内心独白、系统提示语</td>
+      </tr>
+      <tr>
+        <td>对孩子 / 对自身的心理影响</td>
+        <td>侧枝事件（孩子对话框变少、父母操作失误变多）</td>
+      </tr>
+      <tr>
+        <td>「最后一次像自己是什么时候」</td>
+        <td>隐藏任务内容，或结尾唯一可完成的小任务</td>
+      </tr>
+    </table>
+
+    <p style="margin-top:14px;color:var(--muted);font-size:14px"><strong>问卷示例题目：</strong></p>
+    <ul>
+      <li>「你目前同时承担哪些角色？」（子女 / 父母 / 员工 / 管理者 / 其他）</li>
+      <li>「你每天大概有多少时间属于自己（不包括睡眠）？」</li>
+      <li>「你是否经常觉得『忙完这阵就好了』，但那个时刻从未到来？」（1–5 分）</li>
+      <li>「你最近一次『做回自己』是什么时候？在做什么？」（开放题）</li>
+      <li>「这种忙碌对你的情绪 / 家庭关系有什么影响？」（开放题）</li>
+    </ul>
+  </div>
+
+  <!-- 项目周期 -->
+  <div class="card">
+    <h3>项目周期 · 八周框架</h3>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-week">第 1–2 周</div>
+        <div class="tl-content">
+          <strong>文献调研 + 问卷设计</strong>
+          <span>阅读夹心层、时间贫困、角色冲突相关文献；设计并发放问卷（目标 30–50 份，含夹心层家庭或有过类似经历者）</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 3 周</div>
+        <div class="tl-content">
+          <strong>深度访谈</strong>
+          <span>对 5–8 名夹心层家庭成员（或他们的子女）进行访谈，聚焦「做回自己」与「等一等」的真实体验</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 4–5 周</div>
+        <div class="tl-content">
+          <strong>游戏原型开发</strong>
+          <span>搭建三场景切换 + 任务清单机制；将调研数据（休息时长、任务密度）设为游戏参数；嵌入访谈原话为台词</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 6 周</div>
+        <div class="tl-content">
+          <strong>用户测试</strong>
+          <span>邀请 10–20 人试玩，观察是否在「清单失控」转折点产生预期的自觉感，调整节奏</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-week">第 7–8 周</div>
+        <div class="tl-content">
+          <strong>论文撰写 + 最终展示</strong>
+          <span>四千字小论文：夹心层时间困境的背景 + 调研数据 + 游戏设计分析 + 结构批判结论</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 概念风险 -->
+  <div class="card">
+    <h3>概念风险 · 设计时需守住</h3>
+    <ul>
+      <li>❌ 避免做成「忙碌模拟器」——要有<strong>转折</strong>（清单失控 / 玩家自觉），不只是累</li>
+      <li>❌ 「做回自己」不能等同于「睡个好觉」——前者是<strong>不被角色定义的时间</strong>，需单独设计「自我条」</li>
+      <li>❌ 上帝视角若全程不变，可能削弱共情——考虑后期<strong>视角滑入</strong>某一角色，或让玩家操作也被系统篡改</li>
+      <li>❌ 不让任何单一角色当「反派」——<strong>系统免责，结构负责</strong>，避免滑向「谁没做好」的归因</li>
+      <li>❌ 游戏<strong>不能正常赢</strong>——若有一刻「像自己」，应是 rare、小、或带代价的</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ═══════════════ COMPARE ═══════════════ -->
+<section class="project p1" id="compare">
+  <div class="project-header">
+    <div class="project-num" style="background:rgba(108,255,168,.12);color:var(--green)">↔</div>
+    <div>
+      <div class="project-title" style="font-size:22px">两个方向的对比</div>
+      <div class="project-subtitle">概念阶段选型参考</div>
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <tr>
+        <th></th>
+        <th>方向一 · AI 时代的自我价值</th>
+        <th>方向二 · 夹心层的时间困境</th>
+      </tr>
+      <tr>
+        <td><strong>主题气质</strong></td>
+        <td>抽象、未来、存在焦虑</td>
+        <td>具体、日常、结构性压力</td>
+      </tr>
+      <tr>
+        <td><strong>用户入口</strong></td>
+        <td>熟悉的验证码界面</td>
+        <td>熟悉的「忙」的体验</td>
+      </tr>
+      <tr>
+        <td><strong>核心隐喻</strong></td>
+        <td>验证失效 → 自主性才是人性证明</td>
+        <td>清单无尽 = 结构吞噬个人时间</td>
+      </tr>
+      <tr>
+        <td><strong>调研重心</strong></td>
+        <td>态度、价值感、开放题</td>
+        <td>时间数据、角色冲突、身心状态</td>
+      </tr>
+      <tr>
+        <td><strong>调研融入</strong></td>
+        <td>证据 + 氛围（台词、数据、最后一关）</td>
+        <td>规则本身（任务密度、休息上限来自真实数据）</td>
+      </tr>
+      <tr>
+        <td><strong>概念风险</strong></td>
+        <td>结尾容易硬升华</td>
+        <td>容易做成忙碌模拟器</td>
+      </tr>
+      <tr>
+        <td><strong>与 AI 结合</strong></td>
+        <td>直接——AI 是核心议题</td>
+        <td>间接——可用 AI 生成台词/任务，但非必须</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  社会科学 × AI 交互项目 · 概念方案文档 · 2026<br>
+  项目周期：八周 · 最终交付：交互网页 + 调研 + 四千字小论文
+</footer>
+
+<script>
+  // Highlight active nav tab on scroll
+  const sections = document.querySelectorAll('.project[id]');
+  const tabs = document.querySelectorAll('.nav-tabs a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tabs.forEach(t => t.classList.remove('active'));
+        const active = document.querySelector(`.nav-tabs a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
