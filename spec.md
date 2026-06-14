@@ -33,6 +33,6 @@
 
 ## Research Question & Hypothesis
 
-Research Question: How does my interactive web demo affect users' awareness that sandwich generation time poverty is a structural problem?
+Research Question: How does an interactive task-list demo affect users' awareness of sandwich generation time poverty and its impact on family members?
 
-Hypothesis: I hypothesize that after using my interactive web demo, users will increase their awareness that sandwich generation time poverty is a structural problem.
+Hypothesis: I hypothesize that after using the demo, users will better understand how serious and common sandwich generation time poverty is, and see it as a structural problem.
