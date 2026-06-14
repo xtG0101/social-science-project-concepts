@@ -30,3 +30,9 @@
 - **结尾屏 2–3 题**：最想点但点不了的是什么；是否感到清单永远做不完（1–5 分）；若这是你家的一天，谁最难受、为什么（开放题）。可链到问卷星 / Google 表单，或页内 textarea。
 - **局内简单统计**（localStorage）：完成任务数、尝试休息次数、被打断次数；结尾展示给用户，兼作展示与论文素材。
 - **线下试玩 5–10 人**：观察是否在中期开始找休息按钮、打断时是否愣住，记在试玩表上。
+
+## Research Question & Hypothesis
+
+Research Question: How does my interactive web demo affect users' awareness that sandwich generation time poverty is a structural problem?
+
+Hypothesis: I hypothesize that after using my interactive web demo, users will increase their awareness that sandwich generation time poverty is a structural problem.
