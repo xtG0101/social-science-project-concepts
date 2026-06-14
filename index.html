@@ -3,958 +3,1209 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>夹心层时间困境 · 交互项目概念方案</title>
+  <title>夹心层世代的时间困境</title>
   <style>
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #22263a;
-      --border: #2e3348;
-      --text: #e8eaf0;
-      --muted: #9499b0;
-      --accent: #ff8c6c;
-      --accent-dim: rgba(255, 140, 108, 0.12);
-      --accent2: #6cffa8;
-      --accent2-dim: rgba(108, 255, 168, 0.1);
-      --radius: 14px;
-      --font: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      --ink: #202124;
+      --muted: #667085;
+      --paper: #fbfaf7;
+      --panel: #ffffff;
+      --line: #d9d4ca;
+      --work: #3f6f8f;
+      --home: #c66b4d;
+      --self: #5d8f6d;
+      --warn: #b34444;
+      --gold: #d39c3f;
+      --soft-work: #e9f2f6;
+      --soft-home: #f8ece6;
+      --soft-self: #edf5ed;
+      --shadow: 0 18px 45px rgba(37, 38, 43, .10);
+      --radius: 8px;
+      --font: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-
     body {
+      margin: 0;
       font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.75;
-      font-size: 16px;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(63,111,143,.06) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(198,107,77,.05) 1px, transparent 1px),
+        var(--paper);
+      background-size: 36px 36px;
+      line-height: 1.72;
     }
 
-    .hero {
-      text-align: center;
-      padding: 80px 24px 60px;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,140,108,.16), transparent);
-    }
-    .hero-tag {
-      display: inline-block;
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 4px 14px;
-      margin-bottom: 20px;
-    }
-    .hero h1 {
-      font-size: clamp(28px, 5vw, 42px);
-      font-weight: 700;
-      line-height: 1.25;
-      margin-bottom: 16px;
-    }
-    .hero p {
-      max-width: 680px;
-      margin: 0 auto;
-      color: var(--muted);
-      font-size: 17px;
-    }
-
-    .nav-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding: 0 24px 48px;
-      flex-wrap: wrap;
-    }
-    .nav-tabs a {
-      text-decoration: none;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 13px;
-      transition: all .2s;
-    }
-    .nav-tabs a:hover {
-      color: var(--text);
-      border-color: var(--accent);
-      background: var(--accent-dim);
-    }
-
-    .container {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
-
-    .section { margin-bottom: 88px; scroll-margin-top: 32px; }
-
-    .section-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 20px;
-      margin-bottom: 36px;
-    }
-    .section-icon {
-      flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .section-title {
-      font-size: clamp(20px, 4vw, 28px);
-      font-weight: 700;
-      line-height: 1.3;
-    }
-    .section-subtitle {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 6px;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+    button, select, textarea, input { font: inherit; }
+    button {
+      border: 1px solid var(--ink);
       border-radius: var(--radius);
-      padding: 28px 32px;
-      margin-bottom: 18px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
-    .card h3 {
-      font-size: 13px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
+    button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(32,33,36,.10); }
+    button:disabled { cursor: not-allowed; opacity: .45; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
       display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      background: rgba(251,250,247,.92);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .topbar a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,.72);
+    }
+
+    header {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 18px 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+    .intro, .game-shell, .section, .note-card {
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .intro {
+      padding: 30px;
+      min-height: 100%;
+    }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--work);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .05em;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 2px;
+      background: var(--work);
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+    .lead {
+      max-width: 720px;
+      color: #3d4148;
+      font-size: 18px;
+      margin: 0 0 18px;
+    }
+    .plain-list {
+      padding-left: 20px;
+      margin: 16px 0 0;
+      color: #3d4148;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .tag {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 13px;
+      color: #3f454c;
+    }
+
+    .game-shell {
+      padding: 0;
+      overflow: hidden;
+    }
+    .game-head {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, var(--soft-work), var(--soft-home) 52%, var(--soft-self));
+    }
+    .game-head h2 {
+      margin: 0 0 4px;
+      font-size: 22px;
+    }
+    .game-head p {
+      margin: 0;
+      color: #4e5560;
+      font-size: 14px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .primary {
+      background: var(--ink);
+      color: #fff;
+      padding: 9px 14px;
+      font-weight: 700;
+    }
+    .secondary {
+      padding: 8px 12px;
+      background: #fff;
+    }
+    .select-wrap {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
+      font-size: 13px;
+      color: #4e5560;
     }
-    .card h3::before {
-      content: "";
-      display: inline-block;
-      width: 3px;
-      height: 14px;
-      border-radius: 2px;
-      background: var(--accent);
-    }
-    .card h4 {
-      font-size: 15px;
-      color: var(--text);
-      margin: 20px 0 10px;
-    }
-    .card p, .card li { color: #c8cce0; }
-    .card ul, .card ol { padding-left: 20px; }
-    .card li { margin-bottom: 8px; }
-    .card li:last-child { margin-bottom: 0; }
-
-    .highlight {
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 16px 0;
-      font-size: 15px;
-      background: var(--accent-dim);
-      border-left: 3px solid var(--accent);
-    }
-    .highlight.green {
-      background: var(--accent2-dim);
-      border-left-color: var(--accent2);
+    select {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--ink);
     }
 
-    .tag {
-      display: inline-block;
-      font-size: 12px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      margin: 3px 3px 3px 0;
-      background: var(--accent-dim);
-      color: var(--accent);
+    .game-body { padding: 18px; }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
     }
-
-    .flow { display: flex; flex-direction: column; margin: 16px 0; }
-    .flow-step { display: flex; gap: 16px; align-items: flex-start; }
-    .flow-line {
+    .meter-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px;
+    }
+    .meter-label {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-      width: 28px;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: #4e5560;
+      margin-bottom: 7px;
     }
-    .flow-dot {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid var(--accent);
+    .meter {
+      height: 10px;
+      border-radius: 999px;
+      background: #ece8df;
+      overflow: hidden;
     }
-    .flow-connector {
-      width: 2px; flex: 1; min-height: 20px; margin: 4px 0;
-      background: var(--accent-dim);
+    .fill {
+      height: 100%;
+      width: 50%;
+      border-radius: inherit;
+      transition: width .25s ease, background .25s ease;
     }
-    .flow-content { padding-bottom: 22px; flex: 1; }
-    .flow-content strong { color: var(--text); display: block; margin-bottom: 4px; }
-    .flow-content span { color: var(--muted); font-size: 14px; }
+    .fill.fatigue { background: var(--warn); }
+    .fill.child { background: var(--gold); }
+    .fill.self { background: var(--self); }
 
+    .mini-stage {
+      position: relative;
+      min-height: 170px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #fff 0 62%, #ece3d7 62% 100%);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .room-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: #4e5560;
+    }
+    .window {
+      position: absolute;
+      top: 42px;
+      right: 24px;
+      width: 86px;
+      height: 54px;
+      border: 3px solid #8a9a9a;
+      background: #dfeef0;
+    }
+    .desk {
+      position: absolute;
+      right: 30px;
+      bottom: 44px;
+      width: 120px;
+      height: 18px;
+      background: #9b6d50;
+      border-radius: 4px;
+    }
+    .desk::before, .desk::after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      width: 9px;
+      height: 38px;
+      background: #7f573e;
+    }
+    .desk::before { left: 14px; }
+    .desk::after { right: 14px; }
+    .doll {
+      position: absolute;
+      bottom: 43px;
+      width: 58px;
+      height: 96px;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    .doll.parent { left: 74px; }
+    .doll.child { left: 168px; transform: scale(.76); transform-origin: bottom center; opacity: .88; }
+    .doll.elder { left: 252px; transform: scale(.86); transform-origin: bottom center; opacity: .8; }
+    .head {
+      position: absolute;
+      left: 15px;
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: #f0d0b5;
+    }
+    .body {
+      position: absolute;
+      top: 30px;
+      left: 9px;
+      width: 40px;
+      height: 50px;
+      border: 2px solid var(--ink);
+      background: #eecb6b;
+      border-radius: 12px 12px 6px 6px;
+    }
+    .parent .body { background: #78a5bd; }
+    .elder .body { background: #b2b0a8; }
+    .leg {
+      position: absolute;
+      top: 78px;
+      width: 12px;
+      height: 18px;
+      background: #4f5963;
+      border-radius: 0 0 5px 5px;
+    }
+    .leg.one { left: 15px; }
+    .leg.two { left: 31px; }
+    .speech {
+      position: absolute;
+      left: 18px;
+      bottom: 142px;
+      max-width: 280px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.95);
+      color: #3d4148;
+      font-size: 13px;
+    }
+    .stage-rest .window { background: #dcebdc; }
+    .stage-rest .desk { background: #6f9a73; }
+    .stage-home .window { background: #f2ddd4; }
+    .stage-home .desk { background: #ad7259; }
+    .stage-overload .parent { transform: rotate(-2deg) translateY(5px); }
+    .stage-overload .child { opacity: .48; }
+
+    .scene-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .scene-tabs button {
+      padding: 8px 8px;
+      font-size: 13px;
+      background: #fff;
+    }
+    .scene-tabs button.active {
+      color: #fff;
+      background: var(--ink);
+    }
+    .task-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+    }
+    .task-panel h3 {
+      margin: 0;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 16px;
+    }
+    .task-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .task-list li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid #eee9df;
+    }
+    .task-list li:last-child { border-bottom: 0; }
+    .task-title {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .task-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .task-list button {
+      padding: 7px 10px;
+      min-width: 76px;
+      font-size: 13px;
+      background: #fff;
+    }
+    .rest-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+      border: 1px dashed #b8aa96;
+      border-radius: var(--radius);
+      padding: 12px;
+      background: #fffdf8;
+    }
+    .rest-title { font-weight: 700; }
+    .rest-sub { color: var(--muted); font-size: 13px; }
+    .rest-row button {
+      padding: 9px 12px;
+      background: var(--soft-self);
+      border-color: var(--self);
+    }
+    .progress {
+      grid-column: 1 / -1;
+      height: 8px;
+      border-radius: 999px;
+      background: #ece8df;
+      overflow: hidden;
+      display: none;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--self);
+      transition: width .2s linear;
+    }
+    .log {
+      margin-top: 12px;
+      min-height: 78px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #f9f7f1;
+      padding: 10px 12px;
+      color: #4e5560;
+      font-size: 13px;
+    }
+    .ending {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 14px;
+    }
+    .ending h3 { margin: 0 0 8px; }
+    textarea {
+      width: 100%;
+      min-height: 82px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      margin-top: 8px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .saved-feedback {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 18px 56px;
+    }
+    .section {
+      margin-top: 22px;
+      padding: 26px;
+    }
+    .research-switch {
+      margin-top: 22px;
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+    }
+    .research-toggle {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 700;
+    }
+    .research-toggle .mark {
+      width: 20px;
+      height: 20px;
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .research-panel {
+      display: none;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }
+    .research-panel.open {
+      display: block;
+    }
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .research-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 16px;
+    }
+    .research-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+    .research-card p {
+      margin: 8px 0;
+      color: #3d4148;
+    }
+    .research-card ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      color: #3d4148;
+    }
+    .research-card li { margin: 6px 0; }
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 26px;
+      line-height: 1.25;
+    }
+    .section h3 {
+      margin: 24px 0 8px;
+      font-size: 18px;
+    }
+    .section p { margin: 9px 0; }
+    .section ul, .section ol { padding-left: 22px; }
+    .section li { margin: 7px 0; }
+    .grid-2, .grid-3 {
+      display: grid;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .note-card {
+      box-shadow: none;
+      padding: 16px;
+    }
+    .note-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .quote {
+      border-left: 4px solid var(--home);
+      background: #fff8f3;
+      padding: 12px 14px;
+      margin: 16px 0;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
-      margin: 12px 0;
+      margin: 14px 0;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: table;
     }
-    th {
+    th, td {
       text-align: left;
-      padding: 10px 14px;
-      background: var(--surface2);
-      color: var(--muted);
-      font-weight: 500;
-      font-size: 12px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    td {
-      padding: 10px 14px;
-      border-top: 1px solid var(--border);
-      color: #c8cce0;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
       vertical-align: top;
-    }
-    tr:first-child td { border-top: none; }
-
-    .compare {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin: 16px 0;
-    }
-    @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
-    .compare-box {
-      background: var(--surface2);
-      border-radius: 10px;
-      padding: 16px;
       font-size: 14px;
     }
-    .compare-box .label {
-      font-size: 11px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      color: var(--accent);
-    }
-
-    .stakeholders {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin: 16px 0;
-    }
-    .stakeholder {
-      background: var(--surface2);
-      border-radius: 10px;
-      padding: 18px;
-      font-size: 14px;
-    }
-    .stakeholder .role {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--accent);
-    }
-    .stakeholder .feel { color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .stakeholder .scene { font-size: 12px; color: #6cffa8; margin-top: 8px; }
-
-    .scenes {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 16px 0;
-    }
-    @media (max-width: 700px) { .scenes { grid-template-columns: 1fr; } }
-    .scene-card {
-      background: var(--surface2);
-      border-radius: 10px;
-      padding: 18px;
-      border-top: 3px solid var(--accent);
-    }
-    .scene-card .name { font-weight: 600; margin-bottom: 8px; }
-    .scene-card .tasks { font-size: 13px; color: var(--muted); }
-
-    .bars {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 16px 0;
-    }
-    @media (max-width: 600px) { .bars { grid-template-columns: 1fr; } }
-    .bar-item {
-      background: var(--surface2);
-      border-radius: 10px;
-      padding: 14px;
-      font-size: 13px;
-    }
-    .bar-item strong { display: block; margin-bottom: 6px; color: var(--accent); }
-    .bar-item span { color: var(--muted); }
-
-    .timeline { display: flex; flex-direction: column; }
-    .tl-item {
-      display: grid;
-      grid-template-columns: 100px 1fr;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .tl-item:last-child { border-bottom: none; }
-    .tl-week { font-size: 13px; font-weight: 600; color: var(--accent); padding-top: 2px; }
-    .tl-content strong { display: block; margin-bottom: 4px; }
-    .tl-content span { color: var(--muted); font-size: 14px; }
-
-    .quote {
-      font-style: italic;
-      color: var(--muted);
-      border-left: 2px solid var(--border);
-      padding-left: 16px;
-      margin: 12px 0;
-      font-size: 14px;
-    }
-
+    th { background: #f3efe7; }
+    tr:last-child td { border-bottom: 0; }
     footer {
       text-align: center;
-      padding: 40px 24px;
+      padding: 24px;
       color: var(--muted);
-      font-size: 13px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--line);
+      background: rgba(255,255,255,.7);
+    }
+
+    @media (max-width: 900px) {
+      header { grid-template-columns: 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .status-grid { grid-template-columns: 1fr; }
+      .doll.elder { left: 238px; }
+    }
+    @media (max-width: 560px) {
+      .intro, .section { padding: 20px; }
+      .research-grid { grid-template-columns: 1fr; }
+      .scene-tabs { grid-template-columns: 1fr; }
+      .task-list li, .rest-row { grid-template-columns: 1fr; }
+      .task-list button, .rest-row button { width: 100%; }
+      .mini-stage { min-height: 190px; }
+      .doll.parent { left: 34px; }
+      .doll.child { left: 122px; }
+      .doll.elder { left: 196px; }
+      .desk { display: none; }
+      table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
 <body>
+  <nav class="topbar" aria-label="页面导航">
+    <a href="#play">试玩</a>
+    <a href="#concept">核心概念</a>
+    <a href="#research">调研</a>
+    <a href="#design">机制</a>
+    <a href="#paper">论文</a>
+  </nav>
 
-<section class="hero">
-  <div class="hero-tag">社会科学 × AI · 两个月项目 · 概念方案</div>
-  <h1>夹心层世代的时间困境</h1>
-  <p>以平面过家家游戏呈现多重角色下的时间贫困，结合问卷访谈调研与四千字小论文，探讨「什么时候才能做回自己」这一结构性社会问题。</p>
-  <div style="margin-top:18px">
-    <span class="tag">夹心层</span>
-    <span class="tag">时间贫困</span>
-    <span class="tag">角色超载</span>
-    <span class="tag">上帝视角</span>
-    <span class="tag">结构批判</span>
-  </div>
-</section>
-
-<nav class="nav-tabs">
-  <a href="#concept">核心概念</a>
-  <a href="#experience">交互呈现</a>
-  <a href="#stakeholders">角色与场景</a>
-  <a href="#mechanics">游戏机制</a>
-  <a href="#critique">社会批判</a>
-  <a href="#research">调研方案</a>
-  <a href="#timeline">项目周期</a>
-  <a href="#paper">论文框架</a>
-</nav>
-
-<div class="container">
-
-<!-- ═══ 核心概念 ═══ -->
-<section class="section" id="concept">
-  <div class="section-header">
-    <div class="section-icon">◎</div>
-    <div>
-      <div class="section-title">核心 Concept</div>
-      <div class="section-subtitle">交互形式：上帝视角过家家 · 平面多线任务游戏（类似老爹汉堡店）</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>研究对象</h3>
-    <p><strong>夹心层世代</strong>——上面有老人需要照顾，下面有孩子需要管，中间还有自己的工作岗位。他们几乎每天被困在多重角色里：是父母的儿女，是孩子的父母，是职场里的员工或管理者——<strong>但什么时候可以做回自己？</strong></p>
-    <div class="highlight">
-      他们持续告诉自己：「再等一等就可以休息了」「努力一下就能升职了」「多工作一下就能陪伴孩子了」——但那个「等一等」永远不来。没有睡过好觉，也没有时间「做回自己」。
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>时间困境的两个层面</h3>
-    <div class="compare">
-      <div class="compare-box">
-        <div class="label">客观层面</div>
-        可测量、可统计的时间不足。例如：每天休息时间少于两小时；工作日被切割成无数碎片；通勤、家务、陪诊、接送占据大量时段。
+  <header>
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">社会科学 × AI × 搜索引擎 · 单文件作品页</div>
+      <h1 id="page-title">夹心层世代的时间困境</h1>
+      <p class="lead">这是一个关于“上有老人要照顾、下有孩子要陪伴、中间还有工作”的交互网页小游戏。它想解决的不是“某个父母不会安排时间”的问题，而是让同龄人、老师和试玩者看见：当工作、育儿、养老和家庭情感回应都被视为正当任务时，为什么“做回自己”总是被排到最后。</p>
+      <ul class="plain-list">
+        <li><strong>给谁用：</strong>同龄人、老师、试玩同学，以及见过父母一边忙工作一边顾家的人。不需要会玩游戏，打开就能懂。</li>
+        <li><strong>做成什么：</strong>一个 3–5 分钟的单页网页小游戏，加上调研说明和论文框架。</li>
+        <li><strong>怎么结合 AI 和搜索引擎：</strong>用搜索引擎整理文献与案例，用 AI 辅助生成任务台词和访谈主题，再由人工筛选、解释和转化成游戏机制。</li>
+      </ul>
+      <div class="tags" aria-label="关键词">
+        <span class="tag">夹心层</span>
+        <span class="tag">时间贫困</span>
+        <span class="tag">角色超载</span>
+        <span class="tag">无偿照护劳动</span>
+        <span class="tag">清单即结构</span>
       </div>
-      <div class="compare-box">
-        <div class="label">主观层面</div>
-        不论实际时长，主观上感到极度疲惫、极度忙碌、永远「还没忙完」。即使客观上有空，心理上仍觉得没有属于自己的时间。
-      </div>
-    </div>
-    <p style="margin-top:12px;color:var(--muted);font-size:14px">游戏将<strong>同时呈现</strong>这两个层面：时钟与休息条反映客观时间；角色台词与操作迟滞反映主观疲惫。</p>
-  </div>
+    </section>
 
-  <div class="card">
-    <h3>为什么选择「过家家 + 上帝视角」</h3>
-    <ul>
-      <li><strong>过家家</strong>：家庭是最直观的夹心层场域，布偶角色降低真实痛感，却让结构性压力可被「看见」。</li>
-      <li><strong>上帝视角</strong>：用户不扮演某一个受苦的人，而是从外部俯瞰<strong>整户家庭</strong>——父母的忙碌、孩子的落寞、祖辈的无奈，可以<strong>依次呈现</strong>，而非混成一团。</li>
-      <li><strong>宏观性</strong>：夹心层困境不是个人失败，而是多个 stakeholder 在同一结构里各自失去什么——上帝视角天然适合呈现这种「系统性」。</li>
-      <li><strong>后期的反转</strong>：玩家以为自己在外控一切，最后发现<strong>自己也是被清单驱使的 stakeholder</strong>——观看者 / 管理者本身也是社会期待里的一个角色。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h3>概念三层结构</h3>
-    <table>
-      <tr><th>层次</th><th>内容</th><th>用户感受</th></tr>
-      <tr>
-        <td><strong>表层</strong></td>
-        <td>过家家游戏 · 操控布偶爸妈完成任务 · 场景在工作 / 家庭 / 休息之间切换</td>
-        <td>「好忙啊，怎么永远做不完？」</td>
-      </tr>
-      <tr>
-        <td><strong>中层</strong></td>
-        <td>任务清单 = 社会结构内的权力象征（资本逻辑、家庭期待、职场要求）——不是「自然忙」，是<strong>被安排忙</strong></td>
-        <td>「不是我不会玩，是清单根本不让我停」</td>
-      </tr>
-      <tr>
-        <td><strong>深层</strong></td>
-        <td>没有真正的上帝。玩家与布偶一样，都在完成结构要求的下一项；<strong>「做回自己」永远排在清单末尾</strong></td>
-        <td>「原来我也在系统里，不只是他们在受苦」</td>
-      </tr>
-    </table>
-  </div>
-</section>
-
-<!-- ═══ 交互呈现 ═══ -->
-<section class="section" id="experience">
-  <div class="section-header">
-    <div class="section-icon">▶</div>
-    <div>
-      <div class="section-title">交互呈现 · 完整体验流程</div>
-      <div class="section-subtitle">从掌控感到无力感 · 七个 Beat</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>体验弧线</h3>
-    <div class="flow">
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
-        <div class="flow-content">
-          <strong>开场 · 「你是这一家的管理者」</strong>
-          <span>界面干净，清单简短，时钟缓慢。用户拖拽布偶爸妈完成任务，有<strong>明确的掌控感</strong>。系统提示：「今天也要把一切都安排好哦。」</span>
+    <section class="game-shell" id="play" aria-labelledby="game-title">
+      <div class="game-head">
+        <h2 id="game-title">小体验：把今天过完</h2>
+        <p>点击完成任务，也可以尝试“独处 10 分钟”。注意：清单会补上，休息可能被打断。</p>
+        <div class="controls">
+          <button class="primary" id="startBtn">开始一天</button>
+          <button class="secondary" id="resetBtn">重新开始</button>
+          <label class="select-wrap">压力模式
+            <select id="modeSelect" aria-label="选择压力模式">
+              <option value="normal">普通的一天</option>
+              <option value="tight">任务更密的一天</option>
+              <option value="care">照护更多的一天</option>
+            </select>
+          </label>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
-        <div class="flow-content">
-          <strong>升温 · 三场景切换，任务叠加</strong>
-          <span>工作场景弹出「开会」「回邮件」；切到家庭场景弹出「做饭」「辅导作业」「陪老人复诊」；刚点开休息场景，立刻被新任务打断。类似老爹汉堡店：多线并进，手忙脚乱。</span>
+
+      <div class="game-body">
+        <div class="status-grid" aria-label="状态条">
+          <div class="meter-card">
+            <div class="meter-label"><span>疲惫值</span><span id="fatigueText">28%</span></div>
+            <div class="meter"><div class="fill fatigue" id="fatigueFill"></div></div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-label"><span>孩子联结</span><span id="childText">76%</span></div>
+            <div class="meter"><div class="fill child" id="childFill"></div></div>
+          </div>
+          <div class="meter-card">
+            <div class="meter-label"><span>自我时间</span><span id="selfText">20%</span></div>
+            <div class="meter"><div class="fill self" id="selfFill"></div></div>
+          </div>
+        </div>
+
+        <div class="mini-stage stage-home" id="stage" aria-label="布偶家庭场景">
+          <div class="room-label" id="roomLabel">家庭场景</div>
+          <div class="window" aria-hidden="true"></div>
+          <div class="desk" aria-hidden="true"></div>
+          <div class="speech" id="speech">点击“开始一天”。你是这一家的安排者。把今天过完。</div>
+          <div class="doll parent" aria-label="夹心层父母">
+            <span class="head"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span>
+          </div>
+          <div class="doll child" aria-label="孩子">
+            <span class="head"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span>
+          </div>
+          <div class="doll elder" aria-label="祖辈">
+            <span class="head"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span>
+          </div>
+        </div>
+
+        <div class="scene-tabs" aria-label="场景切换">
+          <button id="sceneWork" data-scene="work">工作</button>
+          <button id="sceneHome" data-scene="home" class="active">家庭</button>
+          <button id="sceneRest" data-scene="rest">个人休息</button>
+        </div>
+
+        <div class="task-panel">
+          <h3>今天的清单 <span id="clockText">07:00</span></h3>
+          <ul class="task-list" id="taskList" aria-live="polite"></ul>
+        </div>
+
+        <div class="rest-row">
+          <div>
+            <div class="rest-title">自我任务：独处 10 分钟</div>
+            <div class="rest-sub">它不是睡觉，也不是偷懒，而是不被任何角色定义的一小段时间。</div>
+          </div>
+          <button id="restBtn">尝试独处</button>
+          <div class="progress" id="restProgress"><span id="restProgressBar"></span></div>
+        </div>
+
+        <div class="log" id="logBox" aria-live="polite">试玩记录会出现在这里。完成几个任务后，再试试点击“独处 10 分钟”。</div>
+
+        <div class="ending" id="endingBox">
+          <h3>结尾：你维持了一切，除了你自己</h3>
+          <p id="endingSummary"></p>
+          <label for="feedbackInput"><strong>试玩反馈：</strong>如果这是你家的一天，你觉得谁最难受？你最想删掉哪一项任务？</label>
+          <textarea id="feedbackInput" placeholder="可以写：孩子、父母、老人，或我最想删掉加班/陪诊/家长群……"></textarea>
+          <button class="secondary" id="saveFeedbackBtn">保存到本机</button>
+          <div class="saved-feedback" id="savedFeedback"></div>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">3</div><div class="flow-connector"></div></div>
-        <div class="flow-content">
-          <strong>切换视角 · Stakeholder 依次呈现</strong>
-          <span>用户点击孩子：对话框变少，画里父母的身影变淡。点击祖辈：想帮忙却够不着。点击父母：角色自言自语「忙完这阵就好了」——<strong>每一方都在失去，没有赢家</strong>。</span>
+    </section>
+  </header>
+
+  <main>
+    <section class="section research-switch" id="researchStory">
+      <button class="research-toggle" id="researchToggle" type="button" aria-expanded="false" aria-controls="researchPanel">
+        <span class="mark" id="researchMark">+</span>
+        研究 / The research
+      </button>
+      <div class="research-panel" id="researchPanel">
+        <div class="research-grid">
+          <article class="research-card">
+            <h3>研究问题 / Research question</h3>
+            <p>How does an interactive task-list demo affect users' awareness of sandwich generation time poverty and its impact on family members?</p>
+            <p>我的问题不是“怎样安排时间最高效”，而是：当工作、育儿、养老和自我时间同时被放进一张清单里，用户会不会看见这种时间困境。</p>
+          </article>
+          <article class="research-card">
+            <h3>假设 / Hypothesis</h3>
+            <p>I hypothesize that after using the demo, users will better understand how serious and common sandwich generation time poverty is, and see it as a structural problem.</p>
+            <p>我预期用户玩完后会更容易意识到：这不是某个父母“不够会安排”，而是多重责任一起压下来。</p>
+          </article>
+          <article class="research-card">
+            <h3>为什么重要 / Why it matters</h3>
+            <ul>
+              <li>夹心层世代同时面对工作、孩子和老人照护。</li>
+              <li>他们失去的不只是休息时间，还有真正属于自己的时间。</li>
+              <li>这种时间贫困会影响孩子、老人和整个家庭关系。</li>
+              <li>照护劳动常常被当成“家里应该做的事”，所以很容易被社会忽视。</li>
+            </ul>
+          </article>
+          <article class="research-card">
+            <h3>我做了什么 / What I built</h3>
+            <ul>
+              <li>我做了一个单页网页 demo，让用户处理不断补满的任务清单。</li>
+              <li>页面用疲惫值、孩子联结和自我时间三条状态显示影响。</li>
+              <li>“尝试独处”按钮会短暂恢复自我时间，但很快被紧急任务打断。</li>
+              <li>目前还没有正式 user study；我预期收集试玩数据和开放反馈，看用户是否提到严重性、普遍性、家庭影响和结构压力。</li>
+            </ul>
+          </article>
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">4</div><div class="flow-connector"></div></div>
-        <div class="flow-content">
-          <strong>循环 · 「再等一等」内心独白</strong>
-          <span>清单清空 → 短暂松一口气 → 新清单立刻弹出。休息条永远补不满；「做回自己」项始终灰色、排在最后。角色台词循环播放：「再坚持一下」「等升职了就好了」「孩子大了就好了」。</span>
+    </section>
+
+    <section class="section" id="concept">
+      <h2>核心 Concept：上帝视角过家家</h2>
+      <p><strong>夹心层世代</strong>——上面有老人需要照顾，下面有孩子需要管，中间还有自己的工作岗位。他们几乎每天被困在多重角色里：是父母的儿女，是孩子的父母，是职场里的员工或管理者——<strong>但什么时候可以做回自己？</strong></p>
+      <div class="quote">他们持续告诉自己：“再等一等就可以休息了”“努力一下就能升职了”“多工作一下就能陪伴孩子了”——但那个“等一等”永远不来。没有睡过好觉，也没有时间“做回自己”。</div>
+      <div class="grid-2">
+        <div class="note-card">
+          <strong>客观层面</strong>
+          可测量、可统计的时间不足。例如每天休息时间少于两小时，工作日被切割成无数碎片，通勤、家务、陪诊、接送占据大量时段。
+        </div>
+        <div class="note-card">
+          <strong>主观层面</strong>
+          不论实际时长，主观上感到极度疲惫、极度忙碌、永远“还没忙完”。即使客观上有空，心理上仍觉得没有属于自己的时间。
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">5</div><div class="flow-connector"></div></div>
-        <div class="flow-content">
-          <strong>侧枝后果 · 影响的可见化</strong>
-          <span>若长期忽略孩子：孩子角色蜷缩、对话消失。若父母疲惫值过高：操作失误变多、任务耗时增加。若祖辈需求被搁置：愧疚台词出现。——<strong>时间困境的影响</strong>在游戏里可看见，而非只用文字说明。</span>
+      <p>游戏将同时呈现这两个层面：时钟与状态条反映客观时间；角色台词、清单补满和休息被打断反映主观疲惫。</p>
+
+      <h3>为什么选择“过家家 + 上帝视角”</h3>
+      <ul>
+        <li><strong>过家家：</strong>家庭是最直观的夹心层场域，布偶角色降低真实痛感，却让结构性压力可被看见。</li>
+        <li><strong>上帝视角：</strong>用户不扮演某一个受苦的人，而是从外部俯瞰整户家庭，看到父母的忙碌、孩子的落寞、祖辈的无奈。</li>
+        <li><strong>宏观性：</strong>夹心层困境不是个人失败，而是多个 stakeholder 在同一结构里各自失去什么。</li>
+        <li><strong>后期反转：</strong>玩家以为自己在外控一切，最后发现自己也在被清单驱使。</li>
+      </ul>
+
+      <table>
+        <tr><th>层次</th><th>内容</th><th>用户感受</th></tr>
+        <tr><td>表层</td><td>过家家游戏，操控布偶爸妈完成任务，场景在工作、家庭、休息之间切换。</td><td>好忙啊，怎么永远做不完？</td></tr>
+        <tr><td>中层</td><td>任务清单是社会结构内的权力象征：资本逻辑、家庭期待、职场要求。</td><td>不是我不会玩，是清单根本不让我停。</td></tr>
+        <tr><td>深层</td><td>没有真正的上帝。玩家与布偶一样，都在完成结构要求的下一项。</td><td>原来我也在系统里。</td></tr>
+      </table>
+    </section>
+
+    <section class="section" id="design">
+      <h2>交互呈现与游戏机制</h2>
+      <p>原方案的完整体验流程是：开场有掌控感，随后工作、家庭、个人休息三场景不断切换，任务叠加；玩家点击孩子、祖辈、父母时能看到不同 stakeholder 的失去；最后清单失控，系统提示“已为您重新安排优先级”，揭示“没有真正的上帝，清单才是主人”。</p>
+      <div class="grid-3">
+        <div class="note-card">
+          <strong>工作场景</strong>
+          开会、回邮件、加班、出差、升职考核。清单来源是职场和资本逻辑，台词是“再努力一下就能升职了”。
+        </div>
+        <div class="note-card">
+          <strong>家庭场景</strong>
+          做饭、接送、辅导作业、陪诊、照顾老人。清单来源是家庭责任和代际期待。
+        </div>
+        <div class="note-card">
+          <strong>个人休息场景</strong>
+          睡觉、独处、爱好、发呆、“做回自己”。它本应属于自我，却最容易被打断。
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">6</div><div class="flow-connector"></div></div>
-        <div class="flow-content">
-          <strong>转折 · 清单失控</strong>
-          <span>某一时刻，清单<strong>自动弹出</strong>，用户无法跳过。点击「休息」→ 系统将其改为「加班」。点击「做回自己」→ 提示「已推迟至清单末尾」。揭示：<strong>没有真正的上帝，清单才是主人。</strong></span>
+      <h3>状态条如何表达社会问题</h3>
+      <ul>
+        <li><strong>疲惫值：</strong>反映客观身体状态。完成任务会消耗，休息可恢复，但恢复速度慢且常被新任务打断。</li>
+        <li><strong>自我时间：</strong>反映“做回自己”的程度，与睡眠分开。独处十分钟、看书、发呆可以提升，但永远被挤到最后。</li>
+        <li><strong>关系条：</strong>反映与孩子、祖辈的联结。忽略会下降，做关系任务会回升，但会挤占休息与自我时间。</li>
+      </ul>
+      <h3>清单失控</h3>
+      <ol>
+        <li>玩家多次尝试点击“休息”或“做回自己”。</li>
+        <li>系统弹出提示：“已为您重新安排优先级”。</li>
+        <li>任务被强制替换为结构任务，例如加班、陪诊、回复工作消息。</li>
+        <li>屏幕出现文字：“你以为在管理他们。你也在被管理。”</li>
+      </ol>
+      <div class="quote">游戏设计原则：不能正常赢。若有一刻“像自己”，也应是极小、短暂、或带代价的。比如独自喝十分钟咖啡，但其他角色状态继续恶化。</div>
+    </section>
+
+    <section class="section" id="research">
+      <h2>社会科学调研：数据如何进入游戏</h2>
+      <p>现有研究说明：夹心层世代不是“个人时间管理失败”的例外个案，而是多重社会角色叠加后的结构性处境。英文文献称为 sandwich generation，中国语境中常散落在“上有老下有小”“双重照护”“家庭照护者”“赡养老人/抚养子女”“工作家庭冲突”等关键词下。</p>
+      <p>相关理论包括工作-家庭冲突、角色超载、时间贫困、自主支配时间、无偿照护劳动、隐形家务/认知劳动和照护者负担。它们共同指出：照护不是单一动作，而是持续的时间、情绪、认知和协调劳动。</p>
+
+      <h3>调研要回答的三个问题</h3>
+      <ol>
+        <li>夹心层的时间困境是否存在？包括客观时长和主观感受。</li>
+        <li>困境如何体现？包括角色切换、自我推迟、具体场景。</li>
+        <li>有什么影响？包括对自身心理、孩子、老人和家庭关系的影响。</li>
+      </ol>
+
+      <table>
+        <tr><th>调研内容</th><th>问卷 / 访谈怎么问</th><th>怎么进入游戏</th></tr>
+        <tr><td>客观时间</td><td>每天休息多久？角色占用时间比例？</td><td>设定休息条上限、时钟速度、任务间隔。</td></tr>
+        <tr><td>主观感受</td><td>是否总觉得累？“忙完这阵就好”是否存在？</td><td>角色内心独白、疲惫时操作迟滞。</td></tr>
+        <tr><td>角色清单</td><td>同时承担哪些社会角色？每天切换多少次？</td><td>场景切换频率、结构任务类型列表。</td></tr>
+        <tr><td>自我推迟</td><td>“做回自己”最后一次是什么时候？</td><td>灰色自我任务文案、结尾唯一可完成的小任务。</td></tr>
+        <tr><td>对家庭的影响</td><td>忙碌对孩子情绪、亲子关系有什么影响？</td><td>孩子联结值、对话减少、侧枝事件触发条件。</td></tr>
+      </table>
+
+      <h3>可用的问卷与访谈题</h3>
+      <ul>
+        <li>你目前同时承担哪些角色？子女、父母、配偶、员工、管理者或其他。</li>
+        <li>你每天大概有多少时间属于自己，不包括睡眠？</li>
+        <li>你是否经常觉得“忙完这阵就好了”，但那个时刻从未到来？</li>
+        <li>描述你典型的一天，从醒来到入睡，时间都被谁或什么占用了？</li>
+        <li>你最近一次“做回自己”是什么时候？当时在做什么？</li>
+        <li>如果可以删掉一项任务，你最想删掉什么？工作、家务、育儿、养老、情绪安抚、沟通协调，还是别的？</li>
+      </ul>
+      <p>访谈建议对象是 5–8 名夹心层家庭成员，或能描述父母状态的成年子女。重点收集“做回自己”的体验、“等一等”的真实话术、以及对孩子和老人的影响观察。</p>
+    </section>
+
+    <section class="section">
+      <h2>背景材料与案例转化</h2>
+      <div class="grid-2">
+        <div class="note-card">
+          <strong>无偿照护劳动</strong>
+          ILO 2018 的材料显示，全球每天有大量无偿照护劳动，女性承担的比例显著更高。这个数据适合支撑“照护不是私人小事，而是社会运行的隐藏基础”。
+        </div>
+        <div class="note-card">
+          <strong>中国老龄化背景</strong>
+          第七次全国人口普查显示，2020 年中国大陆 60 岁及以上人口占 18.70%，65 岁及以上人口占 13.50%。这可以作为夹心层压力的宏观背景。
+        </div>
+        <div class="note-card">
+          <strong>陪诊与医疗照护</strong>
+          陪诊任务不只是“陪着去医院”，还包括接送、挂号、推轮椅、取药、看化验单、安排复查和处理信息不对称。游戏中可以转化为固定任务“周一三五透析日”。
+        </div>
+        <div class="note-card">
+          <strong>作业陪伴与家长群劳动</strong>
+          作业陪伴可以拆成看群通知、讲题、打印材料、安抚情绪、拍照上传、修复亲子关系，而不是一个简单按钮。
         </div>
       </div>
-      <div class="flow-step">
-        <div class="flow-line"><div class="flow-dot">✦</div></div>
-        <div class="flow-content">
-          <strong>结尾 · 玩家自觉，不设通关</strong>
-          <span>屏幕不显示「你赢了」或「你输了」。可能出现：访谈里收集到的真实句子；唯一可完成的极小任务（「独自喝十分钟咖啡」——做了，但其他角色状态继续恶化）；或一句收束：<em>「你也在清单里。只是你之前不知道。」</em></span>
-        </div>
-      </div>
-    </div>
-  </div>
+      <p>设计参考包括 SPENT、Financial Times 的 The Uber Game、Bury Me, My Love，以及 Bogotá Care Blocks 等公共实践。它们共同启发这个项目：不要只做数据页，而要让玩家体验“为什么个人优化不够”。</p>
+    </section>
 
-  <div class="card">
-    <h3>视觉与氛围</h3>
-    <ul>
-      <li><strong>美术风格</strong>：平面 2D、布偶/纸片人质感，略带过家家的童趣——与内容的沉重形成反差。</li>
-      <li><strong>色调变化</strong>：开场明亮；中期随任务堆积逐渐变灰、变暗；休息场景永远比工作场景「诱人」却难以抵达。</li>
-      <li><strong>音效</strong>：任务弹出声、时钟滴答、孩子安静的背景音；「清单失控」时音效变得急促、压迫。</li>
-      <li><strong>UI 隐喻</strong>：清单从屏幕上方「压」下来；休息条在底部，永远很短；「做回自己」按钮始终灰色。</li>
-    </ul>
-  </div>
-</section>
+    <section class="section" id="paper">
+      <h2>四千字小论文框架</h2>
+      <table>
+        <tr><th>章节</th><th>建议字数</th><th>内容要点</th></tr>
+        <tr><td>一、问题提出</td><td>约 500 字</td><td>夹心层是谁？时间困境是什么？客观与主观如何同时存在？为什么值得研究？</td></tr>
+        <tr><td>二、文献与背景</td><td>约 600 字</td><td>时间贫困、角色超载、情感劳动，国内外夹心层研究简述。</td></tr>
+        <tr><td>三、调研发现</td><td>约 1000 字</td><td>问卷量化结果、访谈主题分析、“等一等”话术、对自身和孩子的影响。</td></tr>
+        <tr><td>四、交互作品分析</td><td>约 1200 字</td><td>为什么用过家家和上帝视角；三场景、清单隐喻、转折设计；调研数据如何转化为游戏机制。</td></tr>
+        <tr><td>五、结论与反思</td><td>约 700 字</td><td>结构批判收束；“做回自己”为何难；对政策、社会期待和项目局限的反思。</td></tr>
+      </table>
+      <div class="quote">论文与游戏讲同一个故事：调研回答“人们在经历什么”，游戏让用户“经历同一种无力”，论文解释“为什么”。</div>
+    </section>
+  </main>
 
-<!-- ═══ 角色与场景 ═══ -->
-<section class="section" id="stakeholders">
-  <div class="section-header">
-    <div class="section-icon">👥</div>
-    <div>
-      <div class="section-title">Stakeholder 与三场景</div>
-      <div class="section-subtitle">上帝视角下，看见每一方的失去</div>
-    </div>
-  </div>
+  <footer>
+    夹心层时间困境 · 单文件交互作品页 · 根目录 index.html · 纯 HTML + CSS + JavaScript
+  </footer>
 
-  <div class="card">
-    <h3>四个 Stakeholder</h3>
-    <div class="stakeholders">
-      <div class="stakeholder">
-        <div class="role">父母（夹心层核心）</div>
-        <div class="feel">在三个场景间被撕扯，永远有下一项任务。内心反复说服自己「再等一等」。疲惫值上升时，操作变慢、失误增多。</div>
-        <div class="scene">活跃于：工作 / 家庭 / 休息（但休息场景最难抵达）</div>
-      </div>
-      <div class="stakeholder">
-        <div class="role">孩子</div>
-        <div class="feel">被忽略后的落寞——不是大吵大闹，是安静下来的失落。对话框逐渐减少，画里父母的身影越来越模糊，作业本无人签字。</div>
-        <div class="scene">主要呈现于：家庭场景 · 侧枝视角</div>
-      </div>
-      <div class="stakeholder">
-        <div class="role">祖辈</div>
-        <div class="feel">无奈、心疼、有时还有愧疚——想分担，但力不从心。看着子女连轴转，只能说「你先忙你的」。若被长期忽视，身体状态恶化。</div>
-        <div class="scene">主要呈现于：家庭场景 · 陪诊任务线</div>
-      </div>
-      <div class="stakeholder">
-        <div class="role">玩家（你）</div>
-        <div class="feel">开场以为自己是「管家」或「上帝」，能优化这一切。转折后发现：你也在执行清单，无法拒绝系统弹出的任务——<strong>你也是 stakeholder，只是自己不知道</strong>。</div>
-        <div class="scene">贯穿全程 · 视角在结尾被打破</div>
-      </div>
-    </div>
-  </div>
+  <script>
+    const taskPools = {
+      work: [
+        { title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", fatigue: 10, child: -7, self: -8, minutes: 25 },
+        { title: "临时加班改报告", type: "结构任务", note: "做完会推进工作，但自我时间继续减少。", fatigue: 13, child: -8, self: -9, minutes: 40 },
+        { title: "参加升职考核会议", type: "结构任务", note: "“再努力一下就能升职了。”", fatigue: 12, child: -5, self: -7, minutes: 35 },
+        { title: "处理下班后的工作群", type: "结构任务", note: "技术让在线时间延长。", fatigue: 9, child: -6, self: -8, minutes: 20 }
+      ],
+      home: [
+        { title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", fatigue: 8, child: 9, self: -7, minutes: 30 },
+        { title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", fatigue: 9, child: 2, self: -6, minutes: 35 },
+        { title: "陪老人复诊取药", type: "照护任务", note: "医疗照护包含信息判断和排队等待。", fatigue: 12, child: -5, self: -8, minutes: 45 },
+        { title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", fatigue: 7, child: 4, self: -6, minutes: 20 }
+      ],
+      rest: [
+        { title: "想睡一会儿", type: "自我任务", note: "身体想恢复，但清单还在。", fatigue: -7, child: -6, self: 4, minutes: 15 },
+        { title: "发呆十分钟", type: "自我任务", note: "不被任何角色定义的一小段时间。", fatigue: -5, child: -5, self: 7, minutes: 10 },
+        { title: "看一页自己的书", type: "自我任务", note: "“做回自己”不只是睡觉。", fatigue: -4, child: -5, self: 8, minutes: 12 }
+      ],
+      urgent: [
+        { title: "系统插入：老人突然不舒服", type: "紧急照护", note: "休息被推迟至清单末尾。", fatigue: 14, child: -7, self: -10, minutes: 45 },
+        { title: "系统插入：孩子明天要交材料", type: "紧急家庭任务", note: "休息被重新安排。", fatigue: 10, child: 5, self: -9, minutes: 30 },
+        { title: "系统插入：公司要今晚反馈", type: "紧急工作", note: "你以为下班了，清单没有下班。", fatigue: 12, child: -8, self: -10, minutes: 35 }
+      ]
+    };
 
-  <div class="card">
-    <h3>三个核心场景</h3>
-    <div class="scenes">
-      <div class="scene-card">
-        <div class="name">🏢 工作场景</div>
-        <div class="tasks">
-          开会、回邮件、加班、出差、升职考核……<br>
-          清单来源：<strong>职场 / 资本逻辑</strong><br>
-          台词：「再努力一下就能升职了」
-        </div>
-      </div>
-      <div class="scene-card">
-        <div class="name">🏠 家庭场景</div>
-        <div class="tasks">
-          做饭、接送、辅导作业、陪诊、照顾老人……<br>
-          清单来源：<strong>家庭责任 / 代际期待</strong><br>
-          台词：「孩子需要我」「爸妈身体不好了」
-        </div>
-      </div>
-      <div class="scene-card">
-        <div class="name">☕ 个人休息场景</div>
-        <div class="tasks">
-          睡觉、独处、爱好、发呆、「做回自己」……<br>
-          清单来源：<strong>本应属于自我——但永远被打断</strong><br>
-          台词：（往往等不到说台词的时间）
-        </div>
-      </div>
-    </div>
-    <p style="margin-top:14px;color:var(--muted);font-size:14px">场景切换本身即是隐喻：<strong>人不是在某一地忙碌，而是在角色之间被不断切换</strong>，每一切都伴随新任务弹入。</p>
-  </div>
+    const lines = [
+      "忙完这阵就好了。",
+      "等升职了就有时间了。",
+      "孩子大了就好了。",
+      "爸妈身体稳定了就好了。",
+      "周末再说吧。可是周末也有新的清单。",
+      "不是你不会安排，是清单根本不让你停。"
+    ];
 
-  <div class="card">
-    <h3>时间困境的影响（游戏内呈现）</h3>
-    <table>
-      <tr><th>受影响者</th><th>可能的心理 / 关系影响</th><th>游戏内如何看见</th></tr>
-      <tr>
-        <td><strong>夹心层父母</strong></td>
-        <td>焦虑、耗竭、愧疚、自我认同模糊（「我到底是谁？」）</td>
-        <td>疲惫条上升、失误增多、角色镜像里自己的脸变模糊</td>
-      </tr>
-      <tr>
-        <td><strong>孩子</strong></td>
-        <td>被忽视感、落寞、缺乏安全感、亲子联结减弱</td>
-        <td>对话框减少、蜷缩动画、画作中父母缺位</td>
-      </tr>
-      <tr>
-        <td><strong>祖辈</strong></td>
-        <td>无助、心疼子女、成为负担的愧疚感</td>
-        <td>身体指标下降、沉默增多、愧疚台词触发</td>
-      </tr>
-      <tr>
-        <td><strong>家庭整体</strong></td>
-        <td>沟通减少、情感劳动单向流动、「都在忙」却无人真正在场</td>
-        <td>各角色同屏时彼此背对、任务条压过对话条</td>
-      </tr>
-    </table>
-  </div>
-</section>
+    const state = {
+      started: false,
+      scene: "home",
+      fatigue: 28,
+      child: 76,
+      self: 20,
+      minutes: 7 * 60,
+      tasks: [],
+      completed: 0,
+      restAttempts: 0,
+      interruptions: 0,
+      timer: null,
+      restProgress: 0
+    };
 
-<!-- ═══ 游戏机制 ═══ -->
-<section class="section" id="mechanics">
-  <div class="section-header">
-    <div class="section-icon">⚙</div>
-    <div>
-      <div class="section-title">游戏机制设计</div>
-      <div class="section-subtitle">老爹汉堡店式多线任务 · 清单即结构</div>
-    </div>
-  </div>
+    const $ = (id) => document.getElementById(id);
 
-  <div class="card">
-    <h3>核心玩法</h3>
-    <p>玩家以<strong>拖拽 / 点击</strong>操控布偶爸妈，在三个场景间切换，完成从上方弹出的任务清单。操作类似老爹汉堡店：任务不断涌入，需判断优先级，但<strong>没有「最优解」</strong>——做 A 则 B 恶化，清完清单则立即弹出新清单。</p>
-    <div class="highlight green">
-      游戏设计原则：<strong>不能正常赢。</strong>若有一刻「像自己」，应是 rare、极小、或带代价的——例如独自喝十分钟咖啡，但孩子落寞值在此期间上升。
-    </div>
-  </div>
+    function clamp(value) {
+      return Math.max(0, Math.min(100, Math.round(value)));
+    }
 
-  <div class="card">
-    <h3>三条状态条（UI 核心）</h3>
-    <div class="bars">
-      <div class="bar-item">
-        <strong>休息条</strong>
-        <span>反映<strong>客观</strong>身体状态。完成任务消耗，休息场景可恢复——但恢复速度极慢，且常被新任务打断。调研数据（如「日均休息 &lt; 2h」）可设定上限。</span>
-      </div>
-      <div class="bar-item">
-        <strong>自我条</strong>
-        <span>反映<strong>「做回自己」</strong>的程度，与休息条分开。「独处十分钟」「看一会书」可微量提升，但永远被挤到最后。长期为零时，父母角色出现「我是谁？」台词。</span>
-      </div>
-      <div class="bar-item">
-        <strong>关系条</strong>
-        <span>反映与孩子、祖辈的联结程度。忽略则下降，触发落寞 / 愧疚事件。做了关系任务会回升，但挤占休息与自我时间——<strong>三角拉扯</strong>。</span>
-      </div>
-    </div>
-  </div>
+    function timeText() {
+      const h = Math.floor(state.minutes / 60) % 24;
+      const m = state.minutes % 60;
+      return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+    }
 
-  <div class="card">
-    <h3>两类任务</h3>
-    <table>
-      <tr><th>类型</th><th>来源</th><th>特点</th><th>示例</th></tr>
-      <tr>
-        <td><strong>结构任务</strong></td>
-        <td>清单自动下发（系统 / 社会）</td>
-        <td>不可拒绝；做了不涨自我条；代表资本与制度要求</td>
-        <td>上班、加班、开会、缴费、打卡</td>
-      </tr>
-      <tr>
-        <td><strong>关系任务</strong></td>
-        <td>家人角色发起</td>
-        <td>可暂缓但关系条会降；做了缓解某方落寞，但挤占其他时间</td>
-        <td>陪写作业、听孩子说话、陪老人散步</td>
-      </tr>
-      <tr>
-        <td><strong>自我任务</strong></td>
-        <td>休息场景 · 玩家主动点击</td>
-        <td>永远灰色、排在最后；完成微量提升自我条，但易被系统覆盖为结构任务</td>
-        <td>睡一会、独处、喝咖啡、发呆</td>
-      </tr>
-    </table>
-    <div class="quote">「清单」在此象征社会结构内的权力：资本（工作）、家庭期待（育儿养老）、社会节奏（效率）——它们共同构成了那个永远做不完的「待办」。</div>
-  </div>
+    function pick(pool) {
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
 
-  <div class="card">
-    <h3>「再等一等」机制</h3>
-    <p>每当休息条或自我条低于阈值，角色自动触发<strong>自我说服台词</strong>（来自访谈收集的真实语言）：</p>
-    <ul>
-      <li>「忙完这阵就好了。」</li>
-      <li>「等升职了就有时间了。」</li>
-      <li>「孩子大了就好了。」</li>
-      <li>「爸妈身体稳定了就好了。」</li>
-      <li>「周末再说吧。」（但周末从不到来）</li>
-    </ul>
-    <p style="margin-top:12px;color:var(--muted);font-size:14px">这些台词给玩家短暂的「安慰感」，但游戏机制确保<strong>「这阵」永远不会结束</strong>——从而体验「延迟自我满足」的结构性陷阱。</p>
-  </div>
+    function copyTask(task) {
+      return { ...task, id: Date.now() + Math.random() };
+    }
 
-  <div class="card">
-    <h3>清单失控 · 玩家自觉（转折设计）</h3>
-    <ol>
-      <li>玩家多次尝试点击「休息」或「做回自己」</li>
-      <li>系统弹出提示：「已为您重新安排优先级」</li>
-      <li>任务被强制替换为结构任务（加班、陪诊……）</li>
-      <li>玩家操作角色的权限被削弱（拖拽变慢、部分按钮灰掉）</li>
-      <li>屏幕出现文字：<em>「你以为在管理他们。你也在被管理。」</em></li>
-    </ol>
-    <p style="margin-top:12px">此处不指责任何一位家庭成员，而是指向<strong>清单本身</strong>——结构才是操控者。</p>
-  </div>
-</section>
+    function addTask(scene = state.scene) {
+      const mode = $("modeSelect").value;
+      let source = taskPools[scene];
+      if (mode === "care" && Math.random() < .55) source = taskPools.home;
+      if (mode === "tight" && Math.random() < .32) source = taskPools.work;
+      state.tasks.push(copyTask(pick(source)));
+      if (state.tasks.length > 6) state.tasks.shift();
+    }
 
-<!-- ═══ 社会批判 ═══ -->
-<section class="section" id="critique">
-  <div class="section-header">
-    <div class="section-icon">!</div>
-    <div>
-      <div class="section-title">背后的社会问题与批判</div>
-      <div class="section-subtitle">不是「谁没做好」，而是结构让所有人都输</div>
-    </div>
-  </div>
+    function setLog(text) {
+      $("logBox").textContent = text;
+      $("speech").textContent = text;
+    }
 
-  <div class="card">
-    <h3>核心社会议题</h3>
-    <ul>
-      <li><strong>时间贫困（Time Poverty）</strong>：夹心层面临的不是个人时间管理失败，而是<strong>结构性没有时间</strong>。多重角色的合理需求叠加，超过一个人能给出的总量。</li>
-      <li><strong>角色超载（Role Overload）</strong>：同时是儿女、父母、员工——没有任何角色允许被忽略，也没有一个角色能被真正做好。</li>
-      <li><strong>「做回自己」的消失</strong>：休息与自我被无限推后。「再等一等」不是懒惰，是系统在每一轮循环后都注入新任务。</li>
-      <li><strong>情感劳动的不可见</strong>：做饭、陪诊、安慰、协调——大量劳动不被计入「工作」，却占据大量时间。</li>
-      <li><strong>代际连锁影响</strong>：父母耗竭 → 陪伴缺失 → 孩子心理受影响 → 父母更愧疚 → 更不敢休息——恶性循环。</li>
-    </ul>
-    <div class="highlight">
-      <strong>核心批判：</strong>社会把「工作、育儿、养老、自我提升」全部设为默认期待，却从不提供允许「做回自己」的制度与空间。<em>清单（资本逻辑 + 家庭责任 + 效率文化）才是真正的操控者——不是爸爸或妈妈「不够努力」。</em>
-    </div>
-  </div>
+    function updateStage() {
+      const stage = $("stage");
+      stage.className = "mini-stage";
+      if (state.scene === "work") {
+        stage.classList.add("stage-work");
+        $("roomLabel").textContent = "工作场景";
+      } else if (state.scene === "rest") {
+        stage.classList.add("stage-rest");
+        $("roomLabel").textContent = "个人休息场景";
+      } else {
+        stage.classList.add("stage-home");
+        $("roomLabel").textContent = "家庭场景";
+      }
+      if (state.fatigue > 75 || state.child < 35 || state.self < 12) {
+        stage.classList.add("stage-overload");
+      }
+    }
 
-  <div class="card">
-    <h3>与 AI / 搜索引擎的结合点</h3>
-    <p>本项目主题虽非 AI，但可结合课程要求：</p>
-    <ul>
-      <li><strong>调研阶段</strong>：用搜索引擎检索夹心层、时间贫困、角色冲突的学术与报道资料，支撑论文文献综述。</li>
-      <li><strong>开发阶段</strong>：可用 AI 辅助生成任务台词变体、内心独白草稿，再人工筛选加入访谈原话。</li>
-      <li><strong>游戏内彩蛋</strong>：某一结构任务可以是「回复工作消息」——暗示技术延长了「在线」时间，使休息更难抵达（可选，不作主线）。</li>
-    </ul>
-  </div>
+    function renderTasks() {
+      const list = $("taskList");
+      list.innerHTML = "";
+      if (!state.started) {
+        const li = document.createElement("li");
+        li.innerHTML = "<div><div class='task-title'>还没有开始</div><div class='task-meta'>点击“开始一天”后，清单会出现。</div></div>";
+        list.appendChild(li);
+        return;
+      }
+      state.tasks.forEach((task) => {
+        const li = document.createElement("li");
+        const text = document.createElement("div");
+        text.innerHTML = "<div class='task-title'></div><div class='task-meta'></div>";
+        text.querySelector(".task-title").textContent = task.title;
+        text.querySelector(".task-meta").textContent = task.type + " · " + task.note;
+        const btn = document.createElement("button");
+        btn.textContent = "完成";
+        btn.addEventListener("click", () => completeTask(task.id));
+        li.appendChild(text);
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
 
-  <div class="card">
-    <h3>设计时需守住（概念风险）</h3>
-    <ul>
-      <li>❌ 避免做成「忙碌模拟器」——必须有<strong>转折</strong>（清单失控 / 玩家自觉），不只是累</li>
-      <li>❌ 「做回自己」≠「睡个好觉」——前者是<strong>不被角色定义的时间</strong>，需独立的「自我条」</li>
-      <li>❌ 上帝视角全程不变会削弱共情——后期应让<strong>玩家操作也被系统篡改</strong></li>
-      <li>❌ 不让任何角色当「反派」——<strong>系统免责，结构负责</strong></li>
-      <li>❌ 游戏<strong>不能正常通关</strong>——避免给玩家虚假的「平衡好了」结局</li>
-      <li>❌ 孩子的落寞、祖辈的无奈要<strong>可见但不煽情</strong>——用安静细节，而非夸张悲剧</li>
-    </ul>
-  </div>
-</section>
+    function render() {
+      state.fatigue = clamp(state.fatigue);
+      state.child = clamp(state.child);
+      state.self = clamp(state.self);
+      $("fatigueText").textContent = state.fatigue + "%";
+      $("childText").textContent = state.child + "%";
+      $("selfText").textContent = state.self + "%";
+      $("fatigueFill").style.width = state.fatigue + "%";
+      $("childFill").style.width = state.child + "%";
+      $("selfFill").style.width = state.self + "%";
+      $("clockText").textContent = timeText();
+      document.querySelectorAll(".scene-tabs button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.scene === state.scene);
+      });
+      updateStage();
+      renderTasks();
+      maybeEnd();
+    }
 
-<!-- ═══ 调研方案 ═══ -->
-<section class="section" id="research">
-  <div class="section-header">
-    <div class="section-icon">📋</div>
-    <div>
-      <div class="section-title">问卷与访谈调研</div>
-      <div class="section-subtitle">调研数据直接成为游戏规则</div>
-    </div>
-  </div>
+    function startGame() {
+      state.started = true;
+      state.scene = "home";
+      state.fatigue = 28;
+      state.child = 76;
+      state.self = 20;
+      state.minutes = 7 * 60;
+      state.tasks = [];
+      state.completed = 0;
+      state.restAttempts = 0;
+      state.interruptions = 0;
+      $("endingBox").style.display = "none";
+      $("restProgress").style.display = "none";
+      $("restProgressBar").style.width = "0";
+      for (let i = 0; i < 3; i += 1) addTask(i === 0 ? "work" : "home");
+      setLog("你是这一家的安排者。把今天过完。");
+      render();
+    }
 
-  <div class="card">
-    <h3>调研要回答的三个问题</h3>
-    <ol>
-      <li><strong>夹心层的时间困境是否存在？</strong>（客观时长 + 主观感受）</li>
-      <li><strong>困境如何体现？</strong>（角色切换、自我推迟、具体场景）</li>
-      <li><strong>有什么影响？</strong>（对自身心理、对孩子、对家庭关系）</li>
-    </ol>
-    <p style="margin-top:12px;color:var(--muted);font-size:14px">夹心层议题<strong>离不开</strong>一手数据。与方向不同，此处调研不仅支撑论文，<strong>直接喂养游戏参数</strong>（任务密度、休息上限、台词内容）。</p>
-  </div>
+    function resetGame() {
+      window.clearInterval(state.timer);
+      state.timer = null;
+      state.started = false;
+      state.scene = "home";
+      state.fatigue = 28;
+      state.child = 76;
+      state.self = 20;
+      state.minutes = 7 * 60;
+      state.tasks = [];
+      state.completed = 0;
+      state.restAttempts = 0;
+      state.interruptions = 0;
+      $("endingBox").style.display = "none";
+      $("restProgress").style.display = "none";
+      $("restProgressBar").style.width = "0";
+      setLog("试玩记录会出现在这里。完成几个任务后，再试试点击“独处 10 分钟”。");
+      render();
+    }
 
-  <div class="card">
-    <h3>调研如何融入游戏</h3>
-    <table>
-      <tr><th>调研内容</th><th>问卷 / 访谈怎么问</th><th>怎么进游戏</th></tr>
-      <tr>
-        <td>客观时间</td>
-        <td>每天休息多久？角色占用时间比例？</td>
-        <td>设定休息条上限、时钟速度、任务间隔</td>
-      </tr>
-      <tr>
-        <td>主观感受</td>
-        <td>是否总觉得累？「忙完这阵就好」是否存在？</td>
-        <td>角色内心独白、疲惫时操作迟滞</td>
-      </tr>
-      <tr>
-        <td>角色清单</td>
-        <td>同时承担哪些社会角色？每天切换多少次？</td>
-        <td>场景切换频率、结构任务类型列表</td>
-      </tr>
-      <tr>
-        <td>自我推迟</td>
-        <td>「做回自己」最后一次是什么时候？</td>
-        <td>灰色「自我任务」文案、结尾唯一可完成的小任务</td>
-      </tr>
-      <tr>
-        <td>对家庭的影响</td>
-        <td>忙碌对孩子情绪 / 亲子关系的影响？</td>
-        <td>孩子落寞值、对话减少、侧枝事件触发条件</td>
-      </tr>
-      <tr>
-        <td>「等一等」话术</td>
-        <td>你用什么理由说服自己再坚持？（开放题）</td>
-        <td>角色自我说服台词（直接用访谈原话）</td>
-      </tr>
-    </table>
-  </div>
+    function completeTask(id) {
+      if (!state.started) return;
+      const index = state.tasks.findIndex((task) => task.id === id);
+      if (index === -1) return;
+      const task = state.tasks[index];
+      state.tasks.splice(index, 1);
+      state.fatigue += task.fatigue;
+      state.child += task.child;
+      state.self += task.self;
+      state.minutes += task.minutes;
+      state.completed += 1;
+      const extra = $("modeSelect").value === "tight" ? 2 : 1;
+      for (let i = 0; i < extra; i += 1) addTask();
+      if (state.completed % 3 === 0) addTask("urgent");
+      const line = lines[state.completed % lines.length];
+      setLog("完成了“" + task.title + "”。" + line);
+      render();
+    }
 
-  <div class="card">
-    <h3>问卷示例题目</h3>
-    <h4>量化题（1–5 分 / 选择题）</h4>
-    <ul>
-      <li>你目前同时承担哪些角色？（子女 / 父母 / 配偶 / 员工 / 管理者 / 其他，多选）</li>
-      <li>你每天大概有多少时间属于自己（不包括睡眠）？（&lt;30min / 30min–1h / 1–2h / &gt;2h）</li>
-      <li>你是否经常觉得「忙完这阵就好了」，但那个时刻从未到来？</li>
-      <li>你主观上感到疲惫的程度？</li>
-      <li>你觉得自己的休息时间是否足够？</li>
-    </ul>
-    <h4>开放题（访谈也可用）</h4>
-    <ul>
-      <li>描述你典型的一天——从醒来到入睡，时间都被谁 / 什么占用了？</li>
-      <li>你最近一次「做回自己」是什么时候？在做什么？</li>
-      <li>你用什么理由说服自己「再等一等」？</li>
-      <li>这种忙碌对你自己的情绪有什么影响？</li>
-      <li>你觉得孩子 / 老人是否感受到了你的忙碌？他们有什么反应？</li>
-      <li>如果可以删掉一项任务，你最想删掉什么？</li>
-    </ul>
-  </div>
+    function changeScene(scene) {
+      state.scene = scene;
+      if (state.started && state.tasks.length < 4) addTask(scene);
+      const text = scene === "work" ? "你切到工作场景，新的消息已经在等。" :
+        scene === "rest" ? "你切到个人休息场景，但清单也跟了过来。" :
+        "你切到家庭场景，孩子和老人都在这里。";
+      setLog(text);
+      render();
+    }
 
-  <div class="card">
-    <h3>访谈建议</h3>
-    <ul>
-      <li><strong>对象</strong>：5–8 名夹心层家庭成员（或他们的成年子女，能描述父母状态）</li>
-      <li><strong>时长</strong>：20–30 分钟 / 人</li>
-      <li><strong>重点</strong>：「做回自己」的体验、「等一等」的真实话术、对孩子影响的观察</li>
-      <li><strong>产出</strong>：可直接引用的原话 → 游戏台词；典型一天的时间线 → 关卡节奏设计</li>
-    </ul>
-  </div>
-</section>
+    function attemptRest() {
+      if (!state.started) {
+        setLog("先点击“开始一天”，再尝试独处。");
+        return;
+      }
+      if (state.timer) return;
+      state.scene = "rest";
+      state.restAttempts += 1;
+      state.restProgress = 0;
+      state.fatigue -= 6;
+      state.self += 8;
+      state.child -= 2;
+      $("restProgress").style.display = "block";
+      $("restProgressBar").style.width = "0";
+      setLog("你开始尝试独处 10 分钟。安静刚出现，清单也开始刷新。");
+      render();
+      state.timer = window.setInterval(() => {
+        state.restProgress += 16;
+        $("restProgressBar").style.width = Math.min(100, state.restProgress) + "%";
+        if (state.restProgress >= 48) {
+          window.clearInterval(state.timer);
+          state.timer = null;
+          state.interruptions += 1;
+          state.fatigue += 3;
+          state.child -= 4;
+          state.self -= 2;
+          addTask("urgent");
+          state.minutes += 10;
+          setLog("系统提示：已为您重新安排优先级。独处被推迟至清单末尾。");
+          $("restProgress").style.display = "none";
+          $("restProgressBar").style.width = "0";
+          render();
+        }
+      }, 260);
+    }
 
-<!-- ═══ 项目周期 ═══ -->
-<section class="section" id="timeline">
-  <div class="section-header">
-    <div class="section-icon">📅</div>
-    <div>
-      <div class="section-title">项目周期 · 八周框架</div>
-      <div class="section-subtitle">两个月 · 调研先行 · 游戏跟上 · 论文收束</div>
-    </div>
-  </div>
+    function maybeEnd() {
+      const shouldEnd = state.started && (state.completed >= 10 || state.restAttempts >= 3 || state.fatigue >= 92 || state.self <= 3);
+      if (!shouldEnd) return;
+      $("endingBox").style.display = "block";
+      $("endingSummary").textContent = "你完成了 " + state.completed + " 项任务，尝试独处 " + state.restAttempts + " 次，被打断 " + state.interruptions + " 次。此刻疲惫值是 " + state.fatigue + "%，孩子联结是 " + state.child + "%，自我时间是 " + state.self + "%。这不是通关或失败，而是这个项目想呈现的结构：你维持了一切，除了你自己。";
+    }
 
-  <div class="card">
-    <div class="timeline">
-      <div class="tl-item">
-        <div class="tl-week">第 1 周</div>
-        <div class="tl-content">
-          <strong>文献调研</strong>
-          <span>检索夹心层（Sandwich Generation）、时间贫困、角色冲突、情感劳动相关文献与报道；整理概念框架。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 2 周</div>
-        <div class="tl-content">
-          <strong>问卷设计 + 发放</strong>
-          <span>确定目标样本（夹心层或有过类似经历者）；发放问卷，目标 30–50 份；同步招募访谈对象。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 3 周</div>
-        <div class="tl-content">
-          <strong>深度访谈 + 数据分析</strong>
-          <span>完成 5–8 场访谈；汇总问卷量化数据；提取可用于游戏台词的原话与任务密度参数。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 4 周</div>
-        <div class="tl-content">
-          <strong>游戏原型 v1</strong>
-          <span>搭建三场景切换 + 任务清单核心循环；实现休息条 / 自我条 / 关系条；嵌入 2–3 条访谈台词测试氛围。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 5 周</div>
-        <div class="tl-content">
-          <strong>游戏原型 v2</strong>
-          <span>加入 stakeholder 视角切换、侧枝事件、「清单失控」转折；根据调研数据调校任务密度与休息上限。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 6 周</div>
-        <div class="tl-content">
-          <strong>用户测试</strong>
-          <span>邀请 10–20 人试玩；观察是否在转折点产生「无力感 / 自觉感」；记录反馈，调整节奏与台词。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 7 周</div>
-        <div class="tl-content">
-          <strong>论文初稿</strong>
-          <span>四千字小论文：问题背景 + 文献 + 调研发现 + 游戏设计分析 + 结构批判结论。</span>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-week">第 8 周</div>
-        <div class="tl-content">
-          <strong>终稿 + 展示准备</strong>
-          <span>论文修改定稿；游戏最终版；准备现场演示或录屏；整理 GitHub 仓库与在线预览链接。</span>
-        </div>
-      </div>
-    </div>
-  </div>
+    function saveFeedback() {
+      const text = $("feedbackInput").value.trim();
+      if (!text) {
+        $("savedFeedback").textContent = "还没有填写反馈。";
+        return;
+      }
+      const payload = {
+        text,
+        completed: state.completed,
+        restAttempts: state.restAttempts,
+        interruptions: state.interruptions,
+        fatigue: state.fatigue,
+        child: state.child,
+        self: state.self,
+        savedAt: new Date().toLocaleString()
+      };
+      localStorage.setItem("sandwichTimeFeedback", JSON.stringify(payload));
+      $("savedFeedback").textContent = "已保存到这台电脑的浏览器里：" + payload.savedAt;
+    }
 
-  <div class="card">
-    <h3>最终交付物</h3>
-    <ul>
-      <li>✅ 可玩的交互网页游戏（平面过家家 · 三场景 · 任务清单）</li>
-      <li>✅ 问卷数据 + 访谈记录（附录或附件）</li>
-      <li>✅ 四千字小论文</li>
-      <li>✅ 现场演示 / 录屏展示</li>
-    </ul>
-  </div>
-</section>
+    $("startBtn").addEventListener("click", startGame);
+    $("resetBtn").addEventListener("click", resetGame);
+    $("restBtn").addEventListener("click", attemptRest);
+    $("saveFeedbackBtn").addEventListener("click", saveFeedback);
+    $("researchToggle").addEventListener("click", () => {
+      const panel = $("researchPanel");
+      const isOpen = panel.classList.toggle("open");
+      $("researchToggle").setAttribute("aria-expanded", String(isOpen));
+      $("researchMark").textContent = isOpen ? "-" : "+";
+    });
+    document.querySelectorAll(".scene-tabs button").forEach((button) => {
+      button.addEventListener("click", () => changeScene(button.dataset.scene));
+    });
+    $("modeSelect").addEventListener("change", () => {
+      if (state.started) {
+        addTask();
+        setLog("压力模式改变了。清单也随之调整。");
+        render();
+      }
+    });
 
-<!-- ═══ 论文框架 ═══ -->
-<section class="section" id="paper">
-  <div class="section-header">
-    <div class="section-icon">✎</div>
-    <div>
-      <div class="section-title">四千字小论文 · 建议框架</div>
-      <div class="section-subtitle">调研 + 作品 + 批判，三位一体</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <table>
-      <tr><th>章节</th><th>建议字数</th><th>内容要点</th></tr>
-      <tr>
-        <td><strong>一、问题提出</strong></td>
-        <td>~500 字</td>
-        <td>夹心层是谁？时间困境是什么？客观 vs 主观；为什么值得研究</td>
-      </tr>
-      <tr>
-        <td><strong>二、文献与背景</strong></td>
-        <td>~600 字</td>
-        <td>时间贫困、角色超载、情感劳动；国内外夹心层研究简述</td>
-      </tr>
-      <tr>
-        <td><strong>三、调研发现</strong></td>
-        <td>~1000 字</td>
-        <td>问卷量化结果 + 访谈主题分析；「等一等」话术；影响（自身 / 孩子）</td>
-      </tr>
-      <tr>
-        <td><strong>四、交互作品分析</strong></td>
-        <td>~1200 字</td>
-        <td>为什么用过家家 + 上帝视角；三场景、清单隐喻、转折设计；调研数据如何转化为游戏机制</td>
-      </tr>
-      <tr>
-        <td><strong>五、结论与反思</strong></td>
-        <td>~700 字</td>
-        <td>结构批判收束；「做回自己」为何难；对政策 / 社会期待的简要反思；项目局限</td>
-      </tr>
-    </table>
-    <div class="highlight green" style="margin-top:16px">
-      论文与游戏讲同一个故事：<strong>调研回答「人们在经历什么」→ 游戏让用户「经历同一种无力」→ 论文解释「为什么」。</strong>
-    </div>
-  </div>
-</section>
-
-</div>
-
-<footer>
-  夹心层时间困境 · 交互项目概念方案 · 2026<br>
-  项目周期：八周 · 交付：交互游戏 + 问卷访谈 + 四千字小论文
-</footer>
-
+    const saved = localStorage.getItem("sandwichTimeFeedback");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        $("savedFeedback").textContent = "上次保存的反馈：" + parsed.text;
+      } catch (error) {
+        localStorage.removeItem("sandwichTimeFeedback");
+      }
+    }
+    render();
+  </script>
 </body>
 </html>
