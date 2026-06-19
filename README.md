@@ -4,7 +4,8 @@
 
 ## 在线浏览
 
-直接在浏览器中打开 `index.html` 即可查看完整概念方案。
+- Vercel 在线地址：https://social-science-project-concepts.vercel.app/
+- 本地查看：直接在浏览器中打开 `index.html` 即可查看完整概念方案。
 
 ## 项目主题
 
