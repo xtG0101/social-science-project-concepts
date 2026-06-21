@@ -626,6 +626,96 @@
       border-top: 1px solid var(--line);
       background: rgba(255,255,255,.7);
     }
+    .ai-help-button {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+      font-weight: 700;
+    }
+    .ai-panel {
+      position: fixed;
+      right: 18px;
+      bottom: 72px;
+      z-index: 40;
+      width: min(390px, calc(100vw - 36px));
+      max-height: min(620px, calc(100vh - 100px));
+      display: none;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .ai-panel.open { display: grid; }
+    .ai-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, var(--soft-work), var(--soft-self));
+    }
+    .ai-head strong { line-height: 1.25; }
+    .ai-head small {
+      display: block;
+      margin-top: 2px;
+      color: #4e5560;
+      font-weight: 400;
+    }
+    .ai-head button {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background: #fff;
+    }
+    .ai-messages {
+      min-height: 210px;
+      overflow: auto;
+      padding: 12px;
+      background: #fbfaf7;
+    }
+    .ai-msg {
+      margin: 0 0 10px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .ai-msg.user {
+      background: var(--soft-work);
+      border-color: #c9dce6;
+    }
+    .ai-msg.error {
+      color: var(--warn);
+      border-color: #dca8a8;
+      background: #fff7f7;
+    }
+    .ai-form {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .ai-form textarea {
+      min-height: 68px;
+      margin-top: 0;
+    }
+    .ai-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
 
     @media (max-width: 900px) {
       header { grid-template-columns: 1fr; }
@@ -947,6 +1037,23 @@
   <footer>
     夹心层时间困境 · 单文件交互作品页 · 根目录 index.html · 纯 HTML + CSS + JavaScript
   </footer>
+
+  <button class="ai-help-button" id="aiHelpButton" type="button">今日优先级系统</button>
+  <aside class="ai-panel" id="aiPanel" aria-label="今日优先级系统">
+    <div class="ai-head">
+      <strong>今日优先级系统<small>我会帮你重新安排今天最重要的事</small></strong>
+      <button id="aiCloseButton" type="button" aria-label="关闭今日优先级系统">×</button>
+    </div>
+    <div class="ai-messages" id="aiMessages" aria-live="polite">
+      <p class="ai-msg">系统已启动。我会帮助你维持今天的工作、家庭和照护稳定。休息当然重要；如果出现更高优先级任务，我会为你重新排序。</p>
+    </div>
+    <form class="ai-form" id="aiForm">
+      <textarea id="aiQuestion" placeholder="比如：我为什么不能休息？现在应该先做什么？我想独处可以吗？"></textarea>
+      <div class="ai-actions">
+        <button class="secondary" type="submit" id="aiSendButton">发送</button>
+      </div>
+    </form>
+  </aside>
 
   <script>
     const SUPABASE_URL = "https://wkrzdpytofyebbowtwqz.supabase.co";
@@ -1272,6 +1379,61 @@
       }
     }
 
+    function addAiMessage(text, type = "assistant") {
+      const message = document.createElement("p");
+      message.className = "ai-msg" + (type === "user" ? " user" : type === "error" ? " error" : "");
+      message.textContent = text;
+      $("aiMessages").appendChild(message);
+      $("aiMessages").scrollTop = $("aiMessages").scrollHeight;
+    }
+
+    function getAiGameState() {
+      return {
+        scene: state.scene,
+        started: state.started,
+        time: $("clockText").textContent,
+        completed: state.completed,
+        restAttempts: state.restAttempts,
+        interruptions: state.interruptions,
+        fatigue: state.fatigue,
+        childConnection: state.child,
+        selfTime: state.self,
+        visibleTasks: state.tasks.map((task) => ({
+          title: task.title,
+          type: task.type,
+          note: task.note
+        }))
+      };
+    }
+
+    async function askAi(question) {
+      $("aiSendButton").disabled = true;
+      addAiMessage(question, "user");
+      addAiMessage("正在重新计算优先级...", "assistant");
+      const loading = $("aiMessages").lastElementChild;
+
+      try {
+        const response = await fetch("/api/deepseek-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: question,
+            gameState: getAiGameState()
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || "AI 请求失败。");
+        }
+        loading.textContent = data.answer || "AI 没有返回内容。";
+      } catch (error) {
+        loading.remove();
+        addAiMessage(error.message || "今日优先级系统暂时无法连接。请确认你是通过本地服务打开页面，而不是直接双击 HTML。", "error");
+      } finally {
+        $("aiSendButton").disabled = false;
+      }
+    }
+
     $("startBtn").addEventListener("click", startGame);
     $("resetBtn").addEventListener("click", resetGame);
     $("restBtn").addEventListener("click", attemptRest);
@@ -1279,6 +1441,19 @@
     $("submitUsernameBtn").addEventListener("click", submitUsername);
     $("usernameInput").addEventListener("keydown", (event) => {
       if (event.key === "Enter") submitUsername();
+    });
+    $("aiHelpButton").addEventListener("click", () => {
+      $("aiPanel").classList.toggle("open");
+    });
+    $("aiCloseButton").addEventListener("click", () => {
+      $("aiPanel").classList.remove("open");
+    });
+    $("aiForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const question = $("aiQuestion").value.trim();
+      if (!question) return;
+      $("aiQuestion").value = "";
+      askAi(question);
     });
     $("researchToggle").addEventListener("click", () => {
       const panel = $("researchPanel");
