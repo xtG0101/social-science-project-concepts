@@ -433,6 +433,45 @@
       color: #4e5560;
       font-size: 13px;
     }
+    .username-card {
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 12px;
+    }
+    .username-card label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .username-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .username-row input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 9px 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .username-note {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .username-status {
+      margin-top: 6px;
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .username-status.ok { color: var(--self); font-weight: 700; }
+    .username-status.error { color: var(--warn); font-weight: 700; }
     .ending {
       display: none;
       margin-top: 14px;
@@ -708,6 +747,16 @@
 
         <div class="log" id="logBox" aria-live="polite">试玩记录会出现在这里。完成几个任务后，再试试点击“独处 10 分钟”。</div>
 
+        <div class="username-card" aria-labelledby="usernameTitle">
+          <label id="usernameTitle" for="usernameInput">提交用户名 / Submit username</label>
+          <div class="username-row">
+            <input id="usernameInput" type="text" maxlength="40" autocomplete="nickname" placeholder="输入一个昵称，例如 Xin">
+            <button class="secondary" id="submitUsernameBtn" type="button">提交</button>
+          </div>
+          <p class="username-note">只提交昵称，用来确认有人试玩过这个作品；不要填写真实身份证号、手机号或其他隐私信息。</p>
+          <div class="username-status" id="usernameStatus" aria-live="polite"></div>
+        </div>
+
         <div class="ending" id="endingBox">
           <h3>结尾：你维持了一切，除了你自己</h3>
           <p id="endingSummary"></p>
@@ -900,6 +949,9 @@
   </footer>
 
   <script>
+    const SUPABASE_URL = "https://wkrzdpytofyebbowtwqz.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_BBOyfevRj86wv_qGTWCE7Q_flFMKd8k";
+
     const taskPools = {
       work: [
         { title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", fatigue: 10, child: -7, self: -8, minutes: 25 },
@@ -1175,10 +1227,59 @@
       $("savedFeedback").textContent = "已保存到这台电脑的浏览器里：" + payload.savedAt;
     }
 
+    async function submitUsername() {
+      const username = $("usernameInput").value.trim();
+      const status = $("usernameStatus");
+      if (!username) {
+        status.className = "username-status error";
+        status.textContent = "请先输入一个昵称。";
+        return;
+      }
+      if (username.length > 40) {
+        status.className = "username-status error";
+        status.textContent = "昵称不能超过 40 个字符。";
+        return;
+      }
+
+      $("submitUsernameBtn").disabled = true;
+      status.className = "username-status";
+      status.textContent = "正在提交...";
+
+      try {
+        const response = await fetch(SUPABASE_URL + "/rest/v1/username_submissions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ username })
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        localStorage.setItem("sandwichTimeUsername", username);
+        status.className = "username-status ok";
+        status.textContent = "已提交，谢谢你的试玩。";
+      } catch (error) {
+        status.className = "username-status error";
+        status.textContent = "提交失败，请稍后再试。";
+      } finally {
+        $("submitUsernameBtn").disabled = false;
+      }
+    }
+
     $("startBtn").addEventListener("click", startGame);
     $("resetBtn").addEventListener("click", resetGame);
     $("restBtn").addEventListener("click", attemptRest);
     $("saveFeedbackBtn").addEventListener("click", saveFeedback);
+    $("submitUsernameBtn").addEventListener("click", submitUsername);
+    $("usernameInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") submitUsername();
+    });
     $("researchToggle").addEventListener("click", () => {
       const panel = $("researchPanel");
       const isOpen = panel.classList.toggle("open");
@@ -1204,6 +1305,12 @@
       } catch (error) {
         localStorage.removeItem("sandwichTimeFeedback");
       }
+    }
+    const savedUsername = localStorage.getItem("sandwichTimeUsername");
+    if (savedUsername) {
+      $("usernameInput").value = savedUsername;
+      $("usernameStatus").className = "username-status ok";
+      $("usernameStatus").textContent = "这台电脑上次提交的昵称：" + savedUsername;
     }
     render();
   </script>
