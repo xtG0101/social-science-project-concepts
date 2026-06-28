@@ -1566,16 +1566,16 @@
               <div class="desk" aria-hidden="true"></div>
               <div class="speech" id="speech">点击“开始一天”。你是这一家的安排者。把今天过完。</div>
 
-              <button class="hotspot work-a scene-work-only" type="button" data-scene-task="work"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"></path></svg>领导电话<small>拖到这里处理工作压力</small></button>
-              <button class="hotspot work-b scene-work-only" type="button" data-scene-task="work"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="M8 22h8"></path><path d="M12 18v4"></path></svg>会议桌<small>30 分钟被重新占用</small></button>
-              <button class="hotspot home-a scene-home-only" type="button" data-scene-task="home"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2"></path></svg>辅导作业<small>孩子联结会上升</small></button>
-              <button class="hotspot home-b scene-home-only" type="button" data-scene-task="home"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v20"></path><path d="M16 2v20"></path><path d="M4 8h16"></path><path d="M4 16h16"></path></svg>做晚饭<small>隐形家务不会消失</small></button>
-              <button class="hotspot elder-a scene-elder-only" type="button" data-scene-task="elder"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10.5 20.5 10-10a4.2 4.2 0 0 0-6-6l-10 10a4.2 4.2 0 0 0 6 6Z"></path><path d="m8.5 8.5 7 7"></path></svg>送药提醒<small>老人照护进入清单</small></button>
-              <button class="hotspot elder-b scene-elder-only" type="button" data-scene-task="elder"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path></svg>复诊安排<small>排队和判断也算劳动</small></button>
-              <button class="hotspot hospital-a scene-hospital-only" type="button" data-scene-task="hospital"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg>取药窗口<small>医疗照护占用整段时间</small></button>
-              <button class="hotspot hospital-b scene-hospital-only" type="button" data-scene-task="hospital"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path><path d="M9 15h6"></path><path d="M12 12v6"></path></svg>复诊排队<small>等待本身也是时间成本</small></button>
-              <button class="hotspot rest-a scene-rest-only" type="button" data-scene-task="rest"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M8 21h8"></path><path d="M7 8h10v6a5 5 0 0 1-10 0Z"></path><path d="M17 8h1a3 3 0 0 1 0 6h-1"></path></svg>自己的十分钟<small>试着做回自己</small></button>
-              <button class="hotspot rest-b scene-rest-only" type="button" data-scene-task="rest"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4v16"></path><path d="M22 4v16"></path><path d="M2 12h20"></path><path d="M7 12v8"></path><path d="M17 12v8"></path></svg>安静角落<small>但任务仍会追上来</small></button>
+              <button class="hotspot work-a scene-work-only" type="button" data-scene-task="work" data-position="a">工作任务<small>拖到这里处理</small></button>
+              <button class="hotspot work-b scene-work-only" type="button" data-scene-task="work" data-position="b">工作任务<small>拖到这里处理</small></button>
+              <button class="hotspot home-a scene-home-only" type="button" data-scene-task="home" data-position="a">家庭任务<small>拖到这里处理</small></button>
+              <button class="hotspot home-b scene-home-only" type="button" data-scene-task="home" data-position="b">家庭任务<small>拖到这里处理</small></button>
+              <button class="hotspot elder-a scene-elder-only" type="button" data-scene-task="elder" data-position="a">老人照护<small>拖到这里处理</small></button>
+              <button class="hotspot elder-b scene-elder-only" type="button" data-scene-task="elder" data-position="b">老人照护<small>拖到这里处理</small></button>
+              <button class="hotspot hospital-a scene-hospital-only" type="button" data-scene-task="hospital" data-position="a">医疗照护<small>拖到这里处理</small></button>
+              <button class="hotspot hospital-b scene-hospital-only" type="button" data-scene-task="hospital" data-position="b">医疗照护<small>拖到这里处理</small></button>
+              <button class="hotspot rest-a scene-rest-only" type="button" data-scene-task="rest" data-position="a">自我任务<small>拖到这里处理</small></button>
+              <button class="hotspot rest-b scene-rest-only" type="button" data-scene-task="rest" data-position="b">自我任务<small>拖到这里处理</small></button>
 
               <div class="doll parent" id="parentDoll" aria-label="可拖动的夹心层父母">
                 <span class="shadow"></span><span class="head"><span class="hair"></span><span class="face"></span></span><span class="body"></span><span class="arm one"></span><span class="arm two"></span><span class="leg one"></span><span class="leg two"></span>
@@ -1878,40 +1878,28 @@
     ];
     let surveyMode = "pre";
 
-    const taskPools = {
-      work: [
-        { title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", fatigue: 10, child: -7, self: -8, minutes: 25 },
-        { title: "临时加班改报告", type: "结构任务", note: "做完会推进工作，但自我时间继续减少。", fatigue: 13, child: -8, self: -9, minutes: 40 },
-        { title: "参加升职考核会议", type: "结构任务", note: "“再努力一下就能升职了。”", fatigue: 12, child: -5, self: -7, minutes: 35 },
-        { title: "处理下班后的工作群", type: "结构任务", note: "技术让在线时间延长。", fatigue: 9, child: -6, self: -8, minutes: 20 }
-      ],
-      home: [
-        { title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", fatigue: 8, child: 9, self: -7, minutes: 30 },
-        { title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", fatigue: 9, child: 2, self: -6, minutes: 35 },
-        { title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", fatigue: 7, child: 4, self: -6, minutes: 20 }
-      ],
-      elder: [
-        { title: "提醒老人吃药并确认剂量", type: "老人照护", note: "不是一句提醒，而是持续记住和确认。", fatigue: 8, child: -3, self: -6, minutes: 22 },
-        { title: "陪老人复诊取药", type: "老人照护", note: "医疗照护包含信息判断和排队等待。", fatigue: 12, child: -5, self: -8, minutes: 45 },
-        { title: "预约检查并整理病历", type: "认知照护", note: "信息管理也在消耗你的时间。", fatigue: 10, child: -4, self: -7, minutes: 32 },
-        { title: "去老人的家看一眼", type: "情感照护", note: "不去会内疚，去了会挤掉休息。", fatigue: 9, child: -5, self: -8, minutes: 36 }
-      ],
-      hospital: [
-        { title: "排队取药并核对剂量", type: "医疗照护", note: "等待、判断和确认都不是空白时间。", fatigue: 11, child: -5, self: -8, minutes: 40 },
-        { title: "陪老人做复诊检查", type: "医疗照护", note: "一次复诊常常会吃掉半天安排。", fatigue: 13, child: -7, self: -10, minutes: 55 },
-        { title: "和医生确认下一步安排", type: "认知照护", note: "你还要负责听懂、记住、再转述。", fatigue: 9, child: -4, self: -7, minutes: 28 }
-      ],
-      rest: [
-        { title: "想睡一会儿", type: "自我任务", note: "身体想恢复，但清单还在。", fatigue: -7, child: -6, self: 4, minutes: 15 },
-        { title: "发呆十分钟", type: "自我任务", note: "不被任何角色定义的一小段时间。", fatigue: -5, child: -5, self: 7, minutes: 10 },
-        { title: "看一页自己的书", type: "自我任务", note: "“做回自己”不只是睡觉。", fatigue: -4, child: -5, self: 8, minutes: 12 }
-      ],
-      urgent: [
-        { title: "系统插入：老人突然不舒服", type: "紧急照护", note: "休息被推迟至清单末尾。", fatigue: 14, child: -7, self: -10, minutes: 45 },
-        { title: "系统插入：孩子明天要交材料", type: "紧急家庭任务", note: "休息被重新安排。", fatigue: 10, child: 5, self: -9, minutes: 30 },
-        { title: "系统插入：公司要今晚反馈", type: "紧急工作", note: "你以为下班了，清单没有下班。", fatigue: 12, child: -8, self: -10, minutes: 35 }
-      ]
-    };
+    const TASK_LIBRARY = [
+      { id: "work-boss-message", title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", scene: "work", position: "a", hotspotLabel: "领导电话", hotspotHint: "回复紧急工作消息", timeWindow: { start: 7 * 60, end: 22 * 60 }, releaseCondition: "工作消息随时插入", miniGameEntry: "reply_work_message", fatigue: 10, child: -7, self: -8, minutes: 25 },
+      { id: "work-report", title: "临时加班改报告", type: "结构任务", note: "做完会推进工作，但自我时间继续减少。", scene: "work", position: "b", hotspotLabel: "会议桌", hotspotHint: "改完今晚要交的报告", timeWindow: { start: 9 * 60, end: 22 * 60 }, releaseCondition: "工作日任务堆叠", miniGameEntry: "edit_report", fatigue: 13, child: -8, self: -9, minutes: 40 },
+      { id: "work-promotion-meeting", title: "参加升职考核会议", type: "结构任务", note: "“再努力一下就能升职了。”", scene: "work", position: "b", hotspotLabel: "考核会议", hotspotHint: "下午才能出现", timeWindow: { start: 13 * 60, end: 18 * 60 }, releaseCondition: "下午职场评价节点", miniGameEntry: "promotion_meeting", fatigue: 12, child: -5, self: -7, minutes: 35 },
+      { id: "work-group-chat", title: "处理下班后的工作群", type: "结构任务", note: "技术让在线时间延长。", scene: "work", position: "a", hotspotLabel: "工作群", hotspotHint: "下班后也会亮起", timeWindow: { start: 18 * 60, end: 23 * 60 }, releaseCondition: "下班后在线", miniGameEntry: "after_hours_chat", fatigue: 9, child: -6, self: -8, minutes: 20 },
+      { id: "home-breakfast", title: "准备早饭并催孩子出门", type: "隐形家务", note: "一天还没正式开始，家庭清单已经启动。", scene: "home", position: "b", hotspotLabel: "厨房", hotspotHint: "早晨家务", timeWindow: { start: 7 * 60, end: 9 * 60 }, releaseCondition: "早晨上学前", miniGameEntry: "breakfast_rush", fatigue: 7, child: 2, self: -5, minutes: 24 },
+      { id: "home-parent-group", title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", scene: "home", position: "a", hotspotLabel: "家长群通知", hotspotHint: "通知一来就要处理", timeWindow: { start: 8 * 60, end: 21 * 60 }, releaseCondition: "学校通知弹出", miniGameEntry: "parent_group_reply", fatigue: 7, child: 4, self: -6, minutes: 20 },
+      { id: "home-homework", title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", scene: "home", position: "a", hotspotLabel: "辅导作业", hotspotHint: "孩子放学后出现", timeWindow: { start: 16 * 60, end: 22 * 60 }, releaseCondition: "孩子放学后", miniGameEntry: "homework_help", fatigue: 8, child: 9, self: -7, minutes: 30 },
+      { id: "home-dinner", title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", scene: "home", position: "b", hotspotLabel: "做晚饭", hotspotHint: "傍晚固定家务", timeWindow: { start: 17 * 60, end: 21 * 60 }, releaseCondition: "晚饭时间", miniGameEntry: "dinner_cleanup", fatigue: 9, child: 2, self: -6, minutes: 35 },
+      { id: "elder-medication", title: "提醒老人吃药并确认剂量", type: "老人照护", note: "不是一句提醒，而是持续记住和确认。", scene: "elder", position: "a", hotspotLabel: "送药提醒", hotspotHint: "按时确认剂量", timeWindow: { start: 8 * 60, end: 21 * 60 }, releaseCondition: "老人固定用药时间", miniGameEntry: "medication_check", fatigue: 8, child: -3, self: -6, minutes: 22 },
+      { id: "elder-records", title: "预约检查并整理病历", type: "认知照护", note: "信息管理也在消耗你的时间。", scene: "elder", position: "b", hotspotLabel: "复诊安排", hotspotHint: "整理病历和预约", timeWindow: { start: 10 * 60, end: 18 * 60 }, releaseCondition: "医院工作时段", miniGameEntry: "medical_records", fatigue: 10, child: -4, self: -7, minutes: 32 },
+      { id: "elder-visit", title: "去老人的家看一眼", type: "情感照护", note: "不去会内疚，去了会挤掉休息。", scene: "elder", position: "a", hotspotLabel: "上门看一眼", hotspotHint: "晚饭后更容易出现", timeWindow: { start: 18 * 60, end: 22 * 60 }, releaseCondition: "晚间情感照护", miniGameEntry: "elder_visit", fatigue: 9, child: -5, self: -8, minutes: 36 },
+      { id: "hospital-prescription", title: "排队取药并核对剂量", type: "医疗照护", note: "等待、判断和确认都不是空白时间。", scene: "hospital", position: "a", hotspotLabel: "取药窗口", hotspotHint: "医院开放时段", timeWindow: { start: 9 * 60, end: 17 * 60 }, releaseCondition: "医院窗口开放", miniGameEntry: "prescription_pickup", fatigue: 11, child: -5, self: -8, minutes: 40 },
+      { id: "hospital-checkup", title: "陪老人做复诊检查", type: "医疗照护", note: "一次复诊常常会吃掉半天安排。", scene: "hospital", position: "b", hotspotLabel: "复诊排队", hotspotHint: "检查和等待", timeWindow: { start: 9 * 60, end: 16 * 60 }, releaseCondition: "复诊预约时段", miniGameEntry: "checkup_queue", fatigue: 13, child: -7, self: -10, minutes: 55 },
+      { id: "hospital-doctor-plan", title: "和医生确认下一步安排", type: "认知照护", note: "你还要负责听懂、记住、再转述。", scene: "hospital", position: "b", hotspotLabel: "医生沟通", hotspotHint: "复诊后安排", timeWindow: { start: 10 * 60, end: 17 * 60 }, releaseCondition: "检查后沟通", miniGameEntry: "doctor_plan", fatigue: 9, child: -4, self: -7, minutes: 28 },
+      { id: "rest-nap", title: "想睡一会儿", type: "自我任务", note: "身体想恢复，但清单还在。", scene: "rest", position: "a", hotspotLabel: "自己的十分钟", hotspotHint: "短暂恢复身体", timeWindow: { start: 12 * 60, end: 23 * 60 }, releaseCondition: "疲惫开始累积", miniGameEntry: "short_nap", fatigue: -7, child: -6, self: 4, minutes: 15 },
+      { id: "rest-stare", title: "发呆十分钟", type: "自我任务", note: "不被任何角色定义的一小段时间。", scene: "rest", position: "b", hotspotLabel: "安静角落", hotspotHint: "试着不被打断", timeWindow: { start: 15 * 60, end: 23 * 60 }, releaseCondition: "下午之后的自我需求", miniGameEntry: "quiet_corner", fatigue: -5, child: -5, self: 7, minutes: 10 },
+      { id: "rest-book", title: "看一页自己的书", type: "自我任务", note: "“做回自己”不只是睡觉。", scene: "rest", position: "a", hotspotLabel: "自己的书", hotspotHint: "夜里才有空", timeWindow: { start: 20 * 60, end: 23 * 60 }, releaseCondition: "夜间自我时间", miniGameEntry: "read_book", fatigue: -4, child: -5, self: 8, minutes: 12 },
+      { id: "urgent-elder-sick", title: "系统插入：老人突然不舒服", type: "紧急照护", note: "休息被推迟至清单末尾。", scene: "elder", position: "a", hotspotLabel: "紧急照护", hotspotHint: "系统插入任务", timeWindow: { start: 12 * 60, end: 23 * 60 }, releaseCondition: "疲惫或时间压力升高", miniGameEntry: "urgent_elder_care", fatigue: 14, child: -7, self: -10, minutes: 45 },
+      { id: "urgent-child-material", title: "系统插入：孩子明天要交材料", type: "紧急家庭任务", note: "休息被重新安排。", scene: "home", position: "a", hotspotLabel: "明天材料", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, releaseCondition: "晚间临时家庭任务", miniGameEntry: "urgent_school_material", fatigue: 10, child: 5, self: -9, minutes: 30 },
+      { id: "urgent-work-feedback", title: "系统插入：公司要今晚反馈", type: "紧急工作", note: "你以为下班了，清单没有下班。", scene: "work", position: "a", hotspotLabel: "今晚反馈", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, releaseCondition: "下班后职场插入", miniGameEntry: "urgent_work_feedback", fatigue: 12, child: -8, self: -10, minutes: 35 }
+    ];
 
     const lines = [
       "忙完这阵就好了。",
@@ -1930,6 +1918,7 @@
       self: 20,
       minutes: 7 * 60,
       tasks: [],
+      releasedTaskIds: [],
       completed: 0,
       restAttempts: 0,
       interruptions: 0,
@@ -2160,31 +2149,75 @@
       return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
     }
 
+    function minutesToTime(minutes) {
+      const h = Math.floor(minutes / 60) % 24;
+      const m = minutes % 60;
+      return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+    }
+
     function pick(pool) {
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    function sceneForTask(task, fallbackScene = "home") {
-      if (["结构任务", "紧急工作"].includes(task.type)) return "work";
-      if (["关系任务", "隐形家务", "认知劳动", "紧急家庭任务"].includes(task.type)) return "home";
-      if (["老人照护", "情感照护", "紧急照护"].includes(task.type)) return "elder";
-      if (["医疗照护"].includes(task.type)) return "hospital";
-      if (["自我任务"].includes(task.type)) return "rest";
-      return fallbackScene;
+    function taskMatchesTime(task) {
+      return state.minutes >= task.timeWindow.start && state.minutes <= task.timeWindow.end;
     }
 
-    function copyTask(task, scene) {
-      return { ...task, scene: sceneForTask(task, scene), id: Date.now() + Math.random() };
-    }
-
-    function addTask(scene = state.scene) {
+    function taskMatchesMode(task) {
       const mode = $("modeSelect").value;
-      let sourceScene = taskPools[scene] ? scene : "home";
-      if (mode === "care" && Math.random() < .55) sourceScene = "elder";
-      if (mode === "tight" && Math.random() < .32) sourceScene = "work";
-      const source = taskPools[sourceScene];
-      state.tasks.push(copyTask(pick(source), sourceScene));
-      if (state.tasks.length > 6) state.tasks.shift();
+      if (mode === "care") return task.scene === "elder" || task.scene === "hospital" || Math.random() > .28;
+      if (mode === "tight") return task.scene === "work" || Math.random() > .28;
+      return true;
+    }
+
+    function hasTaskAtPosition(task) {
+      return state.tasks.some((activeTask) => activeTask.scene === task.scene && activeTask.position === task.position);
+    }
+
+    function copyTask(task) {
+      return {
+        ...task,
+        runtimeId: task.id + "-" + Date.now() + "-" + Math.random().toString(16).slice(2)
+      };
+    }
+
+    function activeTaskTarget() {
+      const elapsed = Math.max(0, state.minutes - 7 * 60);
+      return Math.min(6, 2 + Math.floor(elapsed / 120));
+    }
+
+    function releaseTasks(count = 1, preferredScene = null, options = {}) {
+      if (!state.started) return 0;
+      let released = 0;
+      while (released < count && state.tasks.length < 6) {
+        let candidates = TASK_LIBRARY.filter((task) =>
+          !state.releasedTaskIds.includes(task.id) &&
+          taskMatchesTime(task) &&
+          taskMatchesMode(task) &&
+          !hasTaskAtPosition(task)
+        );
+        if (preferredScene) {
+          const sceneCandidates = candidates.filter((task) => task.scene === preferredScene);
+          if (sceneCandidates.length) candidates = sceneCandidates;
+        }
+        if (options.urgentOnly) {
+          candidates = candidates.filter((task) => task.id.startsWith("urgent-"));
+        } else {
+          candidates = candidates.filter((task) => !task.id.startsWith("urgent-"));
+        }
+        if (!candidates.length) break;
+        const task = copyTask(pick(candidates));
+        state.releasedTaskIds.push(task.id);
+        state.tasks.push(task);
+        released += 1;
+      }
+      return released;
+    }
+
+    function releaseDueTasks(preferredScene = null) {
+      const needed = activeTaskTarget() - state.tasks.length;
+      if (needed <= 0) return 0;
+      return releaseTasks(needed, preferredScene);
     }
 
     function setLog(text) {
@@ -2235,7 +2268,7 @@
         const li = document.createElement("li");
         const text = document.createElement("div");
         text.innerHTML = "<div class='task-tag'></div><div class='task-title'></div><div class='task-meta'></div>";
-        text.querySelector(".task-tag").textContent = task.type + " · 拖到对应发光点完成";
+        text.querySelector(".task-tag").textContent = task.type + " · " + task.scene + "-" + task.position + " · " + minutesToTime(task.timeWindow.start) + "-" + minutesToTime(task.timeWindow.end);
         text.querySelector(".task-title").textContent = task.title;
         text.querySelector(".task-meta").textContent = task.note;
         li.appendChild(text);
@@ -2274,6 +2307,7 @@
       state.self = 20;
       state.minutes = 7 * 60;
       state.tasks = [];
+      state.releasedTaskIds = [];
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
@@ -2283,8 +2317,8 @@
       $("endingBox").style.display = "none";
       $("restProgress").style.display = "none";
       $("restProgressBar").style.width = "0";
-      for (let i = 0; i < 3; i += 1) addTask(i === 0 ? "work" : "home");
-      addTask("elder");
+      releaseTasks(2, "work");
+      releaseDueTasks("home");
       setLog("你是这一家的安排者。把今天过完。");
       render();
     }
@@ -2299,6 +2333,7 @@
       state.self = 20;
       state.minutes = 7 * 60;
       state.tasks = [];
+      state.releasedTaskIds = [];
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
@@ -2312,40 +2347,41 @@
       render();
     }
 
-    function findTaskForScene(scene) {
-      return state.tasks.find((task) => task.scene === scene);
+    function findTaskForHotspot(scene, position) {
+      return state.tasks.find((task) => task.scene === scene && task.position === position);
     }
 
     function updateHotspots() {
       document.querySelectorAll(".hotspot").forEach((hotspot) => {
         const scene = hotspot.dataset.sceneTask;
-        const hasTask = scene === "rest" ? true : Boolean(findTaskForScene(scene));
-        hotspot.hidden = !hasTask;
+        const task = findTaskForHotspot(scene, hotspot.dataset.position);
+        hotspot.hidden = !task;
+        hotspot.dataset.taskRuntimeId = task ? task.runtimeId : "";
+        if (task) {
+          hotspot.innerHTML = task.hotspotLabel + "<small>" + task.hotspotHint + "</small>";
+          hotspot.setAttribute("aria-label", task.title);
+        }
       });
     }
 
-    function completeSceneTask(scene, source = "drag") {
+    function completeSceneTask(scene, position, source = "drag") {
       if (!state.started) {
         setLog("先点击“开始一天”，再把父母拖到任务点。");
         return;
       }
-      if (scene === "rest") {
-        attemptRest();
-        return;
-      }
-      const task = findTaskForScene(scene);
+      const task = findTaskForHotspot(scene, position);
       if (!task) {
         setLog("这里暂时没有对应清单。你可以切到有任务的场景，或者在清单清空后尝试独处。");
         render();
         return;
       }
       if (state.scene !== scene) state.scene = scene;
-      completeTask(task.id, source);
+      completeTask(task.runtimeId, source);
     }
 
-    function completeTask(id, source = "button") {
+    function completeTask(runtimeId, source = "button") {
       if (!state.started) return;
-      const index = state.tasks.findIndex((task) => task.id === id);
+      const index = state.tasks.findIndex((task) => task.runtimeId === runtimeId);
       if (index === -1) return;
       const task = state.tasks[index];
       state.tasks.splice(index, 1);
@@ -2354,6 +2390,8 @@
       state.self += task.self;
       state.minutes += task.minutes;
       state.completed += 1;
+      releaseDueTasks(task.scene);
+      if (state.completed % 3 === 0) releaseTasks(1, null, { urgentOnly: true });
       const line = lines[state.completed % lines.length];
       const prefix = source === "drag" ? "你把父母拖到任务点，完成了“" : "完成了“";
       setLog(prefix + task.title + "”。" + line);
@@ -2362,6 +2400,7 @@
 
     function changeScene(scene) {
       state.scene = scene;
+      if (state.started) releaseDueTasks(scene);
       const text = scene === "work" ? "你切到工作场景，新的消息已经在等。" :
         scene === "elder" ? "你切到老人照护场景，药、复诊和内疚都在这里。" :
         scene === "hospital" ? "你切到医院场景，等待、核对和判断都变成了清单。" :
@@ -2496,7 +2535,7 @@
         dragging = false;
         doll.classList.remove("dragging");
         if (hotspot) {
-          completeSceneTask(hotspot.dataset.sceneTask, "drag");
+          completeSceneTask(hotspot.dataset.sceneTask, hotspot.dataset.position, "drag");
         }
         document.querySelectorAll(".hotspot").forEach((item) => item.classList.remove("active-drop"));
       }
@@ -2532,6 +2571,12 @@
 
       window.addEventListener("mouseup", (event) => {
         endDrag(event.clientX, event.clientY);
+      });
+
+      document.querySelectorAll(".hotspot").forEach((hotspot) => {
+        hotspot.addEventListener("click", () => {
+          completeSceneTask(hotspot.dataset.sceneTask, hotspot.dataset.position, "button");
+        });
       });
     }
 
