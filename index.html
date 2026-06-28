@@ -74,13 +74,90 @@
     }
 
     header {
-      max-width: 1180px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 36px 18px 20px;
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 22px;
       align-items: stretch;
+    }
+    body[data-page="play"] header {
+      max-width: 1180px;
+    }
+    .page-view[hidden] {
+      display: none !important;
+    }
+    body:not(.consent-ok) .topbar,
+    body:not(.consent-ok) header,
+    body:not(.consent-ok) main,
+    body:not(.consent-ok) footer,
+    body:not(.consent-ok) .ai-help-button,
+    body:not(.consent-ok) .ai-panel,
+    body:not(.consent-ok) .pressure-alert {
+      display: none !important;
+    }
+    .consent-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    body.consent-ok .consent-screen {
+      display: none;
+    }
+    .consent-card {
+      width: min(720px, 100%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.94);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .consent-card h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 5vw, 42px);
+    }
+    .consent-card p {
+      margin: 0 0 14px;
+      color: #3d4148;
+    }
+    .consent-list {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0;
+      padding: 0;
+      list-style: none;
+    }
+    .consent-list li {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fffdf8;
+      padding: 12px 14px;
+    }
+    .consent-list strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+    }
+    .consent-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .consent-actions button {
+      min-height: 44px;
+      padding: 9px 16px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 700;
+    }
+    .consent-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
     }
     .intro, .game-shell, .section, .note-card {
       background: rgba(255,255,255,.88);
@@ -119,6 +196,52 @@
       font-size: 18px;
       margin: 0 0 18px;
     }
+    .one-line-hook {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border: 1px solid #c9dce6;
+      border-radius: var(--radius);
+      background: var(--soft-work);
+      color: #263746;
+      font-weight: 700;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 14px 0 16px;
+    }
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 8px 14px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .hero-link.primary-link {
+      background: var(--ink);
+      color: #fff;
+    }
+    .hero-link.secondary-link {
+      background: #fff;
+      color: var(--ink);
+    }
+    .quick-start {
+      display: grid;
+      gap: 6px;
+      margin: 12px 0 16px;
+      padding: 12px;
+      border: 1px dashed #b8aa96;
+      border-radius: var(--radius);
+      background: #fffdf8;
+      color: #3d4148;
+      font-size: 14px;
+    }
+    .quick-start strong { color: var(--ink); }
     .plain-list {
       padding-left: 20px;
       margin: 16px 0 0;
@@ -164,6 +287,25 @@
       align-items: center;
       margin-top: 12px;
     }
+    .play-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .step-chip {
+      border: 1px solid rgba(32,33,36,.16);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.78);
+      padding: 8px 10px;
+      font-size: 13px;
+      line-height: 1.35;
+      color: #3d4148;
+    }
+    .step-chip strong {
+      display: block;
+      color: var(--ink);
+    }
     .primary {
       background: var(--ink);
       color: #fff;
@@ -189,7 +331,11 @@
       color: var(--ink);
     }
 
-    .game-body { padding: 18px; }
+    .game-body {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
     .status-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -210,6 +356,25 @@
       color: #4e5560;
       margin-bottom: 7px;
     }
+    .meter-name,
+    .inline-icon-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ui-icon {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .meter-card.fatigue-card .ui-icon { color: var(--warn); }
+    .meter-card.child-card .ui-icon { color: var(--gold); }
+    .meter-card.self-card .ui-icon { color: var(--self); }
     .meter {
       height: 10px;
       border-radius: 999px;
@@ -226,15 +391,38 @@
     .fill.child { background: var(--gold); }
     .fill.self { background: var(--self); }
 
+    .play-board {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+      gap: 14px;
+      align-items: stretch;
+    }
+    .board-column {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
     .mini-stage {
+      --stage-bg: url("assets/generated-backgrounds/home-bg.webp");
       position: relative;
-      min-height: 170px;
+      min-height: 430px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: linear-gradient(180deg, #fff 0 62%, #ece3d7 62% 100%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.22)),
+        var(--stage-bg);
+      background-size: cover, cover;
+      background-position: center, center;
+      background-repeat: no-repeat;
+      box-shadow: inset 0 -90px 110px rgba(32,33,36,.05);
       overflow: hidden;
-      margin-bottom: 14px;
+      touch-action: none;
     }
+    .stage-home { --stage-bg: url("assets/generated-backgrounds/home-bg.webp"); }
+    .stage-work { --stage-bg: url("assets/generated-backgrounds/work-bg.webp"); }
+    .stage-elder { --stage-bg: url("assets/generated-backgrounds/elder-home-bg.webp"); }
+    .stage-hospital { --stage-bg: url("assets/generated-backgrounds/hospital-bg.webp"); }
+    .stage-rest { --stage-bg: url("assets/generated-backgrounds/rest-bg.webp"); }
     .room-label {
       position: absolute;
       top: 10px;
@@ -247,6 +435,20 @@
       font-size: 12px;
       color: #4e5560;
     }
+    .drag-hint {
+      position: absolute;
+      left: 10px;
+      top: 44px;
+      z-index: 2;
+      max-width: 210px;
+      padding: 7px 9px;
+      border: 1px dashed #b8aa96;
+      border-radius: var(--radius);
+      background: rgba(255,253,248,.92);
+      color: #5d5146;
+      font-size: 12px;
+      line-height: 1.35;
+    }
     .window {
       position: absolute;
       top: 42px;
@@ -255,7 +457,12 @@
       height: 54px;
       border: 3px solid #8a9a9a;
       background: #dfeef0;
+      display: none;
     }
+    .stage-work .window { background: #dfeef0; }
+    .stage-elder .window { background: #eee7f3; }
+    .stage-rest .window { background: #dcebdc; }
+    .stage-home .window { background: #f2ddd4; }
     .desk {
       position: absolute;
       right: 30px;
@@ -264,6 +471,7 @@
       height: 18px;
       background: #9b6d50;
       border-radius: 4px;
+      display: none;
     }
     .desk::before, .desk::after {
       content: "";
@@ -275,52 +483,204 @@
     }
     .desk::before { left: 14px; }
     .desk::after { right: 14px; }
+    .stage-work .desk {
+      right: 42px;
+      bottom: 78px;
+      width: 160px;
+      background: #4f7891;
+    }
+    .stage-home .desk {
+      left: 32px;
+      right: auto;
+      bottom: 70px;
+      width: 145px;
+      background: #ad7259;
+    }
+    .stage-elder .desk {
+      right: 46px;
+      bottom: 72px;
+      width: 148px;
+      background: #8275a1;
+    }
+    .stage-rest .desk {
+      left: 38px;
+      right: auto;
+      bottom: 68px;
+      width: 108px;
+      background: #6f9a73;
+    }
     .doll {
       position: absolute;
       bottom: 43px;
-      width: 58px;
-      height: 96px;
+      width: 70px;
+      height: 170px;
+      background-repeat: no-repeat;
+      background-position: center bottom;
+      background-size: contain;
       transition: transform .25s ease, opacity .25s ease;
     }
-    .doll.parent { left: 74px; }
-    .doll.child { left: 168px; transform: scale(.76); transform-origin: bottom center; opacity: .88; }
-    .doll.elder { left: 252px; transform: scale(.86); transform-origin: bottom center; opacity: .8; }
+    .doll > span { display: none; }
+    .doll.parent {
+      left: 46%;
+      bottom: 50px;
+      z-index: 8;
+      cursor: grab;
+      touch-action: none;
+      background-image: url("assets/generated-characters/parent-sprite.webp");
+    }
+    .doll.parent::before {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: -7px;
+      width: calc(100% + 16px);
+      height: calc(100% + 14px);
+      border: 2px dashed rgba(32,33,36,.32);
+      border-radius: 999px;
+      animation: grabPulse 1.8s ease-in-out infinite;
+    }
+    .doll.parent.dragging {
+      cursor: grabbing;
+      transition: none;
+      filter: drop-shadow(0 14px 18px rgba(32,33,36,.22));
+    }
+    .doll.child {
+      left: 168px;
+      bottom: 45px;
+      width: 54px;
+      height: 132px;
+      background-image: url("assets/generated-characters/child-sprite.webp");
+      transform-origin: bottom center;
+      opacity: .9;
+    }
+    .doll.elder {
+      left: 252px;
+      bottom: 44px;
+      width: 58px;
+      height: 146px;
+      background-image: url("assets/generated-characters/elder-sprite.webp");
+      transform-origin: bottom center;
+      opacity: .82;
+    }
+    .stage-work .doll.child,
+    .stage-work .doll.elder,
+    .stage-rest .doll.child,
+    .stage-rest .doll.elder,
+    .stage-elder .doll.child,
+    .stage-home .doll.elder { display: none; }
+    .stage-elder .doll.elder { left: 112px; opacity: 1; }
+    .stage-hospital .doll.child { left: 96px; opacity: .9; }
+    .stage-hospital .doll.elder { left: 176px; opacity: .9; }
+    .stage-home .doll.child { left: 120px; opacity: 1; }
     .head {
       position: absolute;
-      left: 15px;
-      width: 28px;
-      height: 28px;
+      left: 20px;
+      top: 3px;
+      width: 34px;
+      height: 34px;
       border: 2px solid var(--ink);
       border-radius: 50%;
       background: #f0d0b5;
+      z-index: 4;
     }
+    .hair {
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      top: -4px;
+      height: 16px;
+      border: 2px solid var(--ink);
+      border-bottom: 0;
+      border-radius: 16px 16px 6px 6px;
+      background: #3f3a36;
+    }
+    .face {
+      position: absolute;
+      left: 8px;
+      top: 14px;
+      width: 18px;
+      height: 8px;
+      border-top: 2px solid rgba(32,33,36,.62);
+    }
+    .face::before,
+    .face::after {
+      content: "";
+      position: absolute;
+      top: -7px;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+    .face::before { left: 1px; }
+    .face::after { right: 1px; }
     .body {
       position: absolute;
-      top: 30px;
-      left: 9px;
-      width: 40px;
-      height: 50px;
+      top: 42px;
+      left: 14px;
+      width: 46px;
+      height: 58px;
       border: 2px solid var(--ink);
       background: #eecb6b;
-      border-radius: 12px 12px 6px 6px;
+      border-radius: 18px 18px 8px 8px;
+      z-index: 3;
+      box-shadow: inset 0 -10px 0 rgba(32,33,36,.08);
+    }
+    .body::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 0;
+      width: 16px;
+      height: 12px;
+      border: 2px solid var(--ink);
+      border-top: 0;
+      border-radius: 0 0 10px 10px;
+      background: rgba(255,255,255,.65);
     }
     .parent .body { background: #78a5bd; }
-    .elder .body { background: #b2b0a8; }
+    .child .body { background: #f0d890; }
+    .elder .body { background: #b7b5ae; }
+    .elder .hair { background: #e7e3dc; }
+    .arm {
+      position: absolute;
+      top: 52px;
+      width: 12px;
+      height: 42px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: #f0d0b5;
+      z-index: 2;
+      transform-origin: top center;
+    }
+    .arm.one { left: 6px; transform: rotate(8deg); }
+    .arm.two { right: 6px; transform: rotate(-8deg); }
     .leg {
       position: absolute;
-      top: 78px;
-      width: 12px;
-      height: 18px;
+      top: 98px;
+      width: 14px;
+      height: 26px;
+      border: 2px solid var(--ink);
       background: #4f5963;
       border-radius: 0 0 5px 5px;
+      z-index: 2;
     }
-    .leg.one { left: 15px; }
-    .leg.two { left: 31px; }
+    .leg.one { left: 22px; }
+    .leg.two { left: 40px; }
+    .shadow {
+      position: absolute;
+      left: 10px;
+      bottom: -5px;
+      width: 54px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(32,33,36,.14);
+    }
     .speech {
       position: absolute;
       left: 18px;
-      bottom: 142px;
-      max-width: 280px;
+      bottom: 332px;
+      max-width: min(360px, calc(100% - 36px));
       padding: 8px 10px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -328,23 +688,151 @@
       color: #3d4148;
       font-size: 13px;
     }
-    .stage-rest .window { background: #dcebdc; }
-    .stage-rest .desk { background: #6f9a73; }
-    .stage-home .window { background: #f2ddd4; }
-    .stage-home .desk { background: #ad7259; }
     .stage-overload .parent { transform: rotate(-2deg) translateY(5px); }
     .stage-overload .child { opacity: .48; }
+    .hotspot {
+      position: absolute;
+      z-index: 4;
+      min-width: 112px;
+      padding: 9px 10px;
+      border: 1px solid rgba(32,33,36,.22);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.88);
+      color: #2f343a;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(32,33,36,.09);
+    }
+    .hotspot::before {
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      margin-right: 7px;
+      border-radius: 999px;
+      background: var(--gold);
+      box-shadow: 0 0 0 6px rgba(211,156,63,.16);
+      animation: hotspotPulse 1.6s ease-in-out infinite;
+    }
+    .hotspot .ui-icon {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      vertical-align: -3px;
+      color: #5e6670;
+    }
+    .hotspot small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .hotspot.active-drop {
+      border-color: var(--ink);
+      background: #fff8e8;
+      transform: translateY(-2px);
+    }
+    .hotspot[hidden] { display: none !important; }
+    .hotspot.work-a { right: 38px; top: 116px; }
+    .hotspot.work-b { right: 180px; bottom: 146px; }
+    .hotspot.home-a { left: 50px; top: 124px; }
+    .hotspot.home-b { right: 42px; bottom: 142px; }
+    .hotspot.elder-a { left: 66px; top: 128px; }
+    .hotspot.elder-b { right: 46px; bottom: 142px; }
+    .hotspot.hospital-a { left: 56px; top: 128px; }
+    .hotspot.hospital-b { right: 52px; bottom: 142px; }
+    .hotspot.rest-a { left: 52px; top: 126px; border-style: dashed; }
+    .hotspot.rest-b { right: 48px; bottom: 138px; opacity: .76; }
+    .scene-work-only,
+    .scene-home-only,
+    .scene-elder-only,
+    .scene-hospital-only,
+    .scene-rest-only { display: none; }
+    .stage-work .scene-work-only,
+    .stage-home .scene-home-only,
+    .stage-elder .scene-elder-only,
+    .stage-hospital .scene-hospital-only,
+    .stage-rest .scene-rest-only { display: block; }
+    .system-toast {
+      position: absolute;
+      right: 16px;
+      top: 14px;
+      z-index: 5;
+      max-width: 230px;
+      padding: 9px 10px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: #202124;
+      color: #fff;
+      font-size: 12px;
+      line-height: 1.4;
+      box-shadow: 0 14px 28px rgba(32,33,36,.18);
+    }
+    .timeline {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.88);
+      font-size: 12px;
+      color: #4e5560;
+    }
+    .timeline-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .timeline-track {
+      position: relative;
+      height: 8px;
+      border-radius: 999px;
+      background: #ece8df;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--work), var(--home), var(--warn));
+      transition: width .25s ease;
+    }
+    @keyframes hotspotPulse {
+      0%, 100% { box-shadow: 0 0 0 5px rgba(211,156,63,.12); }
+      50% { box-shadow: 0 0 0 10px rgba(211,156,63,.22); }
+    }
+    @keyframes grabPulse {
+      0%, 100% { opacity: .3; transform: scale(.98); }
+      50% { opacity: .65; transform: scale(1.04); }
+    }
 
     .scene-tabs {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 8px;
-      margin-bottom: 14px;
     }
     .scene-tabs button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
       padding: 8px 8px;
       font-size: 13px;
       background: #fff;
+    }
+    .scene-tabs .ui-icon {
+      width: 15px;
+      height: 15px;
     }
     .scene-tabs button.active {
       color: #fff;
@@ -355,6 +843,7 @@
       border-radius: var(--radius);
       background: #fff;
       overflow: hidden;
+      align-self: stretch;
     }
     .task-panel h3 {
       margin: 0;
@@ -369,7 +858,7 @@
     }
     .task-list li {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr;
       gap: 10px;
       align-items: center;
       padding: 12px 14px;
@@ -380,6 +869,16 @@
       font-weight: 700;
       margin-bottom: 2px;
     }
+    .task-tag {
+      display: inline-flex;
+      margin-bottom: 6px;
+      padding: 2px 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #4e5560;
+      background: #fbfaf7;
+      font-size: 11px;
+    }
     .task-meta {
       font-size: 12px;
       color: var(--muted);
@@ -389,6 +888,10 @@
       min-width: 76px;
       font-size: 13px;
       background: #fff;
+    }
+    .task-empty {
+      color: var(--self);
+      font-weight: 700;
     }
     .rest-row {
       display: grid;
@@ -481,6 +984,42 @@
       padding: 14px;
     }
     .ending h3 { margin: 0 0 8px; }
+    .pressure-alert {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(32,33,36,.82);
+      color: #fff;
+    }
+    .pressure-alert.show { display: grid; }
+    .pressure-alert-card {
+      width: min(560px, 100%);
+      border: 1px solid rgba(255,255,255,.34);
+      border-radius: var(--radius);
+      background: #202124;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,.38);
+    }
+    .pressure-alert-card strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 26px;
+    }
+    .pressure-alert-card p {
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      line-height: 1.6;
+    }
+    .log.warning {
+      border-color: var(--warn);
+      background: #fff3ef;
+      color: #8f352b;
+      font-weight: 700;
+    }
     textarea {
       width: 100%;
       min-height: 82px;
@@ -496,6 +1035,106 @@
       margin-top: 8px;
       color: var(--muted);
       font-size: 13px;
+    }
+    .survey-page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 36px 18px 56px;
+    }
+    .survey-card {
+      background: rgba(255,255,255,.9);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .survey-card h2 {
+      margin: 14px 0 8px;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+    .survey-card p {
+      margin: 0;
+      color: #4e5560;
+    }
+    .survey-scale-note {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border: 1px dashed #b8aa96;
+      border-radius: var(--radius);
+      background: #fffdf8;
+      color: #3d4148;
+      font-size: 14px;
+    }
+    .survey-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+    #surveyQuestions {
+      display: grid;
+      gap: 14px;
+    }
+    .survey-question {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 14px;
+    }
+    .survey-question legend {
+      padding: 0;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .survey-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .survey-options label {
+      display: grid;
+      gap: 4px;
+      place-items: center;
+      min-height: 54px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfaf7;
+      cursor: pointer;
+      font-size: 12px;
+      color: #4e5560;
+      text-align: center;
+    }
+    .survey-options input {
+      margin: 0;
+      accent-color: var(--work);
+    }
+    .survey-submit-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+    .survey-status {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .survey-status.error { color: var(--warn); }
+    .survey-status.ok { color: var(--self); }
+    .survey-result {
+      margin-top: 16px;
+      border: 1px solid #c9dce6;
+      border-radius: var(--radius);
+      background: var(--soft-work);
+      padding: 12px;
+      color: #263746;
+      font-size: 14px;
+    }
+    .survey-result[hidden] {
+      display: none !important;
     }
 
     main {
@@ -628,7 +1267,7 @@
     }
     .ai-help-button {
       position: fixed;
-      right: 18px;
+      left: 18px;
       bottom: 18px;
       z-index: 40;
       padding: 10px 14px;
@@ -639,7 +1278,7 @@
     }
     .ai-panel {
       position: fixed;
-      right: 18px;
+      left: 18px;
       bottom: 72px;
       z-index: 40;
       width: min(390px, calc(100vw - 36px));
@@ -725,22 +1364,106 @@
     }
     @media (max-width: 560px) {
       .intro, .section { padding: 20px; }
+      header { padding-top: 22px; }
+      .lead { font-size: 16px; }
+      .hero-actions { display: grid; }
+      .hero-link { width: 100%; }
+      .quick-start { font-size: 13px; }
+      .game-head { padding: 16px; }
+      .controls { display: grid; }
+      .controls button, .select-wrap, .select-wrap select { width: 100%; }
+      .select-wrap { justify-content: space-between; }
+      .play-steps { grid-template-columns: 1fr; }
+      .play-board { grid-template-columns: 1fr; }
       .research-grid { grid-template-columns: 1fr; }
-      .scene-tabs { grid-template-columns: 1fr; }
+      .scene-tabs { grid-template-columns: repeat(2, 1fr); }
       .task-list li, .rest-row { grid-template-columns: 1fr; }
       .task-list button, .rest-row button { width: 100%; }
-      .mini-stage { min-height: 190px; }
-      .doll.parent { left: 34px; }
+      .username-row { grid-template-columns: 1fr; }
+      .username-row button { width: 100%; }
+      .survey-card { padding: 20px; }
+      .survey-options { grid-template-columns: 1fr; }
+      .survey-options label {
+        grid-template-columns: auto 1fr;
+        justify-items: start;
+        min-height: 42px;
+        padding: 8px 10px;
+        text-align: left;
+      }
+      .mini-stage { min-height: 390px; }
+      .speech {
+        left: 12px;
+        bottom: auto;
+        top: 86px;
+        max-width: calc(100% - 24px);
+      }
+      .drag-hint { max-width: calc(100% - 130px); }
+      .system-toast {
+        top: auto;
+        right: 12px;
+        bottom: 54px;
+        max-width: 170px;
+      }
+      .doll.parent { left: 44%; bottom: 86px; }
       .doll.child { left: 122px; }
       .doll.elder { left: 196px; }
+      .hotspot {
+        min-width: 96px;
+        max-width: 138px;
+        font-size: 12px;
+      }
+      .hotspot.work-a,
+      .hotspot.home-a,
+      .hotspot.elder-a,
+      .hotspot.hospital-a,
+      .hotspot.rest-a { left: 14px; right: auto; top: 154px; }
+      .hotspot.work-b,
+      .hotspot.home-b,
+      .hotspot.elder-b,
+      .hotspot.hospital-b,
+      .hotspot.rest-b { right: 14px; bottom: 118px; }
       .desk { display: none; }
+      .ai-help-button {
+        top: 58px;
+        right: 12px;
+        left: auto;
+        bottom: auto;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .ai-panel {
+        top: 112px;
+        right: 12px;
+        left: 12px;
+        bottom: 16px;
+        width: auto;
+        max-height: none;
+      }
       table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
 <body>
+  <section class="consent-screen" id="consentScreen" aria-labelledby="consentTitle">
+    <div class="consent-card">
+      <div class="eyebrow">课堂研究 · 知情同意</div>
+      <h1 id="consentTitle">开始前，请先读一下</h1>
+      <p>这个网页是一个关于“夹心层世代时间困境”的课堂研究作品。你可以试玩，也可以选择不参加。</p>
+      <ul class="consent-list">
+        <li><strong>匿名</strong>我们不会收集你的真实姓名、身份证号、手机号等能认出你是谁的信息。</li>
+        <li><strong>自愿</strong>参不参加完全由你决定。你不需要给出理由。</li>
+        <li><strong>随时可退出</strong>如果中途不想继续，随时关掉页面离开就可以。</li>
+        <li><strong>数据用途</strong>你的回答只会用于这个课堂研究，不会拿去做别的用途。</li>
+      </ul>
+      <div class="consent-actions">
+        <button id="agreeConsentBtn" type="button">同意，进入作品</button>
+        <p class="consent-note">点击同意后，本浏览器会记住这个选择；这条记录只存在你的电脑/手机里。</p>
+      </div>
+    </div>
+  </section>
+
   <nav class="topbar" aria-label="页面导航">
-    <a href="#play">试玩</a>
+    <a href="#survey">试玩</a>
     <a href="#concept">核心概念</a>
     <a href="#research">调研</a>
     <a href="#design">机制</a>
@@ -751,7 +1474,18 @@
     <section class="intro" aria-labelledby="page-title">
       <div class="eyebrow">社会科学 × AI × 搜索引擎 · 单文件作品页</div>
       <h1 id="page-title">夹心层世代的时间困境</h1>
+      <p class="one-line-hook">3 分钟试玩：你要帮一个上有老、下有小、还要上班的家庭把一天撑过去。</p>
       <p class="lead">这是一个关于“上有老人要照顾、下有孩子要陪伴、中间还有工作”的交互网页小游戏。它想解决的不是“某个父母不会安排时间”的问题，而是让同龄人、老师和试玩者看见：当工作、育儿、养老和家庭情感回应都被视为正当任务时，为什么“做回自己”总是被排到最后。</p>
+      <div class="hero-actions" aria-label="快速入口">
+        <a class="hero-link primary-link" href="#survey">直接开始试玩</a>
+        <a class="hero-link secondary-link" href="#researchStory">先看研究问题</a>
+      </div>
+      <div class="quick-start" aria-label="最快玩法">
+        <strong>最快玩法：</strong>
+        <span>1. 点“开始一天”</span>
+        <span>2. 连续完成几项清单任务</span>
+        <span>3. 再点“尝试独处”，看休息如何被重新排序</span>
+      </div>
       <ul class="plain-list">
         <li><strong>给谁用：</strong>同龄人、老师、试玩同学，以及见过父母一边忙工作一边顾家的人。不需要会玩游戏，打开就能懂。</li>
         <li><strong>做成什么：</strong>一个 3–5 分钟的单页网页小游戏，加上调研说明和论文框架。</li>
@@ -767,10 +1501,27 @@
       </div>
     </section>
 
-    <section class="game-shell" id="play" aria-labelledby="game-title">
+    <section class="survey-page page-view" id="survey" aria-labelledby="surveyTitle" hidden>
+      <div class="survey-card">
+        <div class="eyebrow" id="surveyEyebrow">试玩前小问卷</div>
+        <h2 id="surveyTitle">先回答 5 个很短的问题</h2>
+        <p id="surveyIntro">这些题没有标准答案，只用来比较你试玩前后的理解有没有变化。</p>
+        <div class="survey-scale-note">评分说明：1 = 非常不同意，2 = 不太同意，3 = 不确定，4 = 比较同意，5 = 非常同意。</div>
+        <form class="survey-form" id="awarenessSurvey">
+          <div id="surveyQuestions"></div>
+          <div class="survey-submit-row">
+            <button class="primary" id="surveySubmitBtn" type="submit">提交并进入试玩</button>
+            <div class="survey-status" id="surveyStatus" aria-live="polite"></div>
+          </div>
+        </form>
+        <div class="survey-result" id="surveyResult" hidden></div>
+      </div>
+    </section>
+
+    <section class="game-shell page-view" id="play" aria-labelledby="game-title">
       <div class="game-head">
         <h2 id="game-title">小体验：把今天过完</h2>
-        <p>点击完成任务，也可以尝试“独处 10 分钟”。注意：清单会补上，休息可能被打断。</p>
+        <p>没时间研究也没关系：先点黑色按钮开始，把夹心层父母拖到发光任务点，再试试“独处 10 分钟”。</p>
         <div class="controls">
           <button class="primary" id="startBtn">开始一天</button>
           <button class="secondary" id="resetBtn">重新开始</button>
@@ -782,69 +1533,99 @@
             </select>
           </label>
         </div>
+        <div class="play-steps" aria-label="玩法三步">
+          <div class="step-chip"><strong>1. 开始</strong>生成今天的任务清单。</div>
+          <div class="step-chip"><strong>2. 处理清单</strong>观察疲惫、孩子联结和自我时间。</div>
+          <div class="step-chip"><strong>3. 尝试独处</strong>看看休息是否真的属于你。</div>
+        </div>
       </div>
 
       <div class="game-body">
         <div class="status-grid" aria-label="状态条">
-          <div class="meter-card">
-            <div class="meter-label"><span>疲惫值</span><span id="fatigueText">28%</span></div>
+          <div class="meter-card fatigue-card">
+            <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2h4"></path><path d="M12 14v-4"></path><path d="M4 13a8 8 0 1 0 16 0a8 8 0 0 0-16 0"></path></svg>疲惫值</span><span id="fatigueText">28%</span></div>
             <div class="meter"><div class="fill fatigue" id="fatigueFill"></div></div>
           </div>
-          <div class="meter-card">
-            <div class="meter-label"><span>孩子联结</span><span id="childText">76%</span></div>
+          <div class="meter-card child-card">
+            <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.5-1.4 3-3.1 3-5.4A5.1 5.1 0 0 0 12.9 5L12 6l-.9-1A5.1 5.1 0 0 0 2 8.6c0 2.3 1.5 4 3 5.4l7 7Z"></path></svg>孩子联结</span><span id="childText">76%</span></div>
             <div class="meter"><div class="fill child" id="childFill"></div></div>
           </div>
-          <div class="meter-card">
-            <div class="meter-label"><span>自我时间</span><span id="selfText">20%</span></div>
+          <div class="meter-card self-card">
+            <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v4"></path><path d="m16.2 7.8 2.9-2.9"></path><path d="M18 12h4"></path><path d="m16.2 16.2 2.9 2.9"></path><path d="M12 18v4"></path><path d="m7.8 16.2-2.9 2.9"></path><path d="M6 12H2"></path><path d="m7.8 7.8-2.9-2.9"></path><circle cx="12" cy="12" r="3"></circle></svg>自我时间</span><span id="selfText">20%</span></div>
             <div class="meter"><div class="fill self" id="selfFill"></div></div>
           </div>
         </div>
 
-        <div class="mini-stage stage-home" id="stage" aria-label="布偶家庭场景">
-          <div class="room-label" id="roomLabel">家庭场景</div>
-          <div class="window" aria-hidden="true"></div>
-          <div class="desk" aria-hidden="true"></div>
-          <div class="speech" id="speech">点击“开始一天”。你是这一家的安排者。把今天过完。</div>
-          <div class="doll parent" aria-label="夹心层父母">
-            <span class="head"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span>
-          </div>
-          <div class="doll child" aria-label="孩子">
-            <span class="head"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span>
-          </div>
-          <div class="doll elder" aria-label="祖辈">
-            <span class="head"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span>
-          </div>
-        </div>
+        <div class="play-board">
+          <div class="board-column">
+            <div class="mini-stage stage-home" id="stage" aria-label="可拖拽任务场景">
+              <div class="room-label" id="roomLabel">家庭场景</div>
+              <div class="drag-hint">拖动父母到发光任务点，松开就会处理对应清单。</div>
+              <div class="system-toast">今日优先级系统：休息会在必要任务后重新排序。</div>
+              <div class="window" aria-hidden="true"></div>
+              <div class="desk" aria-hidden="true"></div>
+              <div class="speech" id="speech">点击“开始一天”。你是这一家的安排者。把今天过完。</div>
 
-        <div class="scene-tabs" aria-label="场景切换">
-          <button id="sceneWork" data-scene="work">工作</button>
-          <button id="sceneHome" data-scene="home" class="active">家庭</button>
-          <button id="sceneRest" data-scene="rest">个人休息</button>
-        </div>
+              <button class="hotspot work-a scene-work-only" type="button" data-scene-task="work"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"></path></svg>领导电话<small>拖到这里处理工作压力</small></button>
+              <button class="hotspot work-b scene-work-only" type="button" data-scene-task="work"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="M8 22h8"></path><path d="M12 18v4"></path></svg>会议桌<small>30 分钟被重新占用</small></button>
+              <button class="hotspot home-a scene-home-only" type="button" data-scene-task="home"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2"></path></svg>辅导作业<small>孩子联结会上升</small></button>
+              <button class="hotspot home-b scene-home-only" type="button" data-scene-task="home"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v20"></path><path d="M16 2v20"></path><path d="M4 8h16"></path><path d="M4 16h16"></path></svg>做晚饭<small>隐形家务不会消失</small></button>
+              <button class="hotspot elder-a scene-elder-only" type="button" data-scene-task="elder"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10.5 20.5 10-10a4.2 4.2 0 0 0-6-6l-10 10a4.2 4.2 0 0 0 6 6Z"></path><path d="m8.5 8.5 7 7"></path></svg>送药提醒<small>老人照护进入清单</small></button>
+              <button class="hotspot elder-b scene-elder-only" type="button" data-scene-task="elder"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path></svg>复诊安排<small>排队和判断也算劳动</small></button>
+              <button class="hotspot hospital-a scene-hospital-only" type="button" data-scene-task="hospital"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg>取药窗口<small>医疗照护占用整段时间</small></button>
+              <button class="hotspot hospital-b scene-hospital-only" type="button" data-scene-task="hospital"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path><path d="M9 15h6"></path><path d="M12 12v6"></path></svg>复诊排队<small>等待本身也是时间成本</small></button>
+              <button class="hotspot rest-a scene-rest-only" type="button" data-scene-task="rest"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M8 21h8"></path><path d="M7 8h10v6a5 5 0 0 1-10 0Z"></path><path d="M17 8h1a3 3 0 0 1 0 6h-1"></path></svg>自己的十分钟<small>试着做回自己</small></button>
+              <button class="hotspot rest-b scene-rest-only" type="button" data-scene-task="rest"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4v16"></path><path d="M22 4v16"></path><path d="M2 12h20"></path><path d="M7 12v8"></path><path d="M17 12v8"></path></svg>安静角落<small>但任务仍会追上来</small></button>
 
-        <div class="task-panel">
-          <h3>今天的清单 <span id="clockText">07:00</span></h3>
-          <ul class="task-list" id="taskList" aria-live="polite"></ul>
+              <div class="doll parent" id="parentDoll" aria-label="可拖动的夹心层父母">
+                <span class="shadow"></span><span class="head"><span class="hair"></span><span class="face"></span></span><span class="body"></span><span class="arm one"></span><span class="arm two"></span><span class="leg one"></span><span class="leg two"></span>
+              </div>
+              <div class="doll child" aria-label="孩子">
+                <span class="shadow"></span><span class="head"><span class="hair"></span><span class="face"></span></span><span class="body"></span><span class="arm one"></span><span class="arm two"></span><span class="leg one"></span><span class="leg two"></span>
+              </div>
+              <div class="doll elder" aria-label="祖辈">
+                <span class="shadow"></span><span class="head"><span class="hair"></span><span class="face"></span></span><span class="body"></span><span class="arm one"></span><span class="arm two"></span><span class="leg one"></span><span class="leg two"></span>
+              </div>
+              <div class="timeline" aria-label="一天的时间线">
+                <span class="timeline-time"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>07:00</span>
+                <div class="timeline-track"><span class="timeline-fill" id="timelineFill"></span></div>
+                <span class="timeline-time"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5l3 2"></path><path d="M5 3 2 6"></path><path d="m22 6-3-3"></path><path d="M6.4 18.6 4 21"></path><path d="m17.6 18.6 2.4 2.4"></path><circle cx="12" cy="13" r="8"></circle></svg><span id="timelineNow">07:00</span></span>
+              </div>
+            </div>
+
+            <div class="scene-tabs" aria-label="场景切换">
+              <button id="sceneWork" data-scene="work"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>切到工作</button>
+              <button id="sceneHome" data-scene="home" class="active"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg>切到家庭</button>
+              <button id="sceneElder" data-scene="elder"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path><path d="M16 22v-5a4 4 0 0 0-8 0v5"></path><path d="M19 14v8"></path></svg>切到老人照护</button>
+              <button id="sceneHospital" data-scene="hospital"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg>切到医院</button>
+              <button id="sceneRest" data-scene="rest"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="m4.93 4.93 2.83 2.83"></path><path d="m16.24 16.24 2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="m4.93 19.07 2.83-2.83"></path><path d="m16.24 7.76 2.83-2.83"></path></svg>切到自我</button>
+            </div>
+          </div>
+
+          <div class="task-panel">
+            <h3>今天的清单 <span id="clockText">07:00</span></h3>
+            <ul class="task-list" id="taskList" aria-live="polite"></ul>
+          </div>
         </div>
 
         <div class="rest-row">
           <div>
-            <div class="rest-title">自我任务：独处 10 分钟</div>
+            <div class="rest-title"><span class="inline-icon-label"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M8 21h8"></path><path d="M7 8h10v6a5 5 0 0 1-10 0Z"></path><path d="M17 8h1a3 3 0 0 1 0 6h-1"></path></svg>自我任务：独处 10 分钟</span></div>
             <div class="rest-sub">它不是睡觉，也不是偷懒，而是不被任何角色定义的一小段时间。</div>
           </div>
           <button id="restBtn">尝试独处</button>
           <div class="progress" id="restProgress"><span id="restProgressBar"></span></div>
         </div>
 
-        <div class="log" id="logBox" aria-live="polite">试玩记录会出现在这里。完成几个任务后，再试试点击“独处 10 分钟”。</div>
+        <div class="log" id="logBox" aria-live="polite">第一步：点“开始一天”。试玩记录会出现在这里。</div>
 
         <div class="username-card" aria-labelledby="usernameTitle">
-          <label id="usernameTitle" for="usernameInput">提交用户名 / Submit username</label>
+          <label id="usernameTitle" for="usernameInput">可选：提交昵称 / Optional username</label>
           <div class="username-row">
             <input id="usernameInput" type="text" maxlength="40" autocomplete="nickname" placeholder="输入一个昵称，例如 Xin">
             <button class="secondary" id="submitUsernameBtn" type="button">提交</button>
           </div>
-          <p class="username-note">只提交昵称，用来确认有人试玩过这个作品；不要填写真实身份证号、手机号或其他隐私信息。</p>
+          <p class="username-note">这一步不是开始游戏必填；只提交昵称，用来确认有人试玩过这个作品。不要填写真实身份证号、手机号或其他隐私信息。</p>
           <div class="username-status" id="usernameStatus" aria-live="polite"></div>
         </div>
 
@@ -855,12 +1636,16 @@
           <textarea id="feedbackInput" placeholder="可以写：孩子、父母、老人，或我最想删掉加班/陪诊/家长群……"></textarea>
           <button class="secondary" id="saveFeedbackBtn">保存到本机</button>
           <div class="saved-feedback" id="savedFeedback"></div>
+          <div class="survey-submit-row">
+            <button class="primary" id="finishExperienceBtn" type="button">我已体验完毕，填写后测</button>
+            <div class="survey-status" id="finishExperienceStatus" aria-live="polite"></div>
+          </div>
         </div>
       </div>
     </section>
   </header>
 
-  <main>
+  <main class="page-view" id="researchPage">
     <section class="section research-switch" id="researchStory">
       <button class="research-toggle" id="researchToggle" type="button" aria-expanded="false" aria-controls="researchPanel">
         <span class="mark" id="researchMark">+</span>
@@ -1069,9 +1854,29 @@
     </form>
   </aside>
 
+  <div class="pressure-alert" id="pressureAlert" aria-live="assertive" aria-hidden="true">
+    <div class="pressure-alert-card">
+      <strong>时间已经被挤满了</strong>
+      <p>疲惫、关系和自我时间同时跌到危险区。不是你不努力，是清单已经超过一个人能承受的范围。</p>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://wkrzdpytofyebbowtwqz.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_BBOyfevRj86wv_qGTWCE7Q_flFMKd8k";
+    const CONSENT_KEY = "sandwichTimeConsentAgreed";
+    const SURVEY_PRE_KEY = "sandwichTimeAwarenessPre";
+    const SURVEY_POST_KEY = "sandwichTimeAwarenessPost";
+    const SURVEY_SESSION_KEY = "sandwichTimeAwarenessSessionId";
+    const SURVEY_TABLE = "awareness_survey_submissions";
+    const surveyQuestions = [
+      "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
+      "我认为很多上有老人、下有孩子、同时还要工作的人，都会面临类似的时间压力。",
+      "我认为夹心层世代缺少自己的时间，主要不是因为他们不会安排时间，而是因为工作、育儿、养老和家庭责任同时压在他们身上。",
+      "我能理解为什么在这些任务都“很重要”的情况下，休息和自我时间总是容易被排到最后。",
+      "我认为夹心层世代的困境更像是一个社会结构问题，而不只是某个家庭或某个人自己的问题。"
+    ];
+    let surveyMode = "pre";
 
     const taskPools = {
       work: [
@@ -1083,8 +1888,18 @@
       home: [
         { title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", fatigue: 8, child: 9, self: -7, minutes: 30 },
         { title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", fatigue: 9, child: 2, self: -6, minutes: 35 },
-        { title: "陪老人复诊取药", type: "照护任务", note: "医疗照护包含信息判断和排队等待。", fatigue: 12, child: -5, self: -8, minutes: 45 },
         { title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", fatigue: 7, child: 4, self: -6, minutes: 20 }
+      ],
+      elder: [
+        { title: "提醒老人吃药并确认剂量", type: "老人照护", note: "不是一句提醒，而是持续记住和确认。", fatigue: 8, child: -3, self: -6, minutes: 22 },
+        { title: "陪老人复诊取药", type: "老人照护", note: "医疗照护包含信息判断和排队等待。", fatigue: 12, child: -5, self: -8, minutes: 45 },
+        { title: "预约检查并整理病历", type: "认知照护", note: "信息管理也在消耗你的时间。", fatigue: 10, child: -4, self: -7, minutes: 32 },
+        { title: "去老人的家看一眼", type: "情感照护", note: "不去会内疚，去了会挤掉休息。", fatigue: 9, child: -5, self: -8, minutes: 36 }
+      ],
+      hospital: [
+        { title: "排队取药并核对剂量", type: "医疗照护", note: "等待、判断和确认都不是空白时间。", fatigue: 11, child: -5, self: -8, minutes: 40 },
+        { title: "陪老人做复诊检查", type: "医疗照护", note: "一次复诊常常会吃掉半天安排。", fatigue: 13, child: -7, self: -10, minutes: 55 },
+        { title: "和医生确认下一步安排", type: "认知照护", note: "你还要负责听懂、记住、再转述。", fatigue: 9, child: -4, self: -7, minutes: 28 }
       ],
       rest: [
         { title: "想睡一会儿", type: "自我任务", note: "身体想恢复，但清单还在。", fatigue: -7, child: -6, self: 4, minutes: 15 },
@@ -1119,10 +1934,219 @@
       restAttempts: 0,
       interruptions: 0,
       timer: null,
-      restProgress: 0
+      restProgress: 0,
+      dragging: false,
+      pressureAlertShown: false,
+      restSucceeded: false
     };
 
     const $ = (id) => document.getElementById(id);
+
+    function getStoredSurvey(key) {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch (error) {
+        localStorage.removeItem(key);
+        return null;
+      }
+    }
+
+    function average(values) {
+      if (!values.length) return 0;
+      return values.reduce((sum, value) => sum + value, 0) / values.length;
+    }
+
+    function getSurveySessionId() {
+      const saved = localStorage.getItem(SURVEY_SESSION_KEY);
+      if (saved) return saved;
+      const id = window.crypto && crypto.randomUUID
+        ? crypto.randomUUID()
+        : "survey-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+      localStorage.setItem(SURVEY_SESSION_KEY, id);
+      return id;
+    }
+
+    async function submitSurveyToSupabase(mode, payload, comparison = {}) {
+      const answers = payload.answers;
+      const body = {
+        session_id: getSurveySessionId(),
+        phase: mode,
+        q1: answers[0],
+        q2: answers[1],
+        q3: answers[2],
+        q4: answers[3],
+        q5: answers[4],
+        average_score: payload.average,
+        pre_average_score: comparison.preAverage ?? null,
+        post_average_score: comparison.postAverage ?? null,
+        average_change: comparison.averageChange ?? null,
+        game_completed: state.completed,
+        game_rest_attempts: state.restAttempts,
+        game_interruptions: state.interruptions,
+        game_fatigue: state.fatigue,
+        game_child: state.child,
+        game_self: state.self,
+        client_saved_at: payload.savedAt
+      };
+
+      const response = await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+    }
+
+    function renderSurvey(mode) {
+      surveyMode = mode;
+      const isPost = mode === "post";
+      $("surveyEyebrow").textContent = isPost ? "试玩后小问卷" : "试玩前小问卷";
+      $("surveyTitle").textContent = isPost ? "再回答同样的 5 个问题" : "先回答 5 个很短的问题";
+      $("surveyIntro").textContent = isPost
+        ? "题目和前测完全一样，用来比较试玩前后的理解变化。"
+        : "这些题没有标准答案，只用来比较你试玩前后的理解有没有变化。";
+      $("surveySubmitBtn").textContent = isPost ? "提交后测并查看变化" : "提交并进入试玩";
+      $("surveyStatus").textContent = "";
+      $("surveyStatus").className = "survey-status";
+      $("surveyResult").hidden = true;
+      $("surveyResult").textContent = "";
+
+      const stored = getStoredSurvey(isPost ? SURVEY_POST_KEY : SURVEY_PRE_KEY);
+      const questions = $("surveyQuestions");
+      questions.innerHTML = "";
+      surveyQuestions.forEach((question, index) => {
+        const fieldset = document.createElement("fieldset");
+        fieldset.className = "survey-question";
+        const legend = document.createElement("legend");
+        legend.textContent = String(index + 1) + ". " + question;
+        fieldset.appendChild(legend);
+
+        const options = document.createElement("div");
+        options.className = "survey-options";
+        for (let value = 1; value <= 5; value += 1) {
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = "q" + index;
+          input.value = String(value);
+          input.required = true;
+          if (stored && stored.answers[index] === value) input.checked = true;
+          const span = document.createElement("span");
+          span.textContent = String(value);
+          label.appendChild(input);
+          label.appendChild(span);
+          options.appendChild(label);
+        }
+        fieldset.appendChild(options);
+        questions.appendChild(fieldset);
+      });
+
+      if (isPost && getStoredSurvey(SURVEY_PRE_KEY)) {
+        $("surveyStatus").className = "survey-status ok";
+        $("surveyStatus").textContent = "已读取前测答案，提交后会自动计算变化。";
+      }
+    }
+
+    function collectSurveyAnswers() {
+      return surveyQuestions.map((_, index) => {
+        const checked = document.querySelector("input[name='q" + index + "']:checked");
+        return checked ? Number(checked.value) : null;
+      });
+    }
+
+    async function submitSurvey(event) {
+      event.preventDefault();
+      const answers = collectSurveyAnswers();
+      if (answers.some((answer) => answer === null)) {
+        $("surveyStatus").className = "survey-status error";
+        $("surveyStatus").textContent = "请先把 5 题都选完。";
+        return;
+      }
+
+      const payload = {
+        answers,
+        average: Number(average(answers).toFixed(2)),
+        savedAt: new Date().toLocaleString()
+      };
+
+      $("surveySubmitBtn").disabled = true;
+      $("surveyStatus").className = "survey-status";
+      $("surveyStatus").textContent = "正在保存...";
+
+      if (surveyMode === "post") {
+        localStorage.setItem(SURVEY_POST_KEY, JSON.stringify(payload));
+        const pre = getStoredSurvey(SURVEY_PRE_KEY);
+        const diff = pre ? Number((payload.average - pre.average).toFixed(2)) : null;
+        try {
+          await submitSurveyToSupabase("post", payload, {
+            preAverage: pre ? pre.average : null,
+            postAverage: payload.average,
+            averageChange: diff
+          });
+          $("surveyStatus").className = "survey-status ok";
+          $("surveyStatus").textContent = "后测已保存并提交到 Supabase。";
+        } catch (error) {
+          $("surveyStatus").className = "survey-status error";
+          $("surveyStatus").textContent = "后测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
+        } finally {
+          $("surveySubmitBtn").disabled = false;
+        }
+        if (pre) {
+          const sign = diff > 0 ? "+" : "";
+          $("surveyResult").hidden = false;
+          $("surveyResult").textContent = "前测平均分 " + pre.average + "，后测平均分 " + payload.average + "，整体变化 " + sign + diff + "。每题也可以用“后测分数 - 前测分数”来算变化。";
+        } else {
+          $("surveyResult").hidden = false;
+          $("surveyResult").textContent = "后测已保存，但这台浏览器里没有找到前测记录，所以暂时不能自动计算变化。";
+        }
+        return;
+      }
+
+      localStorage.setItem(SURVEY_PRE_KEY, JSON.stringify(payload));
+      try {
+        await submitSurveyToSupabase("pre", payload);
+        $("surveyStatus").className = "survey-status ok";
+        $("surveyStatus").textContent = "前测已保存并提交到 Supabase，正在进入试玩。";
+        window.setTimeout(() => {
+          window.location.hash = "play";
+        }, 350);
+      } catch (error) {
+        $("surveyStatus").className = "survey-status error";
+        $("surveyStatus").textContent = "前测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
+        $("surveySubmitBtn").disabled = false;
+      }
+    }
+
+    function goToPostSurvey() {
+      if (!state.started) {
+        $("finishExperienceStatus").className = "survey-status error";
+        $("finishExperienceStatus").textContent = "请先试玩一次，再填写后测。";
+        return;
+      }
+      window.location.hash = "postSurvey";
+    }
+
+    function acceptConsent() {
+      localStorage.setItem(CONSENT_KEY, "yes");
+      document.body.classList.add("consent-ok");
+      $("consentScreen").setAttribute("aria-hidden", "true");
+      showPageForHash();
+    }
+
+    if (localStorage.getItem(CONSENT_KEY) === "yes") {
+      document.body.classList.add("consent-ok");
+      $("consentScreen").setAttribute("aria-hidden", "true");
+    }
 
     function clamp(value) {
       return Math.max(0, Math.min(100, Math.round(value)));
@@ -1138,16 +2162,26 @@
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    function copyTask(task) {
-      return { ...task, id: Date.now() + Math.random() };
+    function sceneForTask(task, fallbackScene = "home") {
+      if (["结构任务", "紧急工作"].includes(task.type)) return "work";
+      if (["关系任务", "隐形家务", "认知劳动", "紧急家庭任务"].includes(task.type)) return "home";
+      if (["老人照护", "情感照护", "紧急照护"].includes(task.type)) return "elder";
+      if (["医疗照护"].includes(task.type)) return "hospital";
+      if (["自我任务"].includes(task.type)) return "rest";
+      return fallbackScene;
+    }
+
+    function copyTask(task, scene) {
+      return { ...task, scene: sceneForTask(task, scene), id: Date.now() + Math.random() };
     }
 
     function addTask(scene = state.scene) {
       const mode = $("modeSelect").value;
-      let source = taskPools[scene];
-      if (mode === "care" && Math.random() < .55) source = taskPools.home;
-      if (mode === "tight" && Math.random() < .32) source = taskPools.work;
-      state.tasks.push(copyTask(pick(source)));
+      let sourceScene = taskPools[scene] ? scene : "home";
+      if (mode === "care" && Math.random() < .55) sourceScene = "elder";
+      if (mode === "tight" && Math.random() < .32) sourceScene = "work";
+      const source = taskPools[sourceScene];
+      state.tasks.push(copyTask(pick(source), sourceScene));
       if (state.tasks.length > 6) state.tasks.shift();
     }
 
@@ -1162,9 +2196,15 @@
       if (state.scene === "work") {
         stage.classList.add("stage-work");
         $("roomLabel").textContent = "工作场景";
+      } else if (state.scene === "elder") {
+        stage.classList.add("stage-elder");
+        $("roomLabel").textContent = "老人照护场景";
+      } else if (state.scene === "hospital") {
+        stage.classList.add("stage-hospital");
+        $("roomLabel").textContent = "医院场景";
       } else if (state.scene === "rest") {
         stage.classList.add("stage-rest");
-        $("roomLabel").textContent = "个人休息场景";
+        $("roomLabel").textContent = "自我场景";
       } else {
         stage.classList.add("stage-home");
         $("roomLabel").textContent = "家庭场景";
@@ -1183,17 +2223,20 @@
         list.appendChild(li);
         return;
       }
+      if (state.tasks.length === 0) {
+        const li = document.createElement("li");
+        li.innerHTML = "<div><div class='task-title task-empty'>清单暂时清空了</div><div class='task-meta'>现在点击“尝试独处”，这一次休息会真正属于你。</div></div>";
+        list.appendChild(li);
+        return;
+      }
       state.tasks.forEach((task) => {
         const li = document.createElement("li");
         const text = document.createElement("div");
-        text.innerHTML = "<div class='task-title'></div><div class='task-meta'></div>";
+        text.innerHTML = "<div class='task-tag'></div><div class='task-title'></div><div class='task-meta'></div>";
+        text.querySelector(".task-tag").textContent = task.type + " · 拖到对应发光点完成";
         text.querySelector(".task-title").textContent = task.title;
-        text.querySelector(".task-meta").textContent = task.type + " · " + task.note;
-        const btn = document.createElement("button");
-        btn.textContent = "完成";
-        btn.addEventListener("click", () => completeTask(task.id));
+        text.querySelector(".task-meta").textContent = task.note;
         li.appendChild(text);
-        li.appendChild(btn);
         list.appendChild(li);
       });
     }
@@ -1209,11 +2252,15 @@
       $("childFill").style.width = state.child + "%";
       $("selfFill").style.width = state.self + "%";
       $("clockText").textContent = timeText();
+      $("timelineNow").textContent = timeText();
+      $("timelineFill").style.width = Math.min(100, Math.max(0, ((state.minutes - 7 * 60) / (16 * 60)) * 100)) + "%";
       document.querySelectorAll(".scene-tabs button").forEach((button) => {
         button.classList.toggle("active", button.dataset.scene === state.scene);
       });
       updateStage();
       renderTasks();
+      updateHotspots();
+      maybeShowPressureAlert();
       maybeEnd();
     }
 
@@ -1228,10 +2275,14 @@
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
+      state.pressureAlertShown = false;
+      state.restSucceeded = false;
+      resetParentDoll();
       $("endingBox").style.display = "none";
       $("restProgress").style.display = "none";
       $("restProgressBar").style.width = "0";
       for (let i = 0; i < 3; i += 1) addTask(i === 0 ? "work" : "home");
+      addTask("elder");
       setLog("你是这一家的安排者。把今天过完。");
       render();
     }
@@ -1249,14 +2300,48 @@
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
+      state.pressureAlertShown = false;
+      state.restSucceeded = false;
+      resetParentDoll();
       $("endingBox").style.display = "none";
       $("restProgress").style.display = "none";
       $("restProgressBar").style.width = "0";
-      setLog("试玩记录会出现在这里。完成几个任务后，再试试点击“独处 10 分钟”。");
+      setLog("第一步：点“开始一天”。试玩记录会出现在这里。");
       render();
     }
 
-    function completeTask(id) {
+    function findTaskForScene(scene) {
+      return state.tasks.find((task) => task.scene === scene);
+    }
+
+    function updateHotspots() {
+      document.querySelectorAll(".hotspot").forEach((hotspot) => {
+        const scene = hotspot.dataset.sceneTask;
+        const hasTask = scene === "rest" ? true : Boolean(findTaskForScene(scene));
+        hotspot.hidden = !hasTask;
+      });
+    }
+
+    function completeSceneTask(scene, source = "drag") {
+      if (!state.started) {
+        setLog("先点击“开始一天”，再把父母拖到任务点。");
+        return;
+      }
+      if (scene === "rest") {
+        attemptRest();
+        return;
+      }
+      const task = findTaskForScene(scene);
+      if (!task) {
+        setLog("这里暂时没有对应清单。你可以切到有任务的场景，或者在清单清空后尝试独处。");
+        render();
+        return;
+      }
+      if (state.scene !== scene) state.scene = scene;
+      completeTask(task.id, source);
+    }
+
+    function completeTask(id, source = "button") {
       if (!state.started) return;
       const index = state.tasks.findIndex((task) => task.id === id);
       if (index === -1) return;
@@ -1267,20 +2352,19 @@
       state.self += task.self;
       state.minutes += task.minutes;
       state.completed += 1;
-      const extra = $("modeSelect").value === "tight" ? 2 : 1;
-      for (let i = 0; i < extra; i += 1) addTask();
-      if (state.completed % 3 === 0) addTask("urgent");
       const line = lines[state.completed % lines.length];
-      setLog("完成了“" + task.title + "”。" + line);
+      const prefix = source === "drag" ? "你把父母拖到任务点，完成了“" : "完成了“";
+      setLog(prefix + task.title + "”。" + line);
       render();
     }
 
     function changeScene(scene) {
       state.scene = scene;
-      if (state.started && state.tasks.length < 4) addTask(scene);
       const text = scene === "work" ? "你切到工作场景，新的消息已经在等。" :
-        scene === "rest" ? "你切到个人休息场景，但清单也跟了过来。" :
-        "你切到家庭场景，孩子和老人都在这里。";
+        scene === "elder" ? "你切到老人照护场景，药、复诊和内疚都在这里。" :
+        scene === "hospital" ? "你切到医院场景，等待、核对和判断都变成了清单。" :
+        scene === "rest" ? "你切到自我场景，但清单也跟了过来。" :
+        "你切到家庭场景，孩子和家务都在这里。";
       setLog(text);
       render();
     }
@@ -1294,38 +2378,159 @@
       state.scene = "rest";
       state.restAttempts += 1;
       state.restProgress = 0;
-      state.fatigue -= 6;
-      state.self += 8;
-      state.child -= 2;
+      if (state.tasks.length === 0) {
+        state.restSucceeded = true;
+        state.fatigue -= 12;
+        state.self += 18;
+        state.minutes += 10;
+        $("restProgress").style.display = "block";
+        $("restProgressBar").style.width = "100%";
+        $("logBox").classList.remove("warning");
+        setLog("这一次，清单真的空了。你独处了 10 分钟，没有被任何角色打断。");
+        render();
+        return;
+      }
+      state.fatigue += 4;
+      state.self -= 4;
+      state.child -= 3;
+      state.interruptions += 1;
       $("restProgress").style.display = "block";
-      $("restProgressBar").style.width = "0";
-      setLog("你开始尝试独处 10 分钟。安静刚出现，清单也开始刷新。");
+      $("restProgressBar").style.width = "36%";
+      $("logBox").classList.add("warning");
+      setLog("休息失败：清单还没有空。今日优先级系统把独处重新排到了必要任务之后。");
       render();
-      state.timer = window.setInterval(() => {
-        state.restProgress += 16;
-        $("restProgressBar").style.width = Math.min(100, state.restProgress) + "%";
-        if (state.restProgress >= 48) {
-          window.clearInterval(state.timer);
-          state.timer = null;
-          state.interruptions += 1;
-          state.fatigue += 3;
-          state.child -= 4;
-          state.self -= 2;
-          addTask("urgent");
-          state.minutes += 10;
-          setLog("系统提示：已为您重新安排优先级。独处被推迟至清单末尾。");
-          $("restProgress").style.display = "none";
-          $("restProgressBar").style.width = "0";
-          render();
-        }
-      }, 260);
+      window.setTimeout(() => {
+        $("logBox").classList.remove("warning");
+        $("restProgress").style.display = "none";
+        $("restProgressBar").style.width = "0";
+      }, 1600);
+    }
+
+    function maybeShowPressureAlert() {
+      if (!state.started || state.pressureAlertShown) return;
+      const shouldWarn = state.self <= 5 && state.child <= 5 && state.fatigue >= 95;
+      if (!shouldWarn) return;
+      state.pressureAlertShown = true;
+      const alert = $("pressureAlert");
+      alert.classList.add("show");
+      alert.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => {
+        alert.classList.remove("show");
+        alert.setAttribute("aria-hidden", "true");
+      }, 3000);
     }
 
     function maybeEnd() {
-      const shouldEnd = state.started && (state.completed >= 10 || state.restAttempts >= 3 || state.fatigue >= 92 || state.self <= 3);
+      const shouldEnd = state.started && (state.restSucceeded || state.completed >= 10 || state.restAttempts >= 3 || state.fatigue >= 96 || state.self <= 3);
       if (!shouldEnd) return;
       $("endingBox").style.display = "block";
-      $("endingSummary").textContent = "你完成了 " + state.completed + " 项任务，尝试独处 " + state.restAttempts + " 次，被打断 " + state.interruptions + " 次。此刻疲惫值是 " + state.fatigue + "%，孩子联结是 " + state.child + "%，自我时间是 " + state.self + "%。这不是通关或失败，而是这个项目想呈现的结构：你维持了一切，除了你自己。";
+      $("endingSummary").textContent = state.restSucceeded
+        ? "你完成了清单上的任务，终于独处了 10 分钟。可是这 10 分钟出现的前提，是所有工作、家庭和照护任务都先被处理完。这个结尾想问的是：为什么“做回自己”必须排在这么后面？"
+        : "你完成了 " + state.completed + " 项任务，尝试独处 " + state.restAttempts + " 次，被打断 " + state.interruptions + " 次。此刻疲惫值是 " + state.fatigue + "%，孩子联结是 " + state.child + "%，自我时间是 " + state.self + "%。这不是通关或失败，而是这个项目想呈现的结构：你维持了一切，除了你自己。";
+    }
+
+    function resetParentDoll() {
+      const doll = $("parentDoll");
+      if (!doll) return;
+      doll.style.left = "";
+      doll.style.top = "";
+      doll.style.bottom = "";
+      doll.classList.remove("dragging");
+      document.querySelectorAll(".hotspot").forEach((hotspot) => hotspot.classList.remove("active-drop"));
+    }
+
+    function getVisibleHotspotAt(x, y) {
+      return [...document.querySelectorAll(".hotspot")]
+        .filter((hotspot) => hotspot.offsetParent !== null)
+        .find((hotspot) => {
+          const rect = hotspot.getBoundingClientRect();
+          return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        });
+    }
+
+    function highlightHotspotAt(x, y) {
+      let active = null;
+      document.querySelectorAll(".hotspot").forEach((hotspot) => {
+        const isActive = hotspot === getVisibleHotspotAt(x, y);
+        hotspot.classList.toggle("active-drop", isActive);
+        if (isActive) active = hotspot;
+      });
+      return active;
+    }
+
+    function enableParentDrag() {
+      const doll = $("parentDoll");
+      const stage = $("stage");
+      let offsetX = 0;
+      let offsetY = 0;
+      let pointerId = null;
+      let dragging = false;
+
+      function beginDrag(clientX, clientY) {
+        const dollRect = doll.getBoundingClientRect();
+        const stageRect = stage.getBoundingClientRect();
+        offsetX = clientX - dollRect.left;
+        offsetY = clientY - dollRect.top;
+        doll.style.left = (dollRect.left - stageRect.left) + "px";
+        doll.style.top = (dollRect.top - stageRect.top) + "px";
+        doll.style.bottom = "auto";
+        dragging = true;
+        doll.classList.add("dragging");
+      }
+
+      function moveDrag(clientX, clientY) {
+        if (!dragging) return;
+        const stageRect = stage.getBoundingClientRect();
+        const nextLeft = Math.max(8, Math.min(stageRect.width - doll.offsetWidth - 8, clientX - stageRect.left - offsetX));
+        const nextTop = Math.max(82, Math.min(stageRect.height - doll.offsetHeight - 52, clientY - stageRect.top - offsetY));
+        doll.style.left = nextLeft + "px";
+        doll.style.top = nextTop + "px";
+        highlightHotspotAt(clientX, clientY);
+      }
+
+      function endDrag(clientX, clientY) {
+        if (!dragging) return;
+        const hotspot = highlightHotspotAt(clientX, clientY);
+        dragging = false;
+        doll.classList.remove("dragging");
+        if (hotspot) {
+          completeSceneTask(hotspot.dataset.sceneTask, "drag");
+        }
+        document.querySelectorAll(".hotspot").forEach((item) => item.classList.remove("active-drop"));
+      }
+
+      doll.addEventListener("pointerdown", (event) => {
+        pointerId = event.pointerId;
+        beginDrag(event.clientX, event.clientY);
+        doll.setPointerCapture(pointerId);
+      });
+
+      doll.addEventListener("pointermove", (event) => {
+        if (pointerId !== event.pointerId) return;
+        moveDrag(event.clientX, event.clientY);
+      });
+
+      doll.addEventListener("pointerup", (event) => {
+        if (pointerId !== event.pointerId) return;
+        doll.releasePointerCapture(pointerId);
+        pointerId = null;
+        endDrag(event.clientX, event.clientY);
+      });
+
+      doll.addEventListener("mousedown", (event) => {
+        if (pointerId !== null) return;
+        if (event.button !== 0) return;
+        beginDrag(event.clientX, event.clientY);
+        event.preventDefault();
+      });
+
+      window.addEventListener("mousemove", (event) => {
+        moveDrag(event.clientX, event.clientY);
+      });
+
+      window.addEventListener("mouseup", (event) => {
+        endDrag(event.clientX, event.clientY);
+      });
     }
 
     function saveFeedback() {
@@ -1427,7 +2632,7 @@
       const loading = $("aiMessages").lastElementChild;
 
       try {
-        const response = await fetch("/api/deepseek-chat", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1448,10 +2653,53 @@
       }
     }
 
+    function setResearchOpen(isOpen) {
+      const panel = $("researchPanel");
+      panel.classList.toggle("open", isOpen);
+      $("researchToggle").setAttribute("aria-expanded", String(isOpen));
+      $("researchMark").textContent = isOpen ? "-" : "+";
+    }
+
+    function showPageForHash() {
+      const id = window.location.hash.replace("#", "");
+      const researchIds = new Set(["researchStory", "concept", "design", "research", "paper"]);
+      const preSurveyDone = Boolean(getStoredSurvey(SURVEY_PRE_KEY));
+      if (id === "play" && !preSurveyDone) {
+        window.location.hash = "survey";
+        return;
+      }
+      const page = id === "play" ? "play" : id === "survey" || id === "postSurvey" ? "survey" : researchIds.has(id) ? "research" : "home";
+
+      document.body.dataset.page = page;
+      $("survey").hidden = page !== "survey";
+      $("play").hidden = page !== "play";
+      $("researchPage").hidden = page !== "research";
+
+      if (page === "survey") {
+        renderSurvey(id === "postSurvey" ? "post" : "pre");
+      }
+
+      if (page === "research" && id === "researchStory") {
+        setResearchOpen(true);
+      }
+
+      window.requestAnimationFrame(() => {
+        const target = id ? $(id) : null;
+        if (target && !target.hidden) {
+          target.scrollIntoView({ block: "start", behavior: "auto" });
+        } else {
+          window.scrollTo({ top: 0 });
+        }
+      });
+    }
+
+    $("agreeConsentBtn").addEventListener("click", acceptConsent);
     $("startBtn").addEventListener("click", startGame);
     $("resetBtn").addEventListener("click", resetGame);
     $("restBtn").addEventListener("click", attemptRest);
     $("saveFeedbackBtn").addEventListener("click", saveFeedback);
+    $("finishExperienceBtn").addEventListener("click", goToPostSurvey);
+    $("awarenessSurvey").addEventListener("submit", submitSurvey);
     $("submitUsernameBtn").addEventListener("click", submitUsername);
     $("usernameInput").addEventListener("keydown", (event) => {
       if (event.key === "Enter") submitUsername();
@@ -1470,18 +2718,14 @@
       askAi(question);
     });
     $("researchToggle").addEventListener("click", () => {
-      const panel = $("researchPanel");
-      const isOpen = panel.classList.toggle("open");
-      $("researchToggle").setAttribute("aria-expanded", String(isOpen));
-      $("researchMark").textContent = isOpen ? "-" : "+";
+      setResearchOpen(!$("researchPanel").classList.contains("open"));
     });
     document.querySelectorAll(".scene-tabs button").forEach((button) => {
       button.addEventListener("click", () => changeScene(button.dataset.scene));
     });
     $("modeSelect").addEventListener("change", () => {
       if (state.started) {
-        addTask();
-        setLog("压力模式改变了。清单也随之调整。");
+        setLog("压力模式改变了。下一次重新开始时，清单密度会随之变化。");
         render();
       }
     });
@@ -1501,6 +2745,9 @@
       $("usernameStatus").className = "username-status ok";
       $("usernameStatus").textContent = "这台电脑上次提交的昵称：" + savedUsername;
     }
+    enableParentDrag();
+    window.addEventListener("hashchange", showPageForHash);
+    showPageForHash();
     render();
   </script>
 </body>
