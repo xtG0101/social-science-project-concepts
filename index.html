@@ -2016,6 +2016,7 @@
         ? "题目和前测完全一样，用来比较试玩前后的理解变化。"
         : "这些题没有标准答案，只用来比较你试玩前后的理解有没有变化。";
       $("surveySubmitBtn").textContent = isPost ? "提交后测并查看变化" : "提交并进入试玩";
+      $("surveySubmitBtn").disabled = false;
       $("surveyStatus").textContent = "";
       $("surveyStatus").className = "survey-status";
       $("surveyResult").hidden = true;
@@ -2123,6 +2124,7 @@
       } catch (error) {
         $("surveyStatus").className = "survey-status error";
         $("surveyStatus").textContent = "前测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
+      } finally {
         $("surveySubmitBtn").disabled = false;
       }
     }
