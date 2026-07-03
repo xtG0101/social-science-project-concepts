@@ -2039,6 +2039,19 @@
       return id;
     }
 
+    async function postSurveyRow(body) {
+      return fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(body)
+      });
+    }
+
     async function submitSurveyToSupabase(mode, payload, comparison = {}) {
       const answers = payload.answers;
       const body = {
@@ -2063,19 +2076,34 @@
         client_saved_at: payload.savedAt
       };
 
-      const response = await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_PUBLISHABLE_KEY,
-          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(body)
-      });
+      let response = await postSurveyRow(body);
 
       if (!response.ok) {
-        throw new Error("HTTP " + response.status);
+        let detail = "";
+        try {
+          detail = await response.text();
+        } catch (error) {
+          detail = "";
+        }
+        const canRetryWithOldColumns = response.status === 400
+          && detail.includes("PGRST204")
+          && (detail.includes("game_boss") || detail.includes("game_parent_relationship"));
+        if (canRetryWithOldColumns) {
+          const fallbackBody = { ...body };
+          delete fallbackBody.game_boss;
+          delete fallbackBody.game_parent_relationship;
+          response = await postSurveyRow(fallbackBody);
+          if (response.ok) {
+            console.warn("Supabase survey table is missing new game metric columns. Saved survey without boss/parent relationship metrics.");
+            return;
+          }
+          try {
+            detail = await response.text();
+          } catch (error) {
+            detail = "";
+          }
+        }
+        throw new Error("HTTP " + response.status + (detail ? ": " + detail : ""));
       }
     }
 
@@ -2169,6 +2197,7 @@
           $("surveyStatus").className = "survey-status ok";
           $("surveyStatus").textContent = "后测已保存并提交到 Supabase。";
         } catch (error) {
+          console.warn("Supabase post-survey submit failed:", error);
           $("surveyStatus").className = "survey-status error";
           $("surveyStatus").textContent = "后测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
         } finally {
@@ -2190,14 +2219,15 @@
         await submitSurveyToSupabase("pre", payload);
         $("surveyStatus").className = "survey-status ok";
         $("surveyStatus").textContent = "前测已保存并提交到 Supabase，正在进入试玩。";
-        window.setTimeout(() => {
-          window.location.hash = "play";
-        }, 350);
       } catch (error) {
-        $("surveyStatus").className = "survey-status error";
-        $("surveyStatus").textContent = "前测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
+        console.warn("Supabase pre-survey submit failed:", error);
+        $("surveyStatus").className = "survey-status ok";
+        $("surveyStatus").textContent = "前测已保存在本机，Supabase 暂时没有连上；先进入试玩，数据表修好后再同步。";
       } finally {
         $("surveySubmitBtn").disabled = false;
+        window.setTimeout(() => {
+          window.location.hash = "play";
+        }, 650);
       }
     }
 
