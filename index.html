@@ -1066,18 +1066,17 @@
         radial-gradient(circle at 80% 68%, rgba(179,68,68,.12), transparent 22%),
         #eef5f3;
     }
-    .bacteria {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      border: 2px solid #5f786c;
-      border-radius: 50% 45% 52% 48%;
-      background: #8bd08f;
-      color: #254238;
-      font-weight: 800;
-      line-height: 36px;
-      text-align: center;
-      box-shadow: 0 8px 14px rgba(32,33,36,.16);
+    .bacteria-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .bacteria-help {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
     }
     .log.warning {
       border-color: var(--warn);
@@ -1928,9 +1927,12 @@
   <div class="mini-game-overlay" id="bacteriaGame" aria-hidden="true">
     <div class="mini-game-card">
       <h3>紧急照护：消灭细菌</h3>
-      <p>老人突然不舒服。先处理眼前的细菌压力：点击 10 个细菌后，这项紧急照护任务才会完成。背景时间已暂停。</p>
+      <p>老人突然不舒服。拖动移动，点击或按空格发射；打掉 10 只细菌后，这项紧急照护任务才会完成。背景时间已暂停。</p>
       <strong id="bacteriaScore">已消灭 0 / 10</strong>
-      <div class="bacteria-field" id="bacteriaField"></div>
+      <div class="bacteria-field" id="bacteriaField">
+        <canvas class="bacteria-canvas" id="bacteriaCanvas" aria-label="消灭细菌小游戏"></canvas>
+      </div>
+      <p class="bacteria-help">鼠标 / 手指控制人物位置，点击画面射击靠近的细菌。</p>
     </div>
   </div>
 
@@ -1946,7 +1948,7 @@
     const GAME_DAY_MINUTES = 24 * 60;
     const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
     const GAME_MINUTES_PER_REAL_SECOND = 5;
-    const TASK_RELEASE_INTERVAL_MINUTES = 30;
+    const TASK_RELEASE_INTERVAL_MINUTES = 25;
     const surveyQuestions = [
       "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
       "我认为很多上有老人、下有孩子、同时还要工作的人，都会面临类似的时间压力。",
@@ -1960,11 +1962,17 @@
       { id: "work-boss-message", title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", scene: "work", position: "a", hotspotLabel: "领导电话", hotspotHint: "回复紧急工作消息", timeWindow: { start: 7 * 60, end: 22 * 60 }, urgency: "紧急", ttlMinutes: 45, releaseCondition: "工作消息随时插入", miniGameEntry: "reply_work_message", fatigue: 10, child: -7, boss: 8, parentRel: -2, minutes: 25, penalty: { boss: -10, fatigue: 6 } },
       { id: "work-report", title: "临时加班改报告", type: "结构任务", note: "做完会推进工作，但家庭和照护被继续推迟。", scene: "work", position: "b", hotspotLabel: "会议桌", hotspotHint: "改完今晚要交的报告", timeWindow: { start: 9 * 60, end: 22 * 60 }, urgency: "重要", ttlMinutes: 60, releaseCondition: "工作日任务堆叠", miniGameEntry: "edit_report", fatigue: 13, child: -8, boss: 11, parentRel: -3, minutes: 40, penalty: { boss: -12, fatigue: 7 } },
       { id: "work-promotion-meeting", title: "参加升职考核会议", type: "结构任务", note: "“再努力一下就能升职了。”", scene: "work", position: "b", hotspotLabel: "考核会议", hotspotHint: "下午才能出现", timeWindow: { start: 13 * 60, end: 18 * 60 }, urgency: "重要", ttlMinutes: 50, releaseCondition: "下午职场评价节点", miniGameEntry: "promotion_meeting", fatigue: 12, child: -5, boss: 14, parentRel: -2, minutes: 35, penalty: { boss: -15, fatigue: 5 } },
+      { id: "work-proposal", title: "写工作的方案", type: "结构任务", note: "方案不是一页纸，而是把晚上的注意力继续交给工作。", scene: "work", position: "b", hotspotLabel: "方案文档", hotspotHint: "下午方案任务", timeWindow: { start: 12 * 60, end: 19 * 60 }, urgency: "重要", ttlMinutes: 65, releaseCondition: "午后工作推进", miniGameEntry: "work_proposal", fatigue: 12, child: -6, boss: 13, parentRel: -3, minutes: 42, penalty: { boss: -14, fatigue: 6 } },
+      { id: "work-intern-guidance", title: "给实习生指导", type: "管理任务", note: "指导别人也会占用自己的下班边界。", scene: "work", position: "a", hotspotLabel: "实习生求助", hotspotHint: "下午突然求助", timeWindow: { start: 14 * 60, end: 18 * 60 }, urgency: "普通", ttlMinutes: 50, releaseCondition: "团队协作插入", miniGameEntry: "intern_guidance", fatigue: 9, child: -5, boss: 8, parentRel: -2, minutes: 28, penalty: { boss: -11, fatigue: 5 } },
+      { id: "work-client-needs", title: "跟客户沟通需求", type: "沟通任务", note: "客户的时间表会重新切割家庭时间。", scene: "work", position: "a", hotspotLabel: "客户电话", hotspotHint: "需求沟通", timeWindow: { start: 15 * 60, end: 21 * 60 }, urgency: "重要", ttlMinutes: 55, releaseCondition: "客户临时确认", miniGameEntry: "client_needs", fatigue: 11, child: -7, boss: 10, parentRel: -3, minutes: 35, penalty: { boss: -13, fatigue: 6 } },
       { id: "work-group-chat", title: "处理下班后的工作群", type: "结构任务", note: "技术让在线时间延长。", scene: "work", position: "a", hotspotLabel: "工作群", hotspotHint: "下班后也会亮起", timeWindow: { start: 18 * 60, end: 23 * 60 }, urgency: "普通", ttlMinutes: 40, releaseCondition: "下班后在线", miniGameEntry: "after_hours_chat", fatigue: 9, child: -6, boss: 7, parentRel: -2, minutes: 20, penalty: { boss: -8, fatigue: 4 } },
       { id: "home-breakfast", title: "准备早饭并催孩子出门", type: "隐形家务", note: "一天还没正式开始，家庭清单已经启动。", scene: "home", position: "b", hotspotLabel: "厨房", hotspotHint: "早晨家务", timeWindow: { start: 7 * 60, end: 9 * 60 }, urgency: "重要", ttlMinutes: 30, releaseCondition: "早晨上学前", miniGameEntry: "breakfast_rush", fatigue: 7, child: 6, boss: -2, parentRel: 0, minutes: 24, penalty: { child: -8, fatigue: 4 } },
       { id: "home-parent-group", title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", scene: "home", position: "a", hotspotLabel: "家长群通知", hotspotHint: "通知一来就要处理", timeWindow: { start: 8 * 60, end: 21 * 60 }, urgency: "普通", ttlMinutes: 50, releaseCondition: "学校通知弹出", miniGameEntry: "parent_group_reply", fatigue: 7, child: 4, boss: -3, parentRel: 0, minutes: 20, penalty: { child: -6, fatigue: 3 } },
       { id: "home-homework", title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", scene: "home", position: "a", hotspotLabel: "辅导作业", hotspotHint: "孩子放学后出现", timeWindow: { start: 16 * 60, end: 22 * 60 }, urgency: "重要", ttlMinutes: 70, releaseCondition: "孩子放学后", miniGameEntry: "homework_help", fatigue: 8, child: 11, boss: -4, parentRel: 0, minutes: 30, penalty: { child: -10, fatigue: 4 } },
+      { id: "home-school-pickup", title: "接孩子放学", type: "关系任务", note: "放学窗口很窄，错过就会变成另一种愧疚。", scene: "home", position: "a", hotspotLabel: "学校门口", hotspotHint: "15:00-16:00 接孩子", timeWindow: { start: 15 * 60, end: 16 * 60 }, urgency: "重要", ttlMinutes: 28, releaseCondition: "放学时间窗口", miniGameEntry: "school_pickup", fatigue: 7, child: 13, boss: -6, parentRel: -1, minutes: 26, penalty: { child: -15, fatigue: 5 } },
+      { id: "home-child-dinner", title: "给孩子烧晚饭", type: "隐形家务", note: "晚饭是一项照料，也是一项每天重复的时间占用。", scene: "home", position: "b", hotspotLabel: "孩子晚饭", hotspotHint: "傍晚照料", timeWindow: { start: 17 * 60, end: 20 * 60 }, urgency: "普通", ttlMinutes: 55, releaseCondition: "傍晚家庭任务", miniGameEntry: "child_dinner", fatigue: 9, child: 9, boss: -4, parentRel: 0, minutes: 34, penalty: { child: -11, fatigue: 5 } },
       { id: "home-dinner", title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", scene: "home", position: "b", hotspotLabel: "做晚饭", hotspotHint: "傍晚固定家务", timeWindow: { start: 17 * 60, end: 21 * 60 }, urgency: "普通", ttlMinutes: 55, releaseCondition: "晚饭时间", miniGameEntry: "dinner_cleanup", fatigue: 9, child: 4, boss: -3, parentRel: 0, minutes: 35, penalty: { child: -7, fatigue: 4 } },
+      { id: "home-bedtime", title: "哄孩子睡觉", type: "关系任务", note: "晚上 9 点以后，孩子需要陪伴，但你也已经快没电了。", scene: "home", position: "a", hotspotLabel: "睡前陪伴", hotspotHint: "21:00 后出现", timeWindow: { start: 21 * 60, end: 23 * 60 }, urgency: "重要", ttlMinutes: 45, releaseCondition: "睡前照料", miniGameEntry: "bedtime_care", fatigue: 8, child: 12, boss: -4, parentRel: 0, minutes: 24, penalty: { child: -13, fatigue: 5 } },
       { id: "elder-medication", title: "提醒老人吃药并确认剂量", type: "老人照护", note: "不是一句提醒，而是持续记住和确认。", scene: "elder", position: "a", hotspotLabel: "送药提醒", hotspotHint: "按时确认剂量", timeWindow: { start: 8 * 60, end: 21 * 60 }, urgency: "重要", ttlMinutes: 45, releaseCondition: "老人固定用药时间", miniGameEntry: "medication_check", fatigue: 8, child: -3, boss: -3, parentRel: 9, minutes: 22, penalty: { parentRel: -10, fatigue: 5 } },
       { id: "elder-records", title: "预约检查并整理病历", type: "认知照护", note: "信息管理也在消耗你的时间。", scene: "elder", position: "b", hotspotLabel: "复诊安排", hotspotHint: "整理病历和预约", timeWindow: { start: 10 * 60, end: 18 * 60 }, urgency: "重要", ttlMinutes: 60, releaseCondition: "医院工作时段", miniGameEntry: "medical_records", fatigue: 10, child: -4, boss: -4, parentRel: 10, minutes: 32, penalty: { parentRel: -11, fatigue: 5 } },
       { id: "elder-visit", title: "去老人的家看一眼", type: "情感照护", note: "不去会内疚，去了会挤掉休息。", scene: "elder", position: "a", hotspotLabel: "上门看一眼", hotspotHint: "晚饭后更容易出现", timeWindow: { start: 18 * 60, end: 22 * 60 }, urgency: "普通", ttlMinutes: 65, releaseCondition: "晚间情感照护", miniGameEntry: "elder_visit", fatigue: 9, child: -5, boss: -3, parentRel: 12, minutes: 36, penalty: { parentRel: -9, fatigue: 4 } },
@@ -1975,6 +1983,22 @@
       { id: "urgent-child-material", title: "系统插入：孩子明天要交材料", type: "紧急家庭任务", note: "休息被重新安排。", scene: "home", position: "a", hotspotLabel: "明天材料", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, urgency: "紧急", ttlMinutes: 35, releaseCondition: "晚间临时家庭任务", miniGameEntry: "urgent_school_material", fatigue: 10, child: 8, boss: -5, parentRel: -2, minutes: 30, penalty: { child: -12, fatigue: 5 } },
       { id: "urgent-work-feedback", title: "系统插入：公司要今晚反馈", type: "紧急工作", note: "你以为下班了，清单没有下班。", scene: "work", position: "a", hotspotLabel: "今晚反馈", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, urgency: "紧急", ttlMinutes: 35, releaseCondition: "下班后职场插入", miniGameEntry: "urgent_work_feedback", fatigue: 12, child: -8, boss: 9, parentRel: -3, minutes: 35, penalty: { boss: -12, fatigue: 6 } }
     ];
+
+    function boostTaskNumbers() {
+      const taskKeys = ["fatigue", "child", "boss", "parentRel"];
+      TASK_LIBRARY.forEach((task) => {
+        taskKeys.forEach((key) => {
+          if (task[key]) task[key] = Math.round(task[key] * 1.35);
+        });
+        if (task.penalty) {
+          Object.keys(task.penalty).forEach((key) => {
+            task.penalty[key] = Math.round(task.penalty[key] * 1.55);
+          });
+        }
+      });
+    }
+
+    boostTaskNumbers();
 
     const lines = [
       "忙完这阵就好了。",
@@ -2000,6 +2024,7 @@
       completed: 0,
       restAttempts: 0,
       interruptions: 0,
+      relationDecaySeconds: 0,
       timer: null,
       clockTimer: null,
       dragging: false,
@@ -2008,7 +2033,23 @@
       ended: false,
       minigameOpen: false,
       pendingMiniGameTask: null,
-      bacteriaCaught: 0
+      bacteriaCaught: 0,
+      bacteriaLoop: null
+    };
+
+    const bacteriaGame = {
+      canvas: null,
+      ctx: null,
+      width: 0,
+      height: 0,
+      dpr: 1,
+      player: { x: 0, y: 0, r: 18 },
+      aim: { x: 0, y: 0 },
+      bullets: [],
+      bugs: [],
+      keys: new Set(),
+      dragging: false,
+      lastShotAt: 0
     };
 
     const $ = (id) => document.getElementById(id);
@@ -2330,6 +2371,16 @@
       state.child += changes.child || 0;
       state.boss += changes.boss || 0;
       state.parentRel += changes.parentRel || 0;
+      state.fatigue = clamp(state.fatigue);
+      state.child = clamp(state.child);
+      state.boss = clamp(state.boss);
+      state.parentRel = clamp(state.parentRel);
+    }
+
+    function applyRelationDecay() {
+      applyMetricChanges({ child: -5, boss: -5, parentRel: -5 });
+      showTaskNotice("关系压力继续流失");
+      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 5。");
     }
 
     function expireTasks() {
@@ -2346,13 +2397,13 @@
 
     function activeTaskTarget() {
       const elapsed = Math.max(0, state.minutes - GAME_START_MINUTES);
-      return Math.min(6, 2 + Math.floor(elapsed / 90));
+      return Math.min(7, 2 + Math.floor(elapsed / 70));
     }
 
     function releaseTasks(count = 1, preferredScene = null, options = {}) {
       if (!state.started) return 0;
       let released = 0;
-      while (released < count && state.tasks.length < 6) {
+      while (released < count && state.tasks.length < 7) {
         let candidates = TASK_LIBRARY.filter((task) =>
           !state.releasedTaskIds.includes(task.id) &&
           taskMatchesTime(task) &&
@@ -2387,7 +2438,7 @@
     function releaseScheduledTasks() {
       if (isDayOver()) return 0;
       let released = 0;
-      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 6) {
+      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 7) {
         released += releaseTasks(1);
         state.nextTaskReleaseAt += TASK_RELEASE_INTERVAL_MINUTES;
       }
@@ -2418,6 +2469,11 @@
         const released = isDayOver() ? 0 : releaseScheduledTasks();
         if (released > 0) {
           setLog("时间来到 " + timeText() + "，新的任务进入清单。");
+        }
+        state.relationDecaySeconds += 1;
+        if (state.relationDecaySeconds >= 5) {
+          state.relationDecaySeconds = 0;
+          applyRelationDecay();
         }
         render();
       }, 1000);
@@ -2524,6 +2580,7 @@
     }
 
     function startGame() {
+      closeBacteriaGame();
       state.started = true;
       state.scene = "home";
       state.fatigue = 28;
@@ -2538,6 +2595,7 @@
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
+      state.relationDecaySeconds = 0;
       state.pressureAlertShown = false;
       state.restSucceeded = false;
       state.ended = false;
@@ -2553,6 +2611,7 @@
     function resetGame() {
       window.clearInterval(state.timer);
       stopTimelineClock();
+      closeBacteriaGame();
       state.timer = null;
       state.started = false;
       state.scene = "home";
@@ -2568,6 +2627,7 @@
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
+      state.relationDecaySeconds = 0;
       state.pressureAlertShown = false;
       state.restSucceeded = false;
       state.ended = false;
@@ -2646,38 +2706,256 @@
       state.bacteriaCaught = 0;
       stopTimelineClock();
       $("bacteriaScore").textContent = "已消灭 0 / 10";
-      const field = $("bacteriaField");
-      field.innerHTML = "";
       $("bacteriaGame").classList.add("show");
       $("bacteriaGame").setAttribute("aria-hidden", "false");
-      for (let i = 0; i < 10; i += 1) spawnBacteria();
+      setupBacteriaGame();
+      state.bacteriaLoop = window.requestAnimationFrame(runBacteriaGame);
     }
 
-    function spawnBacteria() {
-      const field = $("bacteriaField");
-      const germ = document.createElement("button");
-      germ.type = "button";
-      germ.className = "bacteria";
-      germ.textContent = "菌";
-      germ.style.left = Math.round(5 + Math.random() * 82) + "%";
-      germ.style.top = Math.round(8 + Math.random() * 72) + "%";
-      germ.addEventListener("click", () => {
-        germ.remove();
-        state.bacteriaCaught += 1;
-        $("bacteriaScore").textContent = "已消灭 " + state.bacteriaCaught + " / 10";
-        if (state.bacteriaCaught >= 10) finishBacteriaGame();
+    function setupBacteriaGame() {
+      bacteriaGame.canvas = $("bacteriaCanvas");
+      bacteriaGame.ctx = bacteriaGame.canvas.getContext("2d");
+      resizeBacteriaCanvas();
+      bacteriaGame.player.x = bacteriaGame.width / 2;
+      bacteriaGame.player.y = bacteriaGame.height - 58;
+      bacteriaGame.aim.x = bacteriaGame.width / 2;
+      bacteriaGame.aim.y = bacteriaGame.height / 2;
+      bacteriaGame.bullets = [];
+      bacteriaGame.bugs = [];
+      bacteriaGame.lastShotAt = 0;
+      for (let i = 0; i < 6; i += 1) addBacteriaBug();
+    }
+
+    function resizeBacteriaCanvas() {
+      const canvas = $("bacteriaCanvas");
+      const rect = canvas.getBoundingClientRect();
+      bacteriaGame.dpr = window.devicePixelRatio || 1;
+      bacteriaGame.width = Math.max(320, rect.width);
+      bacteriaGame.height = Math.max(260, rect.height);
+      canvas.width = Math.round(bacteriaGame.width * bacteriaGame.dpr);
+      canvas.height = Math.round(bacteriaGame.height * bacteriaGame.dpr);
+      bacteriaGame.ctx = canvas.getContext("2d");
+      bacteriaGame.ctx.setTransform(bacteriaGame.dpr, 0, 0, bacteriaGame.dpr, 0, 0);
+    }
+
+    function addBacteriaBug() {
+      const side = Math.floor(Math.random() * 4);
+      const margin = 28;
+      const bug = {
+        x: side === 0 ? -margin : side === 1 ? bacteriaGame.width + margin : Math.random() * bacteriaGame.width,
+        y: side === 2 ? -margin : side === 3 ? bacteriaGame.height + margin : Math.random() * bacteriaGame.height,
+        r: 15 + Math.random() * 7,
+        speed: .72 + Math.random() * .42,
+        spin: Math.random() * Math.PI * 2,
+        color: Math.random() > .5 ? "#88c28c" : "#d59a6f"
+      };
+      bacteriaGame.bugs.push(bug);
+    }
+
+    function runBacteriaGame() {
+      if (!state.minigameOpen) return;
+      updateBacteriaGame();
+      drawBacteriaGame();
+      state.bacteriaLoop = window.requestAnimationFrame(runBacteriaGame);
+    }
+
+    function updateBacteriaGame() {
+      const speed = 4;
+      if (bacteriaGame.keys.has("ArrowLeft") || bacteriaGame.keys.has("a")) bacteriaGame.player.x -= speed;
+      if (bacteriaGame.keys.has("ArrowRight") || bacteriaGame.keys.has("d")) bacteriaGame.player.x += speed;
+      if (bacteriaGame.keys.has("ArrowUp") || bacteriaGame.keys.has("w")) bacteriaGame.player.y -= speed;
+      if (bacteriaGame.keys.has("ArrowDown") || bacteriaGame.keys.has("s")) bacteriaGame.player.y += speed;
+      bacteriaGame.player.x = Math.max(22, Math.min(bacteriaGame.width - 22, bacteriaGame.player.x));
+      bacteriaGame.player.y = Math.max(22, Math.min(bacteriaGame.height - 22, bacteriaGame.player.y));
+
+      bacteriaGame.bullets.forEach((bullet) => {
+        bullet.x += bullet.vx;
+        bullet.y += bullet.vy;
+        bullet.life -= 1;
       });
-      field.appendChild(germ);
+      bacteriaGame.bullets = bacteriaGame.bullets.filter((bullet) =>
+        bullet.life > 0 && bullet.x > -20 && bullet.x < bacteriaGame.width + 20 && bullet.y > -20 && bullet.y < bacteriaGame.height + 20
+      );
+
+      bacteriaGame.bugs.forEach((bug) => {
+        const angle = Math.atan2(bacteriaGame.player.y - bug.y, bacteriaGame.player.x - bug.x);
+        bug.x += Math.cos(angle) * bug.speed;
+        bug.y += Math.sin(angle) * bug.speed;
+        bug.spin += .08;
+        const distanceToPlayer = Math.hypot(bug.x - bacteriaGame.player.x, bug.y - bacteriaGame.player.y);
+        if (distanceToPlayer < bug.r + bacteriaGame.player.r) {
+          bug.x = Math.random() < .5 ? -30 : bacteriaGame.width + 30;
+          bug.y = Math.random() * bacteriaGame.height;
+        }
+      });
+
+      for (let bugIndex = bacteriaGame.bugs.length - 1; bugIndex >= 0; bugIndex -= 1) {
+        const bug = bacteriaGame.bugs[bugIndex];
+        const bulletIndex = bacteriaGame.bullets.findIndex((bullet) => Math.hypot(bullet.x - bug.x, bullet.y - bug.y) < bug.r + 6);
+        if (bulletIndex !== -1) {
+          bacteriaGame.bugs.splice(bugIndex, 1);
+          bacteriaGame.bullets.splice(bulletIndex, 1);
+          state.bacteriaCaught += 1;
+          $("bacteriaScore").textContent = "已消灭 " + state.bacteriaCaught + " / 10";
+          if (state.bacteriaCaught >= 10) {
+            finishBacteriaGame();
+            return;
+          }
+          addBacteriaBug();
+        }
+      }
+    }
+
+    function drawBacteriaGame() {
+      const ctx = bacteriaGame.ctx;
+      ctx.clearRect(0, 0, bacteriaGame.width, bacteriaGame.height);
+      const gradient = ctx.createLinearGradient(0, 0, bacteriaGame.width, bacteriaGame.height);
+      gradient.addColorStop(0, "#3f3943");
+      gradient.addColorStop(1, "#6f5b64");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, bacteriaGame.width, bacteriaGame.height);
+
+      ctx.strokeStyle = "rgba(255,255,255,.12)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < bacteriaGame.width; x += 32) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, bacteriaGame.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < bacteriaGame.height; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(bacteriaGame.width, y);
+        ctx.stroke();
+      }
+
+      bacteriaGame.bugs.forEach((bug) => {
+        ctx.save();
+        ctx.translate(bug.x, bug.y);
+        ctx.rotate(Math.sin(bug.spin) * .28);
+        ctx.fillStyle = bug.color;
+        ctx.strokeStyle = "#24382f";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, bug.r * 1.08, bug.r * .82, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(36,56,47,.8)";
+        for (let i = -1; i <= 1; i += 1) {
+          ctx.beginPath();
+          ctx.moveTo(-bug.r * .4, i * 5);
+          ctx.lineTo(-bug.r * 1.25, i * 9);
+          ctx.moveTo(bug.r * .4, i * 5);
+          ctx.lineTo(bug.r * 1.25, i * 9);
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#fff7e8";
+        ctx.beginPath();
+        ctx.arc(-5, -4, 3, 0, Math.PI * 2);
+        ctx.arc(5, -4, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      bacteriaGame.bullets.forEach((bullet) => {
+        ctx.fillStyle = "#f3d28d";
+        ctx.strokeStyle = "#5f4530";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      const player = bacteriaGame.player;
+      ctx.save();
+      ctx.translate(player.x, player.y);
+      ctx.fillStyle = "#f0cdb4";
+      ctx.strokeStyle = "#232323";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, -22, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#79a8c0";
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(-16, -8, 32, 42, 7);
+      } else {
+        ctx.rect(-16, -8, 32, 42);
+      }
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-9, 34);
+      ctx.lineTo(-9, 48);
+      ctx.moveTo(9, 34);
+      ctx.lineTo(9, 48);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.strokeStyle = "rgba(255,255,255,.55)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(player.x, player.y - 18);
+      ctx.lineTo(bacteriaGame.aim.x, bacteriaGame.aim.y);
+      ctx.stroke();
+    }
+
+    function shootBacteriaGame() {
+      if (!state.minigameOpen) return;
+      const now = Date.now();
+      if (now - bacteriaGame.lastShotAt < 140) return;
+      bacteriaGame.lastShotAt = now;
+      const angle = Math.atan2(bacteriaGame.aim.y - bacteriaGame.player.y, bacteriaGame.aim.x - bacteriaGame.player.x);
+      bacteriaGame.bullets.push({
+        x: bacteriaGame.player.x,
+        y: bacteriaGame.player.y - 18,
+        vx: Math.cos(angle) * 9,
+        vy: Math.sin(angle) * 9,
+        life: 58
+      });
+    }
+
+    function setBacteriaPointer(event) {
+      if (!state.minigameOpen) return;
+      const rect = $("bacteriaCanvas").getBoundingClientRect();
+      bacteriaGame.aim.x = event.clientX - rect.left;
+      bacteriaGame.aim.y = event.clientY - rect.top;
+      if (bacteriaGame.dragging) {
+        bacteriaGame.player.x = Math.max(22, Math.min(bacteriaGame.width - 22, bacteriaGame.aim.x));
+        bacteriaGame.player.y = Math.max(22, Math.min(bacteriaGame.height - 22, bacteriaGame.aim.y));
+      }
     }
 
     function finishBacteriaGame() {
       const runtimeId = state.pendingMiniGameTask;
       state.minigameOpen = false;
       state.pendingMiniGameTask = null;
+      if (state.bacteriaLoop) {
+        window.cancelAnimationFrame(state.bacteriaLoop);
+        state.bacteriaLoop = null;
+      }
       $("bacteriaGame").classList.remove("show");
       $("bacteriaGame").setAttribute("aria-hidden", "true");
       if (state.started && !state.ended) startTimelineClock();
       completeTask(runtimeId, "drag", { skipMiniGame: true });
+    }
+
+    function closeBacteriaGame() {
+      state.minigameOpen = false;
+      state.pendingMiniGameTask = null;
+      if (state.bacteriaLoop) {
+        window.cancelAnimationFrame(state.bacteriaLoop);
+        state.bacteriaLoop = null;
+      }
+      $("bacteriaGame").classList.remove("show");
+      $("bacteriaGame").setAttribute("aria-hidden", "true");
+      bacteriaGame.bullets = [];
+      bacteriaGame.bugs = [];
+      bacteriaGame.keys.clear();
+      bacteriaGame.dragging = false;
     }
 
     function changeScene(scene) {
@@ -2701,23 +2979,31 @@
       state.scene = "rest";
       state.restAttempts += 1;
       const missing = [];
-      if (state.fatigue < 90) missing.push("疲惫值还没有达到 90%，系统认为你还可以继续撑。");
-      if (state.child < 70) missing.push("孩子联结低于 70%，你先被推回家庭任务。");
-      if (state.boss < 70) missing.push("上司信任低于 70%，工作期待还没有放你走。");
+      const exhaustionOverridesEverything = state.fatigue >= 100;
+      if (!exhaustionOverridesEverything) {
+        if (state.fatigue < 90) missing.push("疲惫值还没有达到 90%，系统认为你还可以继续撑。");
+        if (state.child < 70) missing.push("孩子联结低于 70%，你先被推回家庭任务。");
+        if (state.boss < 70) missing.push("上司信任低于 70%，工作期待还没有放你走。");
+        if (state.parentRel < 70) missing.push("与父母关系低于 70%，照护责任还没有放你走。");
+      }
       if (!missing.length) {
         state.restSucceeded = true;
         state.fatigue -= 25;
         state.child -= 8;
         state.boss -= 8;
+        state.parentRel -= 8;
         state.minutes = Math.min(GAME_END_MINUTES, state.minutes + 10);
         $("logBox").classList.remove("warning");
-        setLog("这一次你真的休息了 10 分钟。疲惫下降，但家庭和工作期待也被短暂牺牲。");
+        setLog(exhaustionOverridesEverything
+          ? "疲惫值已经满格，系统终于不能再说你还可以撑。你休息了 10 分钟。"
+          : "这一次你真的休息了 10 分钟。疲惫下降，但家庭、工作和照护期待也被短暂牺牲。");
         render();
         return;
       }
       state.fatigue += 4;
       state.child -= 3;
       state.boss -= 3;
+      state.parentRel -= 3;
       state.interruptions += 1;
       $("logBox").classList.add("warning");
       showRestFailure("休息失败", missing.join(" "));
@@ -2761,7 +3047,7 @@
 
     function maybeEnd() {
       if (state.ended) return;
-      const shouldEnd = state.started && (isDayOver() || state.restSucceeded || state.completed >= 10 || state.restAttempts >= 3 || state.fatigue >= 100 || state.child <= 3 || state.boss <= 3 || state.parentRel <= 3);
+      const shouldEnd = state.started && (isDayOver() || state.restSucceeded || state.completed >= 10 || state.restAttempts >= 3 || state.child <= 3 || state.boss <= 3 || state.parentRel <= 3);
       if (!shouldEnd) return;
       state.ended = true;
       stopTimelineClock();
@@ -2769,7 +3055,7 @@
       $("endingSummary").textContent = isDayOver()
         ? "这一天走完了。你完成了 " + state.completed + " 项任务，尝试休息 " + state.restAttempts + " 次，被打断 " + state.interruptions + " 次。此刻疲惫值是 " + state.fatigue + "%，孩子联结是 " + state.child + "%，上司信任是 " + state.boss + "%，与父母关系是 " + state.parentRel + "%。清单不是一次出现的，它是沿着时间线不断进入生活的。"
         : state.restSucceeded
-        ? "你终于休息了 10 分钟。可是这 10 分钟出现的前提，是疲惫足够高、孩子联结和上司信任也足够高。这个结尾想问的是：为什么“做回自己”必须先满足这么多外部条件？"
+        ? "你终于休息了 10 分钟。可是这 10 分钟出现的前提，是疲惫足够高，或者身体已经被推到满格；平时还要孩子联结、上司信任和与父母关系都足够高。这个结尾想问的是：为什么“做回自己”必须先满足这么多外部条件？"
         : "你完成了 " + state.completed + " 项任务，尝试休息 " + state.restAttempts + " 次，被打断 " + state.interruptions + " 次。此刻疲惫值是 " + state.fatigue + "%，孩子联结是 " + state.child + "%，上司信任是 " + state.boss + "%，与父母关系是 " + state.parentRel + "%。这不是通关或失败，而是这个项目想呈现的结构：你维持了一切，除了你自己。";
     }
 
@@ -3027,6 +3313,37 @@
     });
     document.querySelectorAll(".scene-tabs button").forEach((button) => {
       button.addEventListener("click", () => changeScene(button.dataset.scene));
+    });
+    $("bacteriaCanvas").addEventListener("pointerdown", (event) => {
+      bacteriaGame.dragging = true;
+      setBacteriaPointer(event);
+      shootBacteriaGame();
+      $("bacteriaCanvas").setPointerCapture(event.pointerId);
+    });
+    $("bacteriaCanvas").addEventListener("pointermove", setBacteriaPointer);
+    $("bacteriaCanvas").addEventListener("pointerup", (event) => {
+      bacteriaGame.dragging = false;
+      $("bacteriaCanvas").releasePointerCapture(event.pointerId);
+    });
+    $("bacteriaCanvas").addEventListener("pointerleave", () => {
+      bacteriaGame.dragging = false;
+    });
+    window.addEventListener("keydown", (event) => {
+      if (!state.minigameOpen) return;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "w", "a", "s", "d"].includes(event.key)) {
+        bacteriaGame.keys.add(event.key);
+        event.preventDefault();
+      }
+      if (event.key === " ") {
+        shootBacteriaGame();
+        event.preventDefault();
+      }
+    });
+    window.addEventListener("keyup", (event) => {
+      bacteriaGame.keys.delete(event.key);
+    });
+    window.addEventListener("resize", () => {
+      if (state.minigameOpen) resizeBacteriaCanvas();
     });
     $("modeSelect").addEventListener("change", () => {
       if (state.started) {
