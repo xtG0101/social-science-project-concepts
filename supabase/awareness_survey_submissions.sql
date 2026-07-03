@@ -16,10 +16,20 @@ create table if not exists public.awareness_survey_submissions (
   game_interruptions integer,
   game_fatigue integer,
   game_child integer,
-  game_self integer,
+  game_boss integer,
+  game_parent_relationship integer,
   client_saved_at text,
   created_at timestamptz not null default now()
 );
+
+alter table public.awareness_survey_submissions
+  add column if not exists game_boss integer;
+
+alter table public.awareness_survey_submissions
+  add column if not exists game_parent_relationship integer;
+
+alter table public.awareness_survey_submissions
+  drop column if exists game_self;
 
 alter table public.awareness_survey_submissions enable row level security;
 
