@@ -28,6 +28,14 @@ How to answer:
 - Do not ask for private information.
 - If the user appears to be discussing real personal distress rather than the game, step out of character and answer supportively.`;
 
+const endingPrompt = `You write short Chinese endings for an interactive social science demo about sandwich generation time poverty.
+
+You are not the pressure-system voice in this mode. You are a clear narrator.
+Use the final game numbers to describe consequences for the parent, child, boss/work, and aging parents.
+Do not invent survey data, percentages beyond the provided game state, or medical certainty.
+Mention that the issue is structural, not a personal failure.
+Keep the ending 80-140 Chinese characters.`;
+
 function sendJson(res, status, payload) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -66,6 +74,7 @@ module.exports = async function handler(req, res) {
   }
 
   const message = String(body.message || "").trim();
+  const mode = String(body.mode || "").trim();
   const gameState = body.gameState && typeof body.gameState === "object"
     ? JSON.stringify(body.gameState).slice(0, 1200)
     : "{}";
@@ -85,7 +94,7 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: "deepseek-v4-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: mode === "ending" ? endingPrompt : systemPrompt },
           { role: "user", content: `Current game state: ${gameState}\n\nUser message: ${message}` },
         ],
         temperature: 0.65,
