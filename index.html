@@ -854,17 +854,26 @@
       background: #fff;
       overflow: hidden;
       align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
     .task-panel h3 {
       margin: 0;
       padding: 12px 14px;
       border-bottom: 1px solid var(--line);
       font-size: 16px;
+      flex: 0 0 auto;
     }
     .task-list {
       list-style: none;
       margin: 0;
       padding: 0;
+      flex: 1 1 auto;
+      max-height: clamp(320px, 48vh, 560px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
     }
     .task-list li {
       display: grid;
@@ -1401,6 +1410,7 @@
       .play-board { grid-template-columns: 1fr; }
       .research-grid { grid-template-columns: 1fr; }
       .scene-tabs { grid-template-columns: repeat(2, 1fr); }
+      .task-list { max-height: 360px; }
       .task-list li, .rest-row { grid-template-columns: 1fr; }
       .task-list button, .rest-row button { width: 100%; }
       .survey-card { padding: 20px; }
@@ -1907,7 +1917,7 @@
     const GAME_START_MINUTES = 7 * 60;
     const GAME_DAY_MINUTES = 24 * 60;
     const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
-    const GAME_MINUTES_PER_REAL_SECOND = 10;
+    const GAME_MINUTES_PER_REAL_SECOND = 5;
     const TASK_RELEASE_INTERVAL_MINUTES = 12;
     const surveyQuestions = [
       "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
@@ -1994,7 +2004,7 @@
       warningLevelsShown: [],
       ultimateWarnings: 0,
       activeUltimateSignals: [],
-      ultimateCooldownUntil: 0,
+      ultimateSignalArmed: { child: true, parentRel: true, boss: true, fatigue: true },
       endingReason: "",
       endingGenerated: false,
       completed: 0,
@@ -2286,6 +2296,11 @@
       return state.tasks.some((activeTask) => activeTask.scene === task.scene && activeTask.position === task.position);
     }
 
+    function isBlockedSpot(task, options = {}) {
+      const spots = options.blockedSpots || (options.blockedSpot ? [options.blockedSpot] : []);
+      return spots.some((spot) => spot && spot.scene === task.scene && spot.position === task.position);
+    }
+
     function copyTask(task) {
       return {
         ...task,
@@ -2365,7 +2380,8 @@
           !state.tasks.some((activeTask) => activeTask.id === task.id) &&
           taskMatchesTime(task) &&
           taskMatchesMode(task) &&
-          !hasTaskAtPosition(task)
+          !hasTaskAtPosition(task) &&
+          !isBlockedSpot(task, options)
         );
         if (preferredScene) {
           const sceneCandidates = candidates.filter((task) => task.scene === preferredScene);
@@ -2386,21 +2402,21 @@
       return released;
     }
 
-    function releaseDueTasks(preferredScene = null) {
+    function releaseDueTasks(preferredScene = null, options = {}) {
       const needed = activeTaskTarget() - state.tasks.length;
       if (needed <= 0) return 0;
-      return releaseTasks(needed, preferredScene);
+      return releaseTasks(needed, preferredScene, options);
     }
 
-    function releaseScheduledTasks() {
+    function releaseScheduledTasks(options = {}) {
       if (isDayOver()) return 0;
       let released = 0;
       while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 12) {
-        released += releaseTasks(2);
+        released += releaseTasks(2, null, options);
         state.nextTaskReleaseAt += TASK_RELEASE_INTERVAL_MINUTES;
       }
       if (state.tasks.length < activeTaskTarget()) {
-        released += releaseDueTasks(state.scene);
+        released += releaseDueTasks(state.scene, options);
       }
       return released;
     }
@@ -2550,7 +2566,7 @@
       state.warningLevelsShown = [];
       state.ultimateWarnings = 0;
       state.activeUltimateSignals = [];
-      state.ultimateCooldownUntil = 0;
+      state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
       state.endingReason = "";
       state.endingGenerated = false;
       state.completed = 0;
@@ -2586,7 +2602,7 @@
       state.warningLevelsShown = [];
       state.ultimateWarnings = 0;
       state.activeUltimateSignals = [];
-      state.ultimateCooldownUntil = 0;
+      state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
       state.endingReason = "";
       state.endingGenerated = false;
       state.completed = 0;
@@ -2618,6 +2634,9 @@
         } else if (task) {
           hotspot.innerHTML = task.hotspotLabel + "<small>" + task.hotspotHint + "</small>";
           hotspot.setAttribute("aria-label", task.title);
+        } else {
+          hotspot.innerHTML = "";
+          hotspot.removeAttribute("aria-label");
         }
       });
     }
@@ -2646,13 +2665,14 @@
       const index = state.tasks.findIndex((task) => task.runtimeId === runtimeId);
       if (index === -1) return;
       const task = state.tasks[index];
+      const completedSpot = { scene: task.scene, position: task.position };
       state.tasks.splice(index, 1);
       applyMetricChanges(task);
       state.minutes = Math.min(GAME_END_MINUTES, state.minutes + task.minutes);
       state.completed += 1;
-      releaseScheduledTasks();
-      releaseDueTasks(task.scene);
-      if (state.completed % 2 === 0) releaseTasks(1, null, { urgentOnly: true });
+      releaseScheduledTasks({ blockedSpot: completedSpot });
+      releaseDueTasks(task.scene, { blockedSpot: completedSpot });
+      if (state.completed % 2 === 0) releaseTasks(1, null, { urgentOnly: true, blockedSpot: completedSpot });
       if (state.boss >= 100) showRestFailure("成功升职", "上司信任已经达到 100%。你获得了升职反馈，但这也说明工作期待会继续把时间拉走。", false);
       const line = lines[state.completed % lines.length];
       const prefix = source === "drag" ? "你把父母拖到任务点，完成了“" : "完成了“";
@@ -2765,20 +2785,23 @@
       if (!state.started || state.ended) return false;
       const signals = getUltimateSignals();
       state.activeUltimateSignals = signals.map((signal) => signal.key);
-      if (!signals.length) {
-        state.ultimateCooldownUntil = 0;
-        return false;
-      }
-      if (state.ultimateCooldownUntil && state.minutes < state.ultimateCooldownUntil) return false;
+      const activeKeys = new Set(state.activeUltimateSignals);
+      ["child", "parentRel", "boss", "fatigue"].forEach((key) => {
+        if (!activeKeys.has(key)) state.ultimateSignalArmed[key] = true;
+      });
+      const newlyTriggered = signals.filter((signal) => state.ultimateSignalArmed[signal.key]);
+      if (!newlyTriggered.length) return false;
+      newlyTriggered.forEach((signal) => {
+        state.ultimateSignalArmed[signal.key] = false;
+      });
       state.ultimateWarnings += 1;
-      state.ultimateCooldownUntil = state.minutes + 45;
       $("ultimateAlertTitle").textContent = "终极警告 " + Math.min(state.ultimateWarnings, 3) + " / 3";
       $("ultimateAlertText").textContent = signals.map((signal) => signal.text).join("；") + "。系统已经不能把这视为普通忙碌。";
       const alert = $("ultimateAlert");
       alert.style.background = "rgba(94,18,18,.9)";
       alert.classList.add("show");
       alert.setAttribute("aria-hidden", "false");
-      setLog("终极警告 " + Math.min(state.ultimateWarnings, 3) + " / 3：" + signals[0].text + "。");
+      setLog("终极警告 " + Math.min(state.ultimateWarnings, 3) + " / 3：" + newlyTriggered[0].text + "。");
       if (state.ultimateWarnings >= 3) {
         window.setTimeout(() => endGame("ultimate-warning"), 900);
       }
