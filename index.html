@@ -14,6 +14,7 @@
       --work: #3f6f8f;
       --home: #c66b4d;
       --self: #5d8f6d;
+      --parent-rel: #8a6fbe;
       --warn: #b34444;
       --gold: #d39c3f;
       --soft-work: #e9f2f6;
@@ -338,7 +339,7 @@
     }
     .status-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       margin-bottom: 14px;
     }
@@ -374,7 +375,8 @@
     }
     .meter-card.fatigue-card .ui-icon { color: var(--warn); }
     .meter-card.child-card .ui-icon { color: var(--gold); }
-    .meter-card.self-card .ui-icon { color: var(--self); }
+    .meter-card.boss-card .ui-icon { color: var(--work); }
+    .meter-card.parent-card .ui-icon { color: var(--parent-rel); }
     .meter {
       height: 10px;
       border-radius: 999px;
@@ -389,7 +391,8 @@
     }
     .fill.fatigue { background: var(--warn); }
     .fill.child { background: var(--gold); }
-    .fill.self { background: var(--self); }
+    .fill.boss { background: var(--work); }
+    .fill.parent-rel { background: var(--parent-rel); }
 
     .play-board {
       display: grid;
@@ -527,6 +530,9 @@
       cursor: grab;
       touch-action: none;
       background-image: url("assets/generated-characters/parent-sprite.webp");
+    }
+    .doll.parent.low-fatigue {
+      background-image: url("assets/generated-characters/parent-healthy-sprite.webp");
     }
     .doll.parent::before {
       content: "";
@@ -736,12 +742,16 @@
     .hotspot[hidden] { display: none !important; }
     .hotspot.work-a { right: 38px; top: 116px; }
     .hotspot.work-b { right: 180px; bottom: 146px; }
+    .hotspot.work-c { left: 54px; bottom: 126px; }
     .hotspot.home-a { left: 50px; top: 124px; }
     .hotspot.home-b { right: 42px; bottom: 142px; }
+    .hotspot.home-c { right: 176px; top: 114px; }
     .hotspot.elder-a { left: 66px; top: 128px; }
     .hotspot.elder-b { right: 46px; bottom: 142px; }
+    .hotspot.elder-c { left: 226px; bottom: 132px; }
     .hotspot.hospital-a { left: 56px; top: 128px; }
     .hotspot.hospital-b { right: 52px; bottom: 142px; }
+    .hotspot.hospital-c { right: 214px; top: 118px; }
     .hotspot.rest-a { left: 52px; top: 126px; border-style: dashed; }
     .hotspot.rest-b { right: 48px; bottom: 138px; opacity: .76; }
     .scene-work-only,
@@ -844,17 +854,26 @@
       background: #fff;
       overflow: hidden;
       align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
     .task-panel h3 {
       margin: 0;
       padding: 12px 14px;
       border-bottom: 1px solid var(--line);
       font-size: 16px;
+      flex: 0 0 auto;
     }
     .task-list {
       list-style: none;
       margin: 0;
       padding: 0;
+      flex: 1 1 auto;
+      max-height: clamp(320px, 48vh, 560px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
     }
     .task-list li {
       display: grid;
@@ -883,6 +902,23 @@
       font-size: 12px;
       color: var(--muted);
     }
+    .task-impact {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .impact-chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: #fbfaf7;
+      color: #4e5560;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .impact-chip.good { color: var(--self); border-color: rgba(93,143,109,.35); }
+    .impact-chip.bad { color: var(--warn); border-color: rgba(179,68,68,.35); }
     .task-list button {
       padding: 7px 10px;
       min-width: 76px;
@@ -936,45 +972,6 @@
       color: #4e5560;
       font-size: 13px;
     }
-    .username-card {
-      margin-top: 12px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: #fff;
-      padding: 12px;
-    }
-    .username-card label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .username-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: center;
-    }
-    .username-row input {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 9px 10px;
-      background: #fff;
-      color: var(--ink);
-    }
-    .username-note {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .username-status {
-      margin-top: 6px;
-      min-height: 20px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .username-status.ok { color: var(--self); font-weight: 700; }
-    .username-status.error { color: var(--warn); font-weight: 700; }
     .ending {
       display: none;
       margin-top: 14px;
@@ -983,6 +980,14 @@
       background: #fff;
       padding: 14px;
     }
+    .feedback-card {
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 14px;
+    }
+    .feedback-card h3 { margin: 0 0 8px; }
     .ending h3 { margin: 0 0 8px; }
     .pressure-alert {
       position: fixed;
@@ -1013,6 +1018,34 @@
       margin: 0;
       color: rgba(255,255,255,.82);
       line-height: 1.6;
+    }
+    .pressure-alert-card button {
+      margin-top: 16px;
+      padding: 9px 14px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .task-notice {
+      position: fixed;
+      left: 50%;
+      top: 76px;
+      z-index: 70;
+      transform: translate(-50%, -12px);
+      opacity: 0;
+      pointer-events: none;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius);
+      background: #202124;
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .task-notice.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
     }
     .log.warning {
       border-color: var(--warn);
@@ -1377,10 +1410,9 @@
       .play-board { grid-template-columns: 1fr; }
       .research-grid { grid-template-columns: 1fr; }
       .scene-tabs { grid-template-columns: repeat(2, 1fr); }
+      .task-list { max-height: 360px; }
       .task-list li, .rest-row { grid-template-columns: 1fr; }
       .task-list button, .rest-row button { width: 100%; }
-      .username-row { grid-template-columns: 1fr; }
-      .username-row button { width: 100%; }
       .survey-card { padding: 20px; }
       .survey-options { grid-template-columns: 1fr; }
       .survey-options label {
@@ -1463,7 +1495,8 @@
   </section>
 
   <nav class="topbar" aria-label="页面导航">
-    <a href="#survey">试玩</a>
+    <a href="#survey">前测 / 试玩</a>
+    <a href="#feedback">试玩反馈</a>
     <a href="#concept">核心概念</a>
     <a href="#research">调研</a>
     <a href="#design">机制</a>
@@ -1484,7 +1517,7 @@
         <strong>最快玩法：</strong>
         <span>1. 点“开始一天”</span>
         <span>2. 连续完成几项清单任务</span>
-        <span>3. 再点“尝试独处”，看休息如何被重新排序</span>
+        <span>3. 切到“自我”场景，把人物拖到休息点，看休息是否被允许</span>
       </div>
       <ul class="plain-list">
         <li><strong>给谁用：</strong>同龄人、老师、试玩同学，以及见过父母一边忙工作一边顾家的人。不需要会玩游戏，打开就能懂。</li>
@@ -1521,7 +1554,7 @@
     <section class="game-shell page-view" id="play" aria-labelledby="game-title">
       <div class="game-head">
         <h2 id="game-title">小体验：把今天过完</h2>
-        <p>没时间研究也没关系：先点黑色按钮开始，把夹心层父母拖到发光任务点，再试试“独处 10 分钟”。</p>
+        <p>目标不是完美通关，而是在一天里尽量维持家庭、工作和照护运转，同时避免疲惫值爆表。休息必须切到“自我”场景后，把夹心层父母拖到休息发光点才会尝试。</p>
         <div class="controls">
           <button class="primary" id="startBtn">开始一天</button>
           <button class="secondary" id="resetBtn">重新开始</button>
@@ -1535,8 +1568,8 @@
         </div>
         <div class="play-steps" aria-label="玩法三步">
           <div class="step-chip"><strong>1. 开始</strong>生成今天的任务清单。</div>
-          <div class="step-chip"><strong>2. 处理清单</strong>观察疲惫、孩子联结和自我时间。</div>
-          <div class="step-chip"><strong>3. 尝试独处</strong>看看休息是否真的属于你。</div>
+          <div class="step-chip"><strong>2. 处理清单</strong>观察疲惫、孩子联结、上司信任和父母关系。</div>
+          <div class="step-chip"><strong>3. 尝试休息</strong>切到自我场景，拖到休息点，看看系统是否允许。</div>
         </div>
       </div>
 
@@ -1550,9 +1583,13 @@
             <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.5-1.4 3-3.1 3-5.4A5.1 5.1 0 0 0 12.9 5L12 6l-.9-1A5.1 5.1 0 0 0 2 8.6c0 2.3 1.5 4 3 5.4l7 7Z"></path></svg>孩子联结</span><span id="childText">76%</span></div>
             <div class="meter"><div class="fill child" id="childFill"></div></div>
           </div>
-          <div class="meter-card self-card">
-            <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v4"></path><path d="m16.2 7.8 2.9-2.9"></path><path d="M18 12h4"></path><path d="m16.2 16.2 2.9 2.9"></path><path d="M12 18v4"></path><path d="m7.8 16.2-2.9 2.9"></path><path d="M6 12H2"></path><path d="m7.8 7.8-2.9-2.9"></path><circle cx="12" cy="12" r="3"></circle></svg>自我时间</span><span id="selfText">20%</span></div>
-            <div class="meter"><div class="fill self" id="selfFill"></div></div>
+          <div class="meter-card boss-card">
+            <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="M8 22h8"></path><path d="M12 18v4"></path></svg>上司信任</span><span id="bossText">62%</span></div>
+            <div class="meter"><div class="fill boss" id="bossFill"></div></div>
+          </div>
+          <div class="meter-card parent-card">
+            <div class="meter-label"><span class="meter-name"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path><path d="M16 22v-5a4 4 0 0 0-8 0v5"></path><path d="M19 14v8"></path></svg>与父母关系</span><span id="parentRelText">64%</span></div>
+            <div class="meter"><div class="fill parent-rel" id="parentRelFill"></div></div>
           </div>
         </div>
 
@@ -1568,14 +1605,18 @@
 
               <button class="hotspot work-a scene-work-only" type="button" data-scene-task="work" data-position="a">工作任务<small>拖到这里处理</small></button>
               <button class="hotspot work-b scene-work-only" type="button" data-scene-task="work" data-position="b">工作任务<small>拖到这里处理</small></button>
+              <button class="hotspot work-c scene-work-only" type="button" data-scene-task="work" data-position="c">工作任务<small>拖到这里处理</small></button>
               <button class="hotspot home-a scene-home-only" type="button" data-scene-task="home" data-position="a">家庭任务<small>拖到这里处理</small></button>
               <button class="hotspot home-b scene-home-only" type="button" data-scene-task="home" data-position="b">家庭任务<small>拖到这里处理</small></button>
+              <button class="hotspot home-c scene-home-only" type="button" data-scene-task="home" data-position="c">家庭任务<small>拖到这里处理</small></button>
               <button class="hotspot elder-a scene-elder-only" type="button" data-scene-task="elder" data-position="a">老人照护<small>拖到这里处理</small></button>
               <button class="hotspot elder-b scene-elder-only" type="button" data-scene-task="elder" data-position="b">老人照护<small>拖到这里处理</small></button>
+              <button class="hotspot elder-c scene-elder-only" type="button" data-scene-task="elder" data-position="c">老人照护<small>拖到这里处理</small></button>
               <button class="hotspot hospital-a scene-hospital-only" type="button" data-scene-task="hospital" data-position="a">医疗照护<small>拖到这里处理</small></button>
               <button class="hotspot hospital-b scene-hospital-only" type="button" data-scene-task="hospital" data-position="b">医疗照护<small>拖到这里处理</small></button>
-              <button class="hotspot rest-a scene-rest-only" type="button" data-scene-task="rest" data-position="a">自我任务<small>拖到这里处理</small></button>
-              <button class="hotspot rest-b scene-rest-only" type="button" data-scene-task="rest" data-position="b">自我任务<small>拖到这里处理</small></button>
+              <button class="hotspot hospital-c scene-hospital-only" type="button" data-scene-task="hospital" data-position="c">医疗照护<small>拖到这里处理</small></button>
+              <button class="hotspot rest-a scene-rest-only" type="button" data-scene-task="rest" data-position="a">睡觉 / 休息<small>拖到这里尝试休息</small></button>
+              <button class="hotspot rest-b scene-rest-only" type="button" data-scene-task="rest" data-position="b">安静角落<small>拖到这里尝试独处</small></button>
 
               <div class="doll parent" id="parentDoll" aria-label="可拖动的夹心层父母">
                 <span class="shadow"></span><span class="head"><span class="hair"></span><span class="face"></span></span><span class="body"></span><span class="arm one"></span><span class="arm two"></span><span class="leg one"></span><span class="leg two"></span>
@@ -1608,34 +1649,19 @@
           </div>
         </div>
 
-        <div class="rest-row">
-          <div>
-            <div class="rest-title"><span class="inline-icon-label"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M8 21h8"></path><path d="M7 8h10v6a5 5 0 0 1-10 0Z"></path><path d="M17 8h1a3 3 0 0 1 0 6h-1"></path></svg>自我任务：独处 10 分钟</span></div>
-            <div class="rest-sub">它不是睡觉，也不是偷懒，而是不被任何角色定义的一小段时间。</div>
-          </div>
-          <button id="restBtn">尝试独处</button>
-          <div class="progress" id="restProgress"><span id="restProgressBar"></span></div>
-        </div>
-
         <div class="log" id="logBox" aria-live="polite">第一步：点“开始一天”。试玩记录会出现在这里。</div>
 
-        <div class="username-card" aria-labelledby="usernameTitle">
-          <label id="usernameTitle" for="usernameInput">可选：提交昵称 / Optional username</label>
-          <div class="username-row">
-            <input id="usernameInput" type="text" maxlength="40" autocomplete="nickname" placeholder="输入一个昵称，例如 Xin">
-            <button class="secondary" id="submitUsernameBtn" type="button">提交</button>
-          </div>
-          <p class="username-note">这一步不是开始游戏必填；只提交昵称，用来确认有人试玩过这个作品。不要填写真实身份证号、手机号或其他隐私信息。</p>
-          <div class="username-status" id="usernameStatus" aria-live="polite"></div>
-        </div>
-
-        <div class="ending" id="endingBox">
-          <h3>结尾：你维持了一切，除了你自己</h3>
-          <p id="endingSummary"></p>
-          <label for="feedbackInput"><strong>试玩反馈：</strong>如果这是你家的一天，你觉得谁最难受？你最想删掉哪一项任务？</label>
+        <div class="feedback-card" id="feedback">
+          <h3>试玩反馈</h3>
+          <label for="feedbackInput"><strong>写下你的试玩感受：</strong>如果这是你家的一天，你觉得谁最难受？你最想删掉哪一项任务？</label>
           <textarea id="feedbackInput" placeholder="可以写：孩子、父母、老人，或我最想删掉加班/陪诊/家长群……"></textarea>
           <button class="secondary" id="saveFeedbackBtn">保存到本机</button>
           <div class="saved-feedback" id="savedFeedback"></div>
+        </div>
+
+        <div class="ending" id="endingBox">
+          <h3 id="endingTitle">结尾：你维持了一切，除了你自己</h3>
+          <p id="endingSummary"></p>
           <div class="survey-submit-row">
             <button class="primary" id="finishExperienceBtn" type="button">我已体验完毕，填写后测</button>
             <div class="survey-status" id="finishExperienceStatus" aria-live="polite"></div>
@@ -1676,8 +1702,8 @@
             <h3>我做了什么 / What I built</h3>
             <ul>
               <li>我做了一个单页网页 demo，让用户处理不断补满的任务清单。</li>
-              <li>页面用疲惫值、孩子联结和自我时间三条状态显示影响。</li>
-              <li>“尝试独处”按钮会短暂恢复自我时间，但很快被紧急任务打断。</li>
+              <li>页面用疲惫值、孩子联结、上司信任和与父母关系四条状态显示影响。</li>
+              <li>休息不再是清单按钮；用户必须切到自我场景并拖动人物，系统再根据指标判断休息是否成功。</li>
               <li>新增“今日优先级系统”：AI 表面像玩法助手，实际上用温和、理性、道德化的语言把用户推回任务清单。</li>
               <li>目前还没有正式 user study；我预期收集试玩数据和开放反馈，看用户是否提到严重性、普遍性、家庭影响和结构压力。</li>
             </ul>
@@ -1857,9 +1883,28 @@
   <div class="pressure-alert" id="pressureAlert" aria-live="assertive" aria-hidden="true">
     <div class="pressure-alert-card">
       <strong>时间已经被挤满了</strong>
-      <p>疲惫、关系和自我时间同时跌到危险区。不是你不努力，是清单已经超过一个人能承受的范围。</p>
+      <p>疲惫、家庭关系和工作期待同时进入危险区。不是你不努力，是清单已经超过一个人能承受的范围。</p>
+      <button id="pressureAlertClose" type="button">继续回到清单</button>
     </div>
   </div>
+
+  <div class="pressure-alert" id="restFailureAlert" aria-live="assertive" aria-hidden="true">
+    <div class="pressure-alert-card">
+      <strong id="restFailureTitle">休息失败</strong>
+      <p id="restFailureText">系统还没有允许你停下来。</p>
+      <button id="restFailureClose" type="button">继续回到清单</button>
+    </div>
+  </div>
+
+  <div class="pressure-alert" id="ultimateAlert" aria-live="assertive" aria-hidden="true">
+    <div class="pressure-alert-card">
+      <strong id="ultimateAlertTitle">终极警告 1 / 3</strong>
+      <p id="ultimateAlertText">某个关系或身体指标已经触底。</p>
+      <button id="ultimateAlertClose" type="button">继续撑下去</button>
+    </div>
+  </div>
+
+  <div class="task-notice" id="taskNotice" aria-live="polite"></div>
 
   <script>
     const SUPABASE_URL = "https://wkrzdpytofyebbowtwqz.supabase.co";
@@ -1869,6 +1914,11 @@
     const SURVEY_POST_KEY = "sandwichTimeAwarenessPost";
     const SURVEY_SESSION_KEY = "sandwichTimeAwarenessSessionId";
     const SURVEY_TABLE = "awareness_survey_submissions";
+    const GAME_START_MINUTES = 7 * 60;
+    const GAME_DAY_MINUTES = 24 * 60;
+    const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
+    const GAME_MINUTES_PER_REAL_SECOND = 5;
+    const TASK_RELEASE_INTERVAL_MINUTES = 12;
     const surveyQuestions = [
       "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
       "我认为很多上有老人、下有孩子、同时还要工作的人，都会面临类似的时间压力。",
@@ -1879,27 +1929,57 @@
     let surveyMode = "pre";
 
     const TASK_LIBRARY = [
-      { id: "work-boss-message", title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", scene: "work", position: "a", hotspotLabel: "领导电话", hotspotHint: "回复紧急工作消息", timeWindow: { start: 7 * 60, end: 22 * 60 }, releaseCondition: "工作消息随时插入", miniGameEntry: "reply_work_message", fatigue: 10, child: -7, self: -8, minutes: 25 },
-      { id: "work-report", title: "临时加班改报告", type: "结构任务", note: "做完会推进工作，但自我时间继续减少。", scene: "work", position: "b", hotspotLabel: "会议桌", hotspotHint: "改完今晚要交的报告", timeWindow: { start: 9 * 60, end: 22 * 60 }, releaseCondition: "工作日任务堆叠", miniGameEntry: "edit_report", fatigue: 13, child: -8, self: -9, minutes: 40 },
-      { id: "work-promotion-meeting", title: "参加升职考核会议", type: "结构任务", note: "“再努力一下就能升职了。”", scene: "work", position: "b", hotspotLabel: "考核会议", hotspotHint: "下午才能出现", timeWindow: { start: 13 * 60, end: 18 * 60 }, releaseCondition: "下午职场评价节点", miniGameEntry: "promotion_meeting", fatigue: 12, child: -5, self: -7, minutes: 35 },
-      { id: "work-group-chat", title: "处理下班后的工作群", type: "结构任务", note: "技术让在线时间延长。", scene: "work", position: "a", hotspotLabel: "工作群", hotspotHint: "下班后也会亮起", timeWindow: { start: 18 * 60, end: 23 * 60 }, releaseCondition: "下班后在线", miniGameEntry: "after_hours_chat", fatigue: 9, child: -6, self: -8, minutes: 20 },
-      { id: "home-breakfast", title: "准备早饭并催孩子出门", type: "隐形家务", note: "一天还没正式开始，家庭清单已经启动。", scene: "home", position: "b", hotspotLabel: "厨房", hotspotHint: "早晨家务", timeWindow: { start: 7 * 60, end: 9 * 60 }, releaseCondition: "早晨上学前", miniGameEntry: "breakfast_rush", fatigue: 7, child: 2, self: -5, minutes: 24 },
-      { id: "home-parent-group", title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", scene: "home", position: "a", hotspotLabel: "家长群通知", hotspotHint: "通知一来就要处理", timeWindow: { start: 8 * 60, end: 21 * 60 }, releaseCondition: "学校通知弹出", miniGameEntry: "parent_group_reply", fatigue: 7, child: 4, self: -6, minutes: 20 },
-      { id: "home-homework", title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", scene: "home", position: "a", hotspotLabel: "辅导作业", hotspotHint: "孩子放学后出现", timeWindow: { start: 16 * 60, end: 22 * 60 }, releaseCondition: "孩子放学后", miniGameEntry: "homework_help", fatigue: 8, child: 9, self: -7, minutes: 30 },
-      { id: "home-dinner", title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", scene: "home", position: "b", hotspotLabel: "做晚饭", hotspotHint: "傍晚固定家务", timeWindow: { start: 17 * 60, end: 21 * 60 }, releaseCondition: "晚饭时间", miniGameEntry: "dinner_cleanup", fatigue: 9, child: 2, self: -6, minutes: 35 },
-      { id: "elder-medication", title: "提醒老人吃药并确认剂量", type: "老人照护", note: "不是一句提醒，而是持续记住和确认。", scene: "elder", position: "a", hotspotLabel: "送药提醒", hotspotHint: "按时确认剂量", timeWindow: { start: 8 * 60, end: 21 * 60 }, releaseCondition: "老人固定用药时间", miniGameEntry: "medication_check", fatigue: 8, child: -3, self: -6, minutes: 22 },
-      { id: "elder-records", title: "预约检查并整理病历", type: "认知照护", note: "信息管理也在消耗你的时间。", scene: "elder", position: "b", hotspotLabel: "复诊安排", hotspotHint: "整理病历和预约", timeWindow: { start: 10 * 60, end: 18 * 60 }, releaseCondition: "医院工作时段", miniGameEntry: "medical_records", fatigue: 10, child: -4, self: -7, minutes: 32 },
-      { id: "elder-visit", title: "去老人的家看一眼", type: "情感照护", note: "不去会内疚，去了会挤掉休息。", scene: "elder", position: "a", hotspotLabel: "上门看一眼", hotspotHint: "晚饭后更容易出现", timeWindow: { start: 18 * 60, end: 22 * 60 }, releaseCondition: "晚间情感照护", miniGameEntry: "elder_visit", fatigue: 9, child: -5, self: -8, minutes: 36 },
-      { id: "hospital-prescription", title: "排队取药并核对剂量", type: "医疗照护", note: "等待、判断和确认都不是空白时间。", scene: "hospital", position: "a", hotspotLabel: "取药窗口", hotspotHint: "医院开放时段", timeWindow: { start: 9 * 60, end: 17 * 60 }, releaseCondition: "医院窗口开放", miniGameEntry: "prescription_pickup", fatigue: 11, child: -5, self: -8, minutes: 40 },
-      { id: "hospital-checkup", title: "陪老人做复诊检查", type: "医疗照护", note: "一次复诊常常会吃掉半天安排。", scene: "hospital", position: "b", hotspotLabel: "复诊排队", hotspotHint: "检查和等待", timeWindow: { start: 9 * 60, end: 16 * 60 }, releaseCondition: "复诊预约时段", miniGameEntry: "checkup_queue", fatigue: 13, child: -7, self: -10, minutes: 55 },
-      { id: "hospital-doctor-plan", title: "和医生确认下一步安排", type: "认知照护", note: "你还要负责听懂、记住、再转述。", scene: "hospital", position: "b", hotspotLabel: "医生沟通", hotspotHint: "复诊后安排", timeWindow: { start: 10 * 60, end: 17 * 60 }, releaseCondition: "检查后沟通", miniGameEntry: "doctor_plan", fatigue: 9, child: -4, self: -7, minutes: 28 },
-      { id: "rest-nap", title: "想睡一会儿", type: "自我任务", note: "身体想恢复，但清单还在。", scene: "rest", position: "a", hotspotLabel: "自己的十分钟", hotspotHint: "短暂恢复身体", timeWindow: { start: 12 * 60, end: 23 * 60 }, releaseCondition: "疲惫开始累积", miniGameEntry: "short_nap", fatigue: -7, child: -6, self: 4, minutes: 15 },
-      { id: "rest-stare", title: "发呆十分钟", type: "自我任务", note: "不被任何角色定义的一小段时间。", scene: "rest", position: "b", hotspotLabel: "安静角落", hotspotHint: "试着不被打断", timeWindow: { start: 15 * 60, end: 23 * 60 }, releaseCondition: "下午之后的自我需求", miniGameEntry: "quiet_corner", fatigue: -5, child: -5, self: 7, minutes: 10 },
-      { id: "rest-book", title: "看一页自己的书", type: "自我任务", note: "“做回自己”不只是睡觉。", scene: "rest", position: "a", hotspotLabel: "自己的书", hotspotHint: "夜里才有空", timeWindow: { start: 20 * 60, end: 23 * 60 }, releaseCondition: "夜间自我时间", miniGameEntry: "read_book", fatigue: -4, child: -5, self: 8, minutes: 12 },
-      { id: "urgent-elder-sick", title: "系统插入：老人突然不舒服", type: "紧急照护", note: "休息被推迟至清单末尾。", scene: "elder", position: "a", hotspotLabel: "紧急照护", hotspotHint: "系统插入任务", timeWindow: { start: 12 * 60, end: 23 * 60 }, releaseCondition: "疲惫或时间压力升高", miniGameEntry: "urgent_elder_care", fatigue: 14, child: -7, self: -10, minutes: 45 },
-      { id: "urgent-child-material", title: "系统插入：孩子明天要交材料", type: "紧急家庭任务", note: "休息被重新安排。", scene: "home", position: "a", hotspotLabel: "明天材料", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, releaseCondition: "晚间临时家庭任务", miniGameEntry: "urgent_school_material", fatigue: 10, child: 5, self: -9, minutes: 30 },
-      { id: "urgent-work-feedback", title: "系统插入：公司要今晚反馈", type: "紧急工作", note: "你以为下班了，清单没有下班。", scene: "work", position: "a", hotspotLabel: "今晚反馈", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, releaseCondition: "下班后职场插入", miniGameEntry: "urgent_work_feedback", fatigue: 12, child: -8, self: -10, minutes: 35 }
+      { id: "work-boss-message", title: "回复老板的紧急消息", type: "结构任务", note: "职场即时响应，休息时间被重新占用。", scene: "work", position: "a", hotspotLabel: "领导电话", hotspotHint: "回复紧急工作消息", timeWindow: { start: 7 * 60, end: 22 * 60 }, urgency: "紧急", ttlMinutes: 45, releaseCondition: "工作消息随时插入", miniGameEntry: "reply_work_message", fatigue: 10, child: -7, boss: 8, parentRel: -2, minutes: 25, penalty: { boss: -10, fatigue: 6 } },
+      { id: "work-report", title: "临时加班改报告", type: "结构任务", note: "做完会推进工作，但家庭和照护被继续推迟。", scene: "work", position: "b", hotspotLabel: "会议桌", hotspotHint: "改完今晚要交的报告", timeWindow: { start: 9 * 60, end: 22 * 60 }, urgency: "重要", ttlMinutes: 60, releaseCondition: "工作日任务堆叠", miniGameEntry: "edit_report", fatigue: 13, child: -8, boss: 11, parentRel: -3, minutes: 40, penalty: { boss: -12, fatigue: 7 } },
+      { id: "work-promotion-meeting", title: "参加升职考核会议", type: "结构任务", note: "“再努力一下就能升职了。”", scene: "work", position: "c", hotspotLabel: "考核会议", hotspotHint: "下午才能出现", timeWindow: { start: 13 * 60, end: 18 * 60 }, urgency: "重要", ttlMinutes: 50, releaseCondition: "下午职场评价节点", miniGameEntry: "promotion_meeting", fatigue: 12, child: -5, boss: 14, parentRel: -2, minutes: 35, penalty: { boss: -15, fatigue: 5 } },
+      { id: "work-proposal", title: "写工作的方案", type: "结构任务", note: "方案不是一页纸，而是把晚上的注意力继续交给工作。", scene: "work", position: "b", hotspotLabel: "方案文档", hotspotHint: "下午方案任务", timeWindow: { start: 12 * 60, end: 19 * 60 }, urgency: "重要", ttlMinutes: 65, releaseCondition: "午后工作推进", miniGameEntry: "work_proposal", fatigue: 12, child: -6, boss: 13, parentRel: -3, minutes: 42, penalty: { boss: -14, fatigue: 6 } },
+      { id: "work-intern-guidance", title: "给实习生指导", type: "管理任务", note: "指导别人也会占用自己的下班边界。", scene: "work", position: "a", hotspotLabel: "实习生求助", hotspotHint: "下午突然求助", timeWindow: { start: 14 * 60, end: 18 * 60 }, urgency: "普通", ttlMinutes: 50, releaseCondition: "团队协作插入", miniGameEntry: "intern_guidance", fatigue: 9, child: -5, boss: 8, parentRel: -2, minutes: 28, penalty: { boss: -11, fatigue: 5 } },
+      { id: "work-client-needs", title: "跟客户沟通需求", type: "沟通任务", note: "客户的时间表会重新切割家庭时间。", scene: "work", position: "c", hotspotLabel: "客户电话", hotspotHint: "需求沟通", timeWindow: { start: 15 * 60, end: 21 * 60 }, urgency: "重要", ttlMinutes: 55, releaseCondition: "客户临时确认", miniGameEntry: "client_needs", fatigue: 11, child: -7, boss: 10, parentRel: -3, minutes: 35, penalty: { boss: -13, fatigue: 6 } },
+      { id: "work-group-chat", title: "处理下班后的工作群", type: "结构任务", note: "技术让在线时间延长。", scene: "work", position: "a", hotspotLabel: "工作群", hotspotHint: "下班后也会亮起", timeWindow: { start: 18 * 60, end: 23 * 60 }, urgency: "普通", ttlMinutes: 40, releaseCondition: "下班后在线", miniGameEntry: "after_hours_chat", fatigue: 9, child: -6, boss: 7, parentRel: -2, minutes: 20, penalty: { boss: -8, fatigue: 4 } },
+      { id: "work-budget-form", title: "补交预算表格", type: "结构任务", note: "一个表格会挤进晚饭、作业和复诊之间。", scene: "work", position: "b", hotspotLabel: "预算表", hotspotHint: "傍晚补交", timeWindow: { start: 16 * 60, end: 22 * 60 }, urgency: "普通", ttlMinutes: 40, releaseCondition: "临时行政任务", miniGameEntry: "budget_form", fatigue: 8, child: -5, boss: 9, parentRel: -2, minutes: 22, penalty: { boss: -12, fatigue: 4 } },
+      { id: "work-weekly-sync", title: "参加部门同步会", type: "会议任务", note: "会议占住整块时间，其他责任只能往后排。", scene: "work", position: "c", hotspotLabel: "同步会议", hotspotHint: "上午固定会议", timeWindow: { start: 9 * 60, end: 12 * 60 }, urgency: "普通", ttlMinutes: 36, releaseCondition: "上午会议", miniGameEntry: "weekly_sync", fatigue: 8, child: -4, boss: 8, parentRel: -2, minutes: 26, penalty: { boss: -10, fatigue: 4 } },
+      { id: "home-breakfast", title: "准备早饭并催孩子出门", type: "隐形家务", note: "一天还没正式开始，家庭清单已经启动。", scene: "home", position: "b", hotspotLabel: "厨房", hotspotHint: "早晨家务", timeWindow: { start: 7 * 60, end: 9 * 60 }, urgency: "重要", ttlMinutes: 30, releaseCondition: "早晨上学前", miniGameEntry: "breakfast_rush", fatigue: 7, child: 6, boss: -2, parentRel: 0, minutes: 24, penalty: { child: -8, fatigue: 4 } },
+      { id: "home-parent-group", title: "回复家长群通知", type: "认知劳动", note: "不是体力活，却持续占用注意力。", scene: "home", position: "a", hotspotLabel: "家长群通知", hotspotHint: "通知一来就要处理", timeWindow: { start: 8 * 60, end: 21 * 60 }, urgency: "普通", ttlMinutes: 50, releaseCondition: "学校通知弹出", miniGameEntry: "parent_group_reply", fatigue: 7, child: 4, boss: -3, parentRel: 0, minutes: 20, penalty: { child: -6, fatigue: 3 } },
+      { id: "home-homework", title: "辅导孩子作业并签字", type: "关系任务", note: "孩子联结会回升，但疲惫也上升。", scene: "home", position: "a", hotspotLabel: "辅导作业", hotspotHint: "孩子放学后出现", timeWindow: { start: 16 * 60, end: 22 * 60 }, urgency: "重要", ttlMinutes: 70, releaseCondition: "孩子放学后", miniGameEntry: "homework_help", fatigue: 8, child: 11, boss: -4, parentRel: 0, minutes: 30, penalty: { child: -10, fatigue: 4 } },
+      { id: "home-school-pickup", title: "接孩子放学", type: "关系任务", note: "放学窗口很窄，错过就会变成另一种愧疚。", scene: "home", position: "c", hotspotLabel: "学校门口", hotspotHint: "15:00-16:00 接孩子", timeWindow: { start: 15 * 60, end: 16 * 60 }, urgency: "重要", ttlMinutes: 28, releaseCondition: "放学时间窗口", miniGameEntry: "school_pickup", fatigue: 7, child: 13, boss: -6, parentRel: -1, minutes: 26, penalty: { child: -15, fatigue: 5 } },
+      { id: "home-child-dinner", title: "给孩子烧晚饭", type: "隐形家务", note: "晚饭是一项照料，也是一项每天重复的时间占用。", scene: "home", position: "c", hotspotLabel: "孩子晚饭", hotspotHint: "傍晚照料", timeWindow: { start: 17 * 60, end: 20 * 60 }, urgency: "普通", ttlMinutes: 55, releaseCondition: "傍晚家庭任务", miniGameEntry: "child_dinner", fatigue: 9, child: 9, boss: -4, parentRel: 0, minutes: 34, penalty: { child: -11, fatigue: 5 } },
+      { id: "home-dinner", title: "做饭、洗碗、整理厨房", type: "隐形家务", note: "看似普通，却每天重复占用时间。", scene: "home", position: "b", hotspotLabel: "做晚饭", hotspotHint: "傍晚固定家务", timeWindow: { start: 17 * 60, end: 21 * 60 }, urgency: "普通", ttlMinutes: 55, releaseCondition: "晚饭时间", miniGameEntry: "dinner_cleanup", fatigue: 9, child: 4, boss: -3, parentRel: 0, minutes: 35, penalty: { child: -7, fatigue: 4 } },
+      { id: "home-bedtime", title: "哄孩子睡觉", type: "关系任务", note: "晚上 9 点以后，孩子需要陪伴，但你也已经快没电了。", scene: "home", position: "a", hotspotLabel: "睡前陪伴", hotspotHint: "21:00 后出现", timeWindow: { start: 21 * 60, end: 23 * 60 }, urgency: "重要", ttlMinutes: 45, releaseCondition: "睡前照料", miniGameEntry: "bedtime_care", fatigue: 8, child: 12, boss: -4, parentRel: 0, minutes: 24, penalty: { child: -13, fatigue: 5 } },
+      { id: "home-school-supplies", title: "临时准备学校材料", type: "认知劳动", note: "孩子的明天，总是在你的今晚提前出现。", scene: "home", position: "b", hotspotLabel: "学校材料", hotspotHint: "晚间准备", timeWindow: { start: 19 * 60, end: 23 * 60 }, urgency: "紧急", ttlMinutes: 35, releaseCondition: "晚间学校通知", miniGameEntry: "school_supplies", fatigue: 7, child: 10, boss: -5, parentRel: -1, minutes: 24, penalty: { child: -14, fatigue: 4 } },
+      { id: "elder-medication", title: "提醒老人吃药并确认剂量", type: "老人照护", note: "不是一句提醒，而是持续记住和确认。", scene: "elder", position: "a", hotspotLabel: "送药提醒", hotspotHint: "按时确认剂量", timeWindow: { start: 8 * 60, end: 21 * 60 }, urgency: "重要", ttlMinutes: 45, releaseCondition: "老人固定用药时间", miniGameEntry: "medication_check", fatigue: 8, child: -3, boss: -3, parentRel: 9, minutes: 22, penalty: { parentRel: -10, fatigue: 5 } },
+      { id: "elder-records", title: "预约检查并整理病历", type: "认知照护", note: "信息管理也在消耗你的时间。", scene: "elder", position: "c", hotspotLabel: "复诊安排", hotspotHint: "整理病历和预约", timeWindow: { start: 10 * 60, end: 18 * 60 }, urgency: "重要", ttlMinutes: 60, releaseCondition: "医院工作时段", miniGameEntry: "medical_records", fatigue: 10, child: -4, boss: -4, parentRel: 10, minutes: 32, penalty: { parentRel: -11, fatigue: 5 } },
+      { id: "elder-visit", title: "去老人的家看一眼", type: "情感照护", note: "不去会内疚，去了会挤掉休息。", scene: "elder", position: "a", hotspotLabel: "上门看一眼", hotspotHint: "晚饭后更容易出现", timeWindow: { start: 18 * 60, end: 22 * 60 }, urgency: "普通", ttlMinutes: 65, releaseCondition: "晚间情感照护", miniGameEntry: "elder_visit", fatigue: 9, child: -5, boss: -3, parentRel: 12, minutes: 36, penalty: { parentRel: -9, fatigue: 4 } },
+      { id: "elder-phone-check", title: "打电话确认老人状态", type: "情感照护", note: "一句电话背后，是持续的惦记和内疚。", scene: "elder", position: "b", hotspotLabel: "确认电话", hotspotHint: "午后问候", timeWindow: { start: 12 * 60, end: 20 * 60 }, urgency: "普通", ttlMinutes: 42, releaseCondition: "午后情感照护", miniGameEntry: "elder_phone_check", fatigue: 6, child: -3, boss: -3, parentRel: 11, minutes: 18, penalty: { parentRel: -13, fatigue: 3 } },
+      { id: "hospital-prescription", title: "排队取药并核对剂量", type: "医疗照护", note: "等待、判断和确认都不是空白时间。", scene: "hospital", position: "a", hotspotLabel: "取药窗口", hotspotHint: "医院开放时段", timeWindow: { start: 9 * 60, end: 17 * 60 }, urgency: "重要", ttlMinutes: 60, releaseCondition: "医院窗口开放", miniGameEntry: "prescription_pickup", fatigue: 11, child: -5, boss: -5, parentRel: 11, minutes: 40, penalty: { parentRel: -12, fatigue: 6 } },
+      { id: "hospital-checkup", title: "陪老人做复诊检查", type: "医疗照护", note: "一次复诊常常会吃掉半天安排。", scene: "hospital", position: "b", hotspotLabel: "复诊排队", hotspotHint: "检查和等待", timeWindow: { start: 9 * 60, end: 16 * 60 }, urgency: "紧急", ttlMinutes: 70, releaseCondition: "复诊预约时段", miniGameEntry: "checkup_queue", fatigue: 13, child: -7, boss: -6, parentRel: 14, minutes: 55, penalty: { parentRel: -15, fatigue: 7 } },
+      { id: "hospital-doctor-plan", title: "和医生确认下一步安排", type: "认知照护", note: "你还要负责听懂、记住、再转述。", scene: "hospital", position: "c", hotspotLabel: "医生沟通", hotspotHint: "复诊后安排", timeWindow: { start: 10 * 60, end: 17 * 60 }, urgency: "重要", ttlMinutes: 50, releaseCondition: "检查后沟通", miniGameEntry: "doctor_plan", fatigue: 9, child: -4, boss: -4, parentRel: 10, minutes: 28, penalty: { parentRel: -10, fatigue: 5 } },
+      { id: "hospital-insurance", title: "提交医保报销材料", type: "认知照护", note: "照护结束后，还有表格、票据和证明。", scene: "hospital", position: "b", hotspotLabel: "报销窗口", hotspotHint: "下午材料", timeWindow: { start: 14 * 60, end: 19 * 60 }, urgency: "普通", ttlMinutes: 45, releaseCondition: "医疗后续手续", miniGameEntry: "insurance_claim", fatigue: 7, child: -4, boss: -4, parentRel: 9, minutes: 24, penalty: { parentRel: -11, fatigue: 4 } },
+      { id: "urgent-elder-sick", title: "系统插入：老人突然不舒服", type: "紧急照护", note: "休息被推迟至清单末尾。", scene: "elder", position: "c", hotspotLabel: "老人突然不舒服", hotspotHint: "拖到这里处理紧急照护", timeWindow: { start: 12 * 60, end: 23 * 60 }, urgency: "紧急", ttlMinutes: 35, releaseCondition: "疲惫或时间压力升高", miniGameEntry: "urgent_elder_care", fatigue: 14, child: -7, boss: -6, parentRel: 15, minutes: 45, penalty: { parentRel: -18, fatigue: 8 } },
+      { id: "urgent-child-material", title: "系统插入：孩子明天要交材料", type: "紧急家庭任务", note: "休息被重新安排。", scene: "home", position: "a", hotspotLabel: "明天材料", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, urgency: "紧急", ttlMinutes: 35, releaseCondition: "晚间临时家庭任务", miniGameEntry: "urgent_school_material", fatigue: 10, child: 8, boss: -5, parentRel: -2, minutes: 30, penalty: { child: -12, fatigue: 5 } },
+      { id: "urgent-work-feedback", title: "系统插入：公司要今晚反馈", type: "紧急工作", note: "你以为下班了，清单没有下班。", scene: "work", position: "a", hotspotLabel: "今晚反馈", hotspotHint: "系统插入任务", timeWindow: { start: 18 * 60, end: 23 * 60 }, urgency: "紧急", ttlMinutes: 35, releaseCondition: "下班后职场插入", miniGameEntry: "urgent_work_feedback", fatigue: 12, child: -8, boss: 9, parentRel: -3, minutes: 35, penalty: { boss: -12, fatigue: 6 } }
     ];
+
+    function boostTaskNumbers() {
+      const relationshipKeys = ["child", "boss", "parentRel"];
+      const scaleValue = (value, factor) => {
+        if (!value) return 0;
+        return Math.sign(value) * Math.max(1, Math.round(Math.abs(value) * factor));
+      };
+      TASK_LIBRARY.forEach((task) => {
+        task.fatigue = scaleValue(task.fatigue, .65);
+        task.ttlMinutes = Math.max(task.id.startsWith("urgent-") ? 120 : 180, Math.round(task.ttlMinutes * 4));
+        relationshipKeys.forEach((key) => {
+          task[key] = scaleValue(task[key], 1.8);
+        });
+        if (task.penalty) {
+          Object.keys(task.penalty).forEach((key) => {
+            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .75 : 2);
+          });
+        }
+      });
+    }
+
+    boostTaskNumbers();
 
     const lines = [
       "忙完这阵就好了。",
@@ -1915,18 +1995,28 @@
       scene: "home",
       fatigue: 28,
       child: 76,
-      self: 20,
-      minutes: 7 * 60,
+      boss: 62,
+      parentRel: 64,
+      minutes: GAME_START_MINUTES,
       tasks: [],
       releasedTaskIds: [],
+      nextTaskReleaseAt: GAME_START_MINUTES,
+      warningLevelsShown: [],
+      ultimateWarnings: 0,
+      activeUltimateSignals: [],
+      ultimateSignalArmed: { child: true, parentRel: true, boss: true, fatigue: true },
+      endingReason: "",
+      endingGenerated: false,
       completed: 0,
       restAttempts: 0,
       interruptions: 0,
+      relationDecaySeconds: 0,
       timer: null,
-      restProgress: 0,
+      clockTimer: null,
       dragging: false,
       pressureAlertShown: false,
-      restSucceeded: false
+      restSucceeded: false,
+      ended: false
     };
 
     const $ = (id) => document.getElementById(id);
@@ -1957,6 +2047,19 @@
       return id;
     }
 
+    async function postSurveyRow(body) {
+      return fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(body)
+      });
+    }
+
     async function submitSurveyToSupabase(mode, payload, comparison = {}) {
       const answers = payload.answers;
       const body = {
@@ -1976,23 +2079,39 @@
         game_interruptions: state.interruptions,
         game_fatigue: state.fatigue,
         game_child: state.child,
-        game_self: state.self,
+        game_boss: state.boss,
+        game_parent_relationship: state.parentRel,
         client_saved_at: payload.savedAt
       };
 
-      const response = await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_PUBLISHABLE_KEY,
-          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(body)
-      });
+      let response = await postSurveyRow(body);
 
       if (!response.ok) {
-        throw new Error("HTTP " + response.status);
+        let detail = "";
+        try {
+          detail = await response.text();
+        } catch (error) {
+          detail = "";
+        }
+        const canRetryWithOldColumns = response.status === 400
+          && detail.includes("PGRST204")
+          && (detail.includes("game_boss") || detail.includes("game_parent_relationship"));
+        if (canRetryWithOldColumns) {
+          const fallbackBody = { ...body };
+          delete fallbackBody.game_boss;
+          delete fallbackBody.game_parent_relationship;
+          response = await postSurveyRow(fallbackBody);
+          if (response.ok) {
+            console.warn("Supabase survey table is missing new game metric columns. Saved survey without boss/parent relationship metrics.");
+            return;
+          }
+          try {
+            detail = await response.text();
+          } catch (error) {
+            detail = "";
+          }
+        }
+        throw new Error("HTTP " + response.status + (detail ? ": " + detail : ""));
       }
     }
 
@@ -2086,6 +2205,7 @@
           $("surveyStatus").className = "survey-status ok";
           $("surveyStatus").textContent = "后测已保存并提交到 Supabase。";
         } catch (error) {
+          console.warn("Supabase post-survey submit failed:", error);
           $("surveyStatus").className = "survey-status error";
           $("surveyStatus").textContent = "后测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
         } finally {
@@ -2107,14 +2227,15 @@
         await submitSurveyToSupabase("pre", payload);
         $("surveyStatus").className = "survey-status ok";
         $("surveyStatus").textContent = "前测已保存并提交到 Supabase，正在进入试玩。";
-        window.setTimeout(() => {
-          window.location.hash = "play";
-        }, 350);
       } catch (error) {
-        $("surveyStatus").className = "survey-status error";
-        $("surveyStatus").textContent = "前测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
+        console.warn("Supabase pre-survey submit failed:", error);
+        $("surveyStatus").className = "survey-status ok";
+        $("surveyStatus").textContent = "前测已保存在本机，Supabase 暂时没有连上；先进入试玩，数据表修好后再同步。";
       } finally {
         $("surveySubmitBtn").disabled = false;
+        window.setTimeout(() => {
+          window.location.hash = "play";
+        }, 650);
       }
     }
 
@@ -2160,7 +2281,8 @@
     }
 
     function taskMatchesTime(task) {
-      return state.minutes >= task.timeWindow.start && state.minutes <= task.timeWindow.end;
+      const clockMinutes = state.minutes % (24 * 60);
+      return clockMinutes >= task.timeWindow.start && clockMinutes <= task.timeWindow.end;
     }
 
     function taskMatchesMode(task) {
@@ -2174,27 +2296,92 @@
       return state.tasks.some((activeTask) => activeTask.scene === task.scene && activeTask.position === task.position);
     }
 
+    function isBlockedSpot(task, options = {}) {
+      const spots = options.blockedSpots || (options.blockedSpot ? [options.blockedSpot] : []);
+      return spots.some((spot) => spot && spot.scene === task.scene && spot.position === task.position);
+    }
+
     function copyTask(task) {
       return {
         ...task,
-        runtimeId: task.id + "-" + Date.now() + "-" + Math.random().toString(16).slice(2)
+        runtimeId: task.id + "-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+        releasedAt: state.minutes,
+        expiresAt: Math.min(GAME_END_MINUTES, state.minutes + task.ttlMinutes)
       };
     }
 
+    function showTaskNotice(text) {
+      const notice = $("taskNotice");
+      notice.textContent = text;
+      notice.classList.add("show");
+      window.clearTimeout(showTaskNotice.timer);
+      showTaskNotice.timer = window.setTimeout(() => {
+        notice.classList.remove("show");
+      }, 850);
+    }
+
+    function metricText(changes) {
+      const labels = { fatigue: "疲惫值", child: "孩子联结", boss: "上司信任", parentRel: "与父母关系" };
+      return Object.entries(changes)
+        .filter(([, value]) => value)
+        .map(([key, value]) => labels[key] + " " + (value > 0 ? "+" : "") + value)
+        .join("，");
+    }
+
+    function sceneLabel(scene) {
+      return {
+        work: "工作任务",
+        home: "家庭任务",
+        elder: "老人照护任务",
+        hospital: "医疗照护任务",
+        rest: "休息机会"
+      }[scene] || "任务";
+    }
+
+    function applyMetricChanges(changes = {}) {
+      state.fatigue += changes.fatigue || 0;
+      state.child += changes.child || 0;
+      state.boss += changes.boss || 0;
+      state.parentRel += changes.parentRel || 0;
+      state.fatigue = clamp(state.fatigue);
+      state.child = clamp(state.child);
+      state.boss = clamp(state.boss);
+      state.parentRel = clamp(state.parentRel);
+    }
+
+    function applyRelationDecay() {
+      applyMetricChanges({ child: -5, boss: -5, parentRel: -5 });
+      showTaskNotice("关系压力继续流失");
+      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 5。");
+    }
+
+    function expireTasks() {
+      if (!state.started) return;
+      const expired = state.tasks.filter((task) => state.minutes >= task.expiresAt);
+      if (!expired.length) return;
+      state.tasks = state.tasks.filter((task) => state.minutes < task.expiresAt);
+      expired.forEach((task) => {
+        applyMetricChanges(task.penalty);
+        showTaskNotice("任务过期：" + task.title);
+        setLog("“" + task.title + "”没有完成，" + metricText(task.penalty) + "。");
+      });
+    }
+
     function activeTaskTarget() {
-      const elapsed = Math.max(0, state.minutes - 7 * 60);
-      return Math.min(6, 2 + Math.floor(elapsed / 120));
+      const elapsed = Math.max(0, state.minutes - GAME_START_MINUTES);
+      return Math.min(12, 4 + Math.floor(elapsed / 35));
     }
 
     function releaseTasks(count = 1, preferredScene = null, options = {}) {
       if (!state.started) return 0;
       let released = 0;
-      while (released < count && state.tasks.length < 6) {
+      while (released < count && state.tasks.length < 12) {
         let candidates = TASK_LIBRARY.filter((task) =>
-          !state.releasedTaskIds.includes(task.id) &&
+          !state.tasks.some((activeTask) => activeTask.id === task.id) &&
           taskMatchesTime(task) &&
           taskMatchesMode(task) &&
-          !hasTaskAtPosition(task)
+          !hasTaskAtPosition(task) &&
+          !isBlockedSpot(task, options)
         );
         if (preferredScene) {
           const sceneCandidates = candidates.filter((task) => task.scene === preferredScene);
@@ -2209,15 +2396,60 @@
         const task = copyTask(pick(candidates));
         state.releasedTaskIds.push(task.id);
         state.tasks.push(task);
+        showTaskNotice("有新的" + sceneLabel(task.scene));
         released += 1;
       }
       return released;
     }
 
-    function releaseDueTasks(preferredScene = null) {
+    function releaseDueTasks(preferredScene = null, options = {}) {
       const needed = activeTaskTarget() - state.tasks.length;
       if (needed <= 0) return 0;
-      return releaseTasks(needed, preferredScene);
+      return releaseTasks(needed, preferredScene, options);
+    }
+
+    function releaseScheduledTasks(options = {}) {
+      if (isDayOver()) return 0;
+      let released = 0;
+      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 12) {
+        released += releaseTasks(2, null, options);
+        state.nextTaskReleaseAt += TASK_RELEASE_INTERVAL_MINUTES;
+      }
+      if (state.tasks.length < activeTaskTarget()) {
+        released += releaseDueTasks(state.scene, options);
+      }
+      return released;
+    }
+
+    function isDayOver() {
+      return state.minutes >= GAME_END_MINUTES;
+    }
+
+    function stopTimelineClock() {
+      window.clearInterval(state.clockTimer);
+      state.clockTimer = null;
+    }
+
+    function startTimelineClock() {
+      stopTimelineClock();
+      state.clockTimer = window.setInterval(() => {
+        if (!state.started || state.ended) {
+          stopTimelineClock();
+          return;
+        }
+        state.minutes = Math.min(GAME_END_MINUTES, state.minutes + GAME_MINUTES_PER_REAL_SECOND);
+        expireTasks();
+        const released = isDayOver() ? 0 : releaseScheduledTasks();
+        if (released > 0) {
+          setLog("时间来到 " + timeText() + "，新的任务进入清单。");
+        }
+        state.relationDecaySeconds += 1;
+        if (state.relationDecaySeconds >= 5) {
+          state.relationDecaySeconds = 0;
+          applyRelationDecay();
+        }
+        render();
+      }, 1000);
     }
 
     function setLog(text) {
@@ -2244,7 +2476,7 @@
         stage.classList.add("stage-home");
         $("roomLabel").textContent = "家庭场景";
       }
-      if (state.fatigue > 75 || state.child < 35 || state.self < 12) {
+      if (state.fatigue > 75 || state.child < 35 || state.boss < 35 || state.parentRel < 35) {
         stage.classList.add("stage-overload");
       }
     }
@@ -2260,17 +2492,34 @@
       }
       if (state.tasks.length === 0) {
         const li = document.createElement("li");
-        li.innerHTML = "<div><div class='task-title task-empty'>清单暂时清空了</div><div class='task-meta'>现在点击“尝试独处”，这一次休息会真正属于你。</div></div>";
+        const text = isDayOver()
+          ? "今天已经走完，当前没有新的待处理任务。"
+          : "当前没有可做任务。时间线还在往前走，下一批任务会按时间继续进入。";
+        li.innerHTML = "<div><div class='task-title task-empty'>等待下一批任务进入</div><div class='task-meta'></div></div>";
+        li.querySelector(".task-meta").textContent = text;
         list.appendChild(li);
         return;
       }
       state.tasks.forEach((task) => {
         const li = document.createElement("li");
         const text = document.createElement("div");
-        text.innerHTML = "<div class='task-tag'></div><div class='task-title'></div><div class='task-meta'></div>";
-        text.querySelector(".task-tag").textContent = task.type + " · " + task.scene + "-" + task.position + " · " + minutesToTime(task.timeWindow.start) + "-" + minutesToTime(task.timeWindow.end);
+        text.innerHTML = "<div class='task-tag'></div><div class='task-title'></div><div class='task-meta'></div><div class='task-impact'></div>";
+        text.querySelector(".task-tag").textContent = task.urgency + " · " + task.type + " · " + minutesToTime(task.timeWindow.start) + "-" + minutesToTime(task.timeWindow.end) + " · " + Math.max(0, task.expiresAt - state.minutes) + " 分钟内处理";
         text.querySelector(".task-title").textContent = task.title;
         text.querySelector(".task-meta").textContent = task.note;
+        const impacts = [
+          ["疲惫值", task.fatigue],
+          ["孩子联结", task.child],
+          ["上司信任", task.boss],
+          ["与父母关系", task.parentRel]
+        ];
+        const impactBox = text.querySelector(".task-impact");
+        impacts.forEach(([label, value]) => {
+          const chip = document.createElement("span");
+          chip.className = "impact-chip " + (value > 0 && label !== "疲惫值" || value < 0 && label === "疲惫值" ? "good" : value === 0 ? "" : "bad");
+          chip.textContent = label + " " + (value > 0 ? "+" : "") + value;
+          impactBox.appendChild(chip);
+        });
         li.appendChild(text);
         list.appendChild(li);
       });
@@ -2279,23 +2528,27 @@
     function render() {
       state.fatigue = clamp(state.fatigue);
       state.child = clamp(state.child);
-      state.self = clamp(state.self);
+      state.boss = clamp(state.boss);
+      state.parentRel = clamp(state.parentRel);
       $("fatigueText").textContent = state.fatigue + "%";
       $("childText").textContent = state.child + "%";
-      $("selfText").textContent = state.self + "%";
+      $("bossText").textContent = state.boss + "%";
+      $("parentRelText").textContent = state.parentRel + "%";
       $("fatigueFill").style.width = state.fatigue + "%";
       $("childFill").style.width = state.child + "%";
-      $("selfFill").style.width = state.self + "%";
+      $("bossFill").style.width = state.boss + "%";
+      $("parentRelFill").style.width = state.parentRel + "%";
+      $("parentDoll").classList.toggle("low-fatigue", state.fatigue < 40);
       $("clockText").textContent = timeText();
       $("timelineNow").textContent = timeText();
-      $("timelineFill").style.width = Math.min(100, Math.max(0, ((state.minutes - 7 * 60) / (16 * 60)) * 100)) + "%";
+      $("timelineFill").style.width = Math.min(100, Math.max(0, ((state.minutes - GAME_START_MINUTES) / GAME_DAY_MINUTES) * 100)) + "%";
       document.querySelectorAll(".scene-tabs button").forEach((button) => {
         button.classList.toggle("active", button.dataset.scene === state.scene);
       });
       updateStage();
       renderTasks();
       updateHotspots();
-      maybeShowPressureAlert();
+      if (!maybeShowUltimateWarning()) maybeShowPressureAlert();
       maybeEnd();
     }
 
@@ -2304,45 +2557,63 @@
       state.scene = "home";
       state.fatigue = 28;
       state.child = 76;
-      state.self = 20;
-      state.minutes = 7 * 60;
+      state.boss = 62;
+      state.parentRel = 64;
+      state.minutes = GAME_START_MINUTES;
       state.tasks = [];
       state.releasedTaskIds = [];
+      state.nextTaskReleaseAt = GAME_START_MINUTES + TASK_RELEASE_INTERVAL_MINUTES;
+      state.warningLevelsShown = [];
+      state.ultimateWarnings = 0;
+      state.activeUltimateSignals = [];
+      state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
+      state.endingReason = "";
+      state.endingGenerated = false;
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
+      state.relationDecaySeconds = 0;
       state.pressureAlertShown = false;
       state.restSucceeded = false;
+      state.ended = false;
       resetParentDoll();
       $("endingBox").style.display = "none";
-      $("restProgress").style.display = "none";
-      $("restProgressBar").style.width = "0";
-      releaseTasks(2, "work");
+      releaseTasks(3, "work");
       releaseDueTasks("home");
       setLog("你是这一家的安排者。把今天过完。");
+      startTimelineClock();
       render();
     }
 
     function resetGame() {
       window.clearInterval(state.timer);
+      stopTimelineClock();
       state.timer = null;
       state.started = false;
       state.scene = "home";
       state.fatigue = 28;
       state.child = 76;
-      state.self = 20;
-      state.minutes = 7 * 60;
+      state.boss = 62;
+      state.parentRel = 64;
+      state.minutes = GAME_START_MINUTES;
       state.tasks = [];
       state.releasedTaskIds = [];
+      state.nextTaskReleaseAt = GAME_START_MINUTES;
+      state.warningLevelsShown = [];
+      state.ultimateWarnings = 0;
+      state.activeUltimateSignals = [];
+      state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
+      state.endingReason = "";
+      state.endingGenerated = false;
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
+      state.relationDecaySeconds = 0;
       state.pressureAlertShown = false;
       state.restSucceeded = false;
+      state.ended = false;
       resetParentDoll();
       $("endingBox").style.display = "none";
-      $("restProgress").style.display = "none";
-      $("restProgressBar").style.width = "0";
       setLog("第一步：点“开始一天”。试玩记录会出现在这里。");
       render();
     }
@@ -2355,11 +2626,17 @@
       document.querySelectorAll(".hotspot").forEach((hotspot) => {
         const scene = hotspot.dataset.sceneTask;
         const task = findTaskForHotspot(scene, hotspot.dataset.position);
-        hotspot.hidden = !task;
+        hotspot.hidden = scene !== "rest" && !task;
         hotspot.dataset.taskRuntimeId = task ? task.runtimeId : "";
-        if (task) {
+        if (scene === "rest") {
+          hotspot.innerHTML = (hotspot.dataset.position === "a" ? "睡觉 / 休息" : "安静角落") + "<small>拖到这里尝试休息</small>";
+          hotspot.setAttribute("aria-label", "尝试休息");
+        } else if (task) {
           hotspot.innerHTML = task.hotspotLabel + "<small>" + task.hotspotHint + "</small>";
           hotspot.setAttribute("aria-label", task.title);
+        } else {
+          hotspot.innerHTML = "";
+          hotspot.removeAttribute("aria-label");
         }
       });
     }
@@ -2367,6 +2644,10 @@
     function completeSceneTask(scene, position, source = "drag") {
       if (!state.started) {
         setLog("先点击“开始一天”，再把父母拖到任务点。");
+        return;
+      }
+      if (scene === "rest") {
+        attemptRest();
         return;
       }
       const task = findTaskForHotspot(scene, position);
@@ -2379,19 +2660,20 @@
       completeTask(task.runtimeId, source);
     }
 
-    function completeTask(runtimeId, source = "button") {
+    function completeTask(runtimeId, source = "button", options = {}) {
       if (!state.started) return;
       const index = state.tasks.findIndex((task) => task.runtimeId === runtimeId);
       if (index === -1) return;
       const task = state.tasks[index];
+      const completedSpot = { scene: task.scene, position: task.position };
       state.tasks.splice(index, 1);
-      state.fatigue += task.fatigue;
-      state.child += task.child;
-      state.self += task.self;
-      state.minutes += task.minutes;
+      applyMetricChanges(task);
+      state.minutes = Math.min(GAME_END_MINUTES, state.minutes + task.minutes);
       state.completed += 1;
-      releaseDueTasks(task.scene);
-      if (state.completed % 3 === 0) releaseTasks(1, null, { urgentOnly: true });
+      releaseScheduledTasks({ blockedSpot: completedSpot });
+      releaseDueTasks(task.scene, { blockedSpot: completedSpot });
+      if (state.completed % 2 === 0) releaseTasks(1, null, { urgentOnly: true, blockedSpot: completedSpot });
+      if (state.boss >= 100) showRestFailure("成功升职", "上司信任已经达到 100%。你获得了升职反馈，但这也说明工作期待会继续把时间拉走。", false);
       const line = lines[state.completed % lines.length];
       const prefix = source === "drag" ? "你把父母拖到任务点，完成了“" : "完成了“";
       setLog(prefix + task.title + "”。" + line);
@@ -2418,41 +2700,65 @@
       if (state.timer) return;
       state.scene = "rest";
       state.restAttempts += 1;
-      state.restProgress = 0;
-      if (state.tasks.length === 0) {
+      const missing = [];
+      const exhaustionOverridesEverything = state.fatigue >= 100;
+      if (!exhaustionOverridesEverything) {
+        if (state.fatigue < 90) missing.push("疲惫值还没有达到 90%，系统认为你还可以继续撑。");
+        if (state.child < 70) missing.push("孩子联结低于 70%，你先被推回家庭任务。");
+        if (state.boss < 70) missing.push("上司信任低于 70%，工作期待还没有放你走。");
+        if (state.parentRel < 70) missing.push("与父母关系低于 70%，照护责任还没有放你走。");
+      }
+      if (!missing.length) {
         state.restSucceeded = true;
-        state.fatigue -= 12;
-        state.self += 18;
-        state.minutes += 10;
-        $("restProgress").style.display = "block";
-        $("restProgressBar").style.width = "100%";
+        state.fatigue -= 25;
+        state.child -= 8;
+        state.boss -= 8;
+        state.parentRel -= 8;
+        state.minutes = Math.min(GAME_END_MINUTES, state.minutes + 10);
         $("logBox").classList.remove("warning");
-        setLog("这一次，清单真的空了。你独处了 10 分钟，没有被任何角色打断。");
+        setLog(exhaustionOverridesEverything
+          ? "疲惫值已经满格，系统终于不能再说你还可以撑。你休息了 10 分钟。"
+          : "这一次你真的休息了 10 分钟。疲惫下降，但家庭、工作和照护期待也被短暂牺牲。");
         render();
         return;
       }
       state.fatigue += 4;
-      state.self -= 4;
       state.child -= 3;
+      state.boss -= 3;
+      state.parentRel -= 3;
       state.interruptions += 1;
-      $("restProgress").style.display = "block";
-      $("restProgressBar").style.width = "36%";
       $("logBox").classList.add("warning");
-      setLog("休息失败：清单还没有空。今日优先级系统把独处重新排到了必要任务之后。");
+      showRestFailure("休息失败", missing.join(" "));
+      setLog("休息失败：" + missing[0]);
       render();
       window.setTimeout(() => {
         $("logBox").classList.remove("warning");
-        $("restProgress").style.display = "none";
-        $("restProgressBar").style.width = "0";
       }, 1600);
     }
 
+    function showRestFailure(title, text, countAsFailure = true) {
+      $("restFailureTitle").textContent = title;
+      $("restFailureText").textContent = text;
+      const alert = $("restFailureAlert");
+      alert.classList.add("show");
+      alert.setAttribute("aria-hidden", "false");
+      if (countAsFailure) state.interruptions += 0;
+    }
+
     function maybeShowPressureAlert() {
-      if (!state.started || state.pressureAlertShown) return;
-      const shouldWarn = state.self <= 5 && state.child <= 5 && state.fatigue >= 95;
-      if (!shouldWarn) return;
-      state.pressureAlertShown = true;
+      if (!state.started) return;
+      const levels = [
+        { value: 95, title: "红色警告：已经到极限了", text: "疲惫值超过 95%。身体已经被过度透支，终极警告会继续累计。" },
+        { value: 85, title: "橙色警告：疲惫正在逼近极限", text: "疲惫值超过 85%。系统提醒你需要休息，但休息条件可能仍然不允许。" },
+        { value: 70, title: "黄色警告：疲惫值已经超过 70%", text: "你已经明显需要休息了。可是在清单里，休息仍然要满足其他关系和工作条件。" }
+      ];
+      const level = levels.find((item) => state.fatigue >= item.value && !state.warningLevelsShown.includes(item.value));
+      if (!level) return;
+      state.warningLevelsShown.push(level.value);
       const alert = $("pressureAlert");
+      alert.querySelector("strong").textContent = level.title;
+      alert.querySelector("p").textContent = level.text;
+      alert.style.background = level.value >= 95 ? "rgba(115,23,23,.88)" : level.value >= 85 ? "rgba(166,86,25,.84)" : "rgba(145,112,28,.78)";
       alert.classList.add("show");
       alert.setAttribute("aria-hidden", "false");
       window.setTimeout(() => {
@@ -2462,12 +2768,111 @@
     }
 
     function maybeEnd() {
-      const shouldEnd = state.started && (state.restSucceeded || state.completed >= 10 || state.restAttempts >= 3 || state.fatigue >= 96 || state.self <= 3);
-      if (!shouldEnd) return;
+      if (state.ended) return;
+      if (state.started && isDayOver()) endGame("safe-day");
+    }
+
+    function getUltimateSignals() {
+      const signals = [];
+      if (state.child < 10) signals.push({ key: "child", text: "孩子情感链接低于 10%" });
+      if (state.parentRel < 10) signals.push({ key: "parentRel", text: "父母情感链接低于 10%" });
+      if (state.boss < 10) signals.push({ key: "boss", text: "上司信任低于 10%" });
+      if (state.fatigue > 90) signals.push({ key: "fatigue", text: "疲惫值高于 90%" });
+      return signals;
+    }
+
+    function maybeShowUltimateWarning() {
+      if (!state.started || state.ended) return false;
+      const signals = getUltimateSignals();
+      state.activeUltimateSignals = signals.map((signal) => signal.key);
+      const activeKeys = new Set(state.activeUltimateSignals);
+      ["child", "parentRel", "boss", "fatigue"].forEach((key) => {
+        if (!activeKeys.has(key)) state.ultimateSignalArmed[key] = true;
+      });
+      const newlyTriggered = signals.filter((signal) => state.ultimateSignalArmed[signal.key]);
+      if (!newlyTriggered.length) return false;
+      newlyTriggered.forEach((signal) => {
+        state.ultimateSignalArmed[signal.key] = false;
+      });
+      state.ultimateWarnings += 1;
+      $("ultimateAlertTitle").textContent = "终极警告 " + Math.min(state.ultimateWarnings, 3) + " / 3";
+      $("ultimateAlertText").textContent = signals.map((signal) => signal.text).join("；") + "。系统已经不能把这视为普通忙碌。";
+      const alert = $("ultimateAlert");
+      alert.style.background = "rgba(94,18,18,.9)";
+      alert.classList.add("show");
+      alert.setAttribute("aria-hidden", "false");
+      setLog("终极警告 " + Math.min(state.ultimateWarnings, 3) + " / 3：" + newlyTriggered[0].text + "。");
+      if (state.ultimateWarnings >= 3) {
+        window.setTimeout(() => endGame("ultimate-warning"), 900);
+      }
+      return true;
+    }
+
+    function finalStatsText() {
+      return "完成任务 " + state.completed + " 项；尝试休息 " + state.restAttempts + " 次；被打断 " + state.interruptions + " 次；终极警告 " + state.ultimateWarnings + " 次。最终数值：疲惫值 " + state.fatigue + "%，孩子联结 " + state.child + "%，上司信任 " + state.boss + "%，与父母关系 " + state.parentRel + "%。";
+    }
+
+    function localEndingText(reason) {
+      const parts = [];
+      if (reason === "safe-day") {
+        parts.push("你安全走完了这一天。你维持了一切，除了你自己。");
+      } else {
+        parts.push("终极警告累计到 3 次，这一天被迫结束。");
+      }
+      if (state.child < 20) parts.push("孩子感到长期被放在清单后面，孤独和疏离感明显加重。");
+      if (state.boss < 20) parts.push("上司信任很低，你在工作中被边缘化，甚至可能面对降职或失去机会。");
+      if (state.boss >= 85) parts.push("上司信任很高，你可能获得升职，但新的期待也会继续吞掉你的时间。");
+      if (state.parentRel < 20) parts.push("你和父母的关系变得疏远，内疚没有消失，只是被下一项任务盖住。");
+      if (state.fatigue > 85) parts.push("疲惫值过高，身体和心理都已经被透支。");
+      parts.push(finalStatsText());
+      return parts.join(" ");
+    }
+
+    async function generateEndingWithAi(reason) {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "ending",
+            message: "请用中文为这个夹心层世代时间贫困小游戏生成一个简短结局，80到140字。不要编造调查数据。根据最终数值判断孩子、上司、父母关系和疲惫的后果。结局原因：" + reason + "。本地结局草稿：" + localEndingText(reason),
+            gameState: {
+              ...getAiGameState(),
+              endingReason: reason,
+              ultimateWarnings: state.ultimateWarnings,
+              finalStats: {
+                fatigue: state.fatigue,
+                childConnection: state.child,
+                bossTrust: state.boss,
+                parentRelationship: state.parentRel
+              }
+            }
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.answer) throw new Error(data.error || "AI ending failed");
+        if (state.ended && state.endingReason === reason) {
+          $("endingSummary").textContent = data.answer + " " + finalStatsText();
+        }
+      } catch (error) {
+        console.warn("AI ending generation failed:", error);
+      }
+    }
+
+    function endGame(reason) {
+      if (state.ended) return;
+      state.ended = true;
+      state.endingReason = reason;
+      stopTimelineClock();
+      $("pressureAlert").classList.remove("show");
+      $("ultimateAlert").classList.remove("show");
+      $("pressureAlert").setAttribute("aria-hidden", "true");
+      $("ultimateAlert").setAttribute("aria-hidden", "true");
       $("endingBox").style.display = "block";
-      $("endingSummary").textContent = state.restSucceeded
-        ? "你完成了清单上的任务，终于独处了 10 分钟。可是这 10 分钟出现的前提，是所有工作、家庭和照护任务都先被处理完。这个结尾想问的是：为什么“做回自己”必须排在这么后面？"
-        : "你完成了 " + state.completed + " 项任务，尝试独处 " + state.restAttempts + " 次，被打断 " + state.interruptions + " 次。此刻疲惫值是 " + state.fatigue + "%，孩子联结是 " + state.child + "%，自我时间是 " + state.self + "%。这不是通关或失败，而是这个项目想呈现的结构：你维持了一切，除了你自己。";
+      $("endingTitle").textContent = reason === "safe-day" ? "结尾：你维持了一切，除了你自己" : "结尾：终极警告已经到达上限";
+      $("endingSummary").textContent = localEndingText(reason) + " AI 正在尝试生成更完整的结局，如果失败，这段本地结局会保留。";
+      $("endingBox").scrollIntoView({ block: "start", behavior: "smooth" });
+      generateEndingWithAi(reason);
     }
 
     function resetParentDoll() {
@@ -2573,11 +2978,6 @@
         endDrag(event.clientX, event.clientY);
       });
 
-      document.querySelectorAll(".hotspot").forEach((hotspot) => {
-        hotspot.addEventListener("click", () => {
-          completeSceneTask(hotspot.dataset.sceneTask, hotspot.dataset.position, "button");
-        });
-      });
     }
 
     function saveFeedback() {
@@ -2593,56 +2993,12 @@
         interruptions: state.interruptions,
         fatigue: state.fatigue,
         child: state.child,
-        self: state.self,
+        boss: state.boss,
+        parentRel: state.parentRel,
         savedAt: new Date().toLocaleString()
       };
       localStorage.setItem("sandwichTimeFeedback", JSON.stringify(payload));
       $("savedFeedback").textContent = "已保存到这台电脑的浏览器里：" + payload.savedAt;
-    }
-
-    async function submitUsername() {
-      const username = $("usernameInput").value.trim();
-      const status = $("usernameStatus");
-      if (!username) {
-        status.className = "username-status error";
-        status.textContent = "请先输入一个昵称。";
-        return;
-      }
-      if (username.length > 40) {
-        status.className = "username-status error";
-        status.textContent = "昵称不能超过 40 个字符。";
-        return;
-      }
-
-      $("submitUsernameBtn").disabled = true;
-      status.className = "username-status";
-      status.textContent = "正在提交...";
-
-      try {
-        const response = await fetch(SUPABASE_URL + "/rest/v1/username_submissions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_PUBLISHABLE_KEY,
-            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify({ username })
-        });
-
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
-
-        localStorage.setItem("sandwichTimeUsername", username);
-        status.className = "username-status ok";
-        status.textContent = "已提交，谢谢你的试玩。";
-      } catch (error) {
-        status.className = "username-status error";
-        status.textContent = "提交失败，请稍后再试。";
-      } finally {
-        $("submitUsernameBtn").disabled = false;
-      }
     }
 
     function addAiMessage(text, type = "assistant") {
@@ -2663,7 +3019,8 @@
         interruptions: state.interruptions,
         fatigue: state.fatigue,
         childConnection: state.child,
-        selfTime: state.self,
+        bossTrust: state.boss,
+        parentRelationship: state.parentRel,
         visibleTasks: state.tasks.map((task) => ({
           title: task.title,
           type: task.type,
@@ -2711,11 +3068,11 @@
       const id = window.location.hash.replace("#", "");
       const researchIds = new Set(["researchStory", "concept", "design", "research", "paper"]);
       const preSurveyDone = Boolean(getStoredSurvey(SURVEY_PRE_KEY));
-      if (id === "play" && !preSurveyDone) {
+      if ((id === "play" || id === "feedback") && !preSurveyDone) {
         window.location.hash = "survey";
         return;
       }
-      const page = id === "play" ? "play" : id === "survey" || id === "postSurvey" ? "survey" : researchIds.has(id) ? "research" : "home";
+      const page = id === "play" || id === "feedback" ? "play" : id === "survey" || id === "postSurvey" ? "survey" : researchIds.has(id) ? "research" : "home";
 
       document.body.dataset.page = page;
       $("survey").hidden = page !== "survey";
@@ -2743,13 +3100,20 @@
     $("agreeConsentBtn").addEventListener("click", acceptConsent);
     $("startBtn").addEventListener("click", startGame);
     $("resetBtn").addEventListener("click", resetGame);
-    $("restBtn").addEventListener("click", attemptRest);
     $("saveFeedbackBtn").addEventListener("click", saveFeedback);
     $("finishExperienceBtn").addEventListener("click", goToPostSurvey);
     $("awarenessSurvey").addEventListener("submit", submitSurvey);
-    $("submitUsernameBtn").addEventListener("click", submitUsername);
-    $("usernameInput").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") submitUsername();
+    $("pressureAlertClose").addEventListener("click", () => {
+      $("pressureAlert").classList.remove("show");
+      $("pressureAlert").setAttribute("aria-hidden", "true");
+    });
+    $("restFailureClose").addEventListener("click", () => {
+      $("restFailureAlert").classList.remove("show");
+      $("restFailureAlert").setAttribute("aria-hidden", "true");
+    });
+    $("ultimateAlertClose").addEventListener("click", () => {
+      $("ultimateAlert").classList.remove("show");
+      $("ultimateAlert").setAttribute("aria-hidden", "true");
     });
     $("aiHelpButton").addEventListener("click", () => {
       $("aiPanel").classList.toggle("open");
@@ -2785,12 +3149,6 @@
       } catch (error) {
         localStorage.removeItem("sandwichTimeFeedback");
       }
-    }
-    const savedUsername = localStorage.getItem("sandwichTimeUsername");
-    if (savedUsername) {
-      $("usernameInput").value = savedUsername;
-      $("usernameStatus").className = "username-status ok";
-      $("usernameStatus").textContent = "这台电脑上次提交的昵称：" + savedUsername;
     }
     enableParentDrag();
     window.addEventListener("hashchange", showPageForHash);
