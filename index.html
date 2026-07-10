@@ -1069,6 +1069,12 @@
       color: var(--muted);
       font-size: 13px;
     }
+    .concept-primer {
+      margin: 18px 0 14px;
+    }
+    .concept-primer .note-card {
+      min-height: 118px;
+    }
     .survey-page {
       max-width: 920px;
       margin: 0 auto;
@@ -1107,6 +1113,50 @@
     #surveyQuestions {
       display: grid;
       gap: 14px;
+    }
+    #demographicQuestions,
+    #postFeedbackQuestions {
+      display: grid;
+      gap: 14px;
+    }
+    .survey-subsection-title {
+      margin: 6px 0 -4px;
+      font-size: 16px;
+      color: var(--ink);
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .field-card {
+      display: grid;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 12px;
+    }
+    .field-card label {
+      font-weight: 700;
+      font-size: 13px;
+      color: #3d4148;
+    }
+    .field-card select,
+    .field-card textarea {
+      margin-top: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfaf7;
+      color: var(--ink);
+      padding: 9px 10px;
+      font: inherit;
+    }
+    .field-card textarea {
+      min-height: 108px;
+    }
+    .field-card.full {
+      grid-column: 1 / -1;
     }
     .survey-question {
       border: 1px solid var(--line);
@@ -1409,6 +1459,7 @@
       .play-steps { grid-template-columns: 1fr; }
       .play-board { grid-template-columns: 1fr; }
       .research-grid { grid-template-columns: 1fr; }
+      .field-grid { grid-template-columns: 1fr; }
       .scene-tabs { grid-template-columns: repeat(2, 1fr); }
       .task-list { max-height: 360px; }
       .task-list li, .rest-row { grid-template-columns: 1fr; }
@@ -1495,8 +1546,7 @@
   </section>
 
   <nav class="topbar" aria-label="页面导航">
-    <a href="#survey">前测 / 试玩</a>
-    <a href="#feedback">试玩反馈</a>
+    <a href="#survey">开始体验</a>
     <a href="#concept">核心概念</a>
     <a href="#research">调研</a>
     <a href="#design">机制</a>
@@ -1509,9 +1559,22 @@
       <h1 id="page-title">夹心层世代的时间困境</h1>
       <p class="one-line-hook">3 分钟试玩：你要帮一个上有老、下有小、还要上班的家庭把一天撑过去。</p>
       <p class="lead">这是一个关于“上有老人要照顾、下有孩子要陪伴、中间还有工作”的交互网页小游戏。它想解决的不是“某个父母不会安排时间”的问题，而是让同龄人、老师和试玩者看见：当工作、育儿、养老和家庭情感回应都被视为正当任务时，为什么“做回自己”总是被排到最后。</p>
+      <div class="grid-3 concept-primer" aria-label="开始前的三个概念">
+        <div class="note-card">
+          <strong>夹心层世代</strong>
+          同时照顾老人、孩子，也要承担工作的人。
+        </div>
+        <div class="note-card">
+          <strong>时间贫困</strong>
+          不是没有安排好时间，而是几乎没有真正可支配的时间。
+        </div>
+        <div class="note-card">
+          <strong>你将体验什么</strong>
+          在一天里切换工作、家庭、老人照护和自我场景，处理不断补上的清单。
+        </div>
+      </div>
       <div class="hero-actions" aria-label="快速入口">
-        <a class="hero-link primary-link" href="#survey">直接开始试玩</a>
-        <a class="hero-link secondary-link" href="#researchStory">先看研究问题</a>
+        <a class="hero-link primary-link" href="#survey">开始体验</a>
       </div>
       <div class="quick-start" aria-label="最快玩法">
         <strong>最快玩法：</strong>
@@ -1541,7 +1604,9 @@
         <p id="surveyIntro">这些题没有标准答案，只用来比较你试玩前后的理解有没有变化。</p>
         <div class="survey-scale-note">评分说明：1 = 非常不同意，2 = 不太同意，3 = 不确定，4 = 比较同意，5 = 非常同意。</div>
         <form class="survey-form" id="awarenessSurvey">
+          <div id="demographicQuestions"></div>
           <div id="surveyQuestions"></div>
+          <div id="postFeedbackQuestions"></div>
           <div class="survey-submit-row">
             <button class="primary" id="surveySubmitBtn" type="submit">提交并进入试玩</button>
             <div class="survey-status" id="surveyStatus" aria-live="polite"></div>
@@ -1650,14 +1715,6 @@
         </div>
 
         <div class="log" id="logBox" aria-live="polite">第一步：点“开始一天”。试玩记录会出现在这里。</div>
-
-        <div class="feedback-card" id="feedback">
-          <h3>试玩反馈</h3>
-          <label for="feedbackInput"><strong>写下你的试玩感受：</strong>如果这是你家的一天，你觉得谁最难受？你最想删掉哪一项任务？</label>
-          <textarea id="feedbackInput" placeholder="可以写：孩子、父母、老人，或我最想删掉加班/陪诊/家长群……"></textarea>
-          <button class="secondary" id="saveFeedbackBtn">保存到本机</button>
-          <div class="saved-feedback" id="savedFeedback"></div>
-        </div>
 
         <div class="ending" id="endingBox">
           <h3 id="endingTitle">结尾：你维持了一切，除了你自己</h3>
@@ -1786,7 +1843,7 @@
           当用户问“为什么不能休息”，AI 会说“休息没有被取消，只是被重新排序”，从而暴露清单背后的道德压力。
         </div>
       </div>
-      <div class="quote">游戏设计原则：不能正常赢。若有一刻“像自己”，也应是极小、短暂、或带代价的。比如独自喝十分钟咖啡，但其他角色状态继续恶化。</div>
+      <div class="quote">游戏设计原则：不应该轻松赢。玩家理解机制后可以艰难撑过一天，但通关仍然带着代价：你可能维持了家庭、工作和照护，却几乎没有真正属于自己的时间。</div>
     </section>
 
     <section class="section" id="research">
@@ -1912,19 +1969,60 @@
     const CONSENT_KEY = "sandwichTimeConsentAgreed";
     const SURVEY_PRE_KEY = "sandwichTimeAwarenessPre";
     const SURVEY_POST_KEY = "sandwichTimeAwarenessPost";
+    const SURVEY_DEMOGRAPHICS_KEY = "sandwichTimeDemographics";
+    const SURVEY_FEEDBACK_KEY = "sandwichTimePostFeedback";
     const SURVEY_SESSION_KEY = "sandwichTimeAwarenessSessionId";
     const SURVEY_TABLE = "awareness_survey_submissions";
     const GAME_START_MINUTES = 7 * 60;
     const GAME_DAY_MINUTES = 24 * 60;
     const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
     const GAME_MINUTES_PER_REAL_SECOND = 5;
-    const TASK_RELEASE_INTERVAL_MINUTES = 12;
+    const TASK_RELEASE_INTERVAL_MINUTES = 18;
     const surveyQuestions = [
       "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
       "我认为很多上有老人、下有孩子、同时还要工作的人，都会面临类似的时间压力。",
       "我认为夹心层世代缺少自己的时间，主要不是因为他们不会安排时间，而是因为工作、育儿、养老和家庭责任同时压在他们身上。",
       "我能理解为什么在这些任务都“很重要”的情况下，休息和自我时间总是容易被排到最后。",
       "我认为夹心层世代的困境更像是一个社会结构问题，而不只是某个家庭或某个人自己的问题。"
+    ];
+    const demographicFields = [
+      {
+        id: "age_group",
+        label: "年龄段",
+        options: [
+          ["", "请选择"],
+          ["under_18", "18 岁以下"],
+          ["18_24", "18-24 岁"],
+          ["25_34", "25-34 岁"],
+          ["35_44", "35-44 岁"],
+          ["45_54", "45-54 岁"],
+          ["55_plus", "55 岁及以上"],
+          ["prefer_not_to_say", "不愿透露"]
+        ]
+      },
+      {
+        id: "gender",
+        label: "性别",
+        options: [
+          ["", "请选择"],
+          ["female", "女性"],
+          ["male", "男性"],
+          ["non_binary", "非二元 / 其他"],
+          ["prefer_not_to_say", "不愿透露"]
+        ]
+      },
+      {
+        id: "family_status",
+        label: "婚姻 / 生育状态",
+        options: [
+          ["", "请选择"],
+          ["not_married_no_children", "未婚 / 无子女"],
+          ["partnered_no_children", "已婚或有伴侣 / 无子女"],
+          ["has_children", "有子女"],
+          ["sandwich_or_caregiving", "正在承担育儿或养老照护"],
+          ["prefer_not_to_say", "不愿透露"]
+        ]
+      }
     ];
     let surveyMode = "pre";
 
@@ -1966,14 +2064,14 @@
         return Math.sign(value) * Math.max(1, Math.round(Math.abs(value) * factor));
       };
       TASK_LIBRARY.forEach((task) => {
-        task.fatigue = scaleValue(task.fatigue, .65);
-        task.ttlMinutes = Math.max(task.id.startsWith("urgent-") ? 120 : 180, Math.round(task.ttlMinutes * 4));
+        task.fatigue = scaleValue(task.fatigue, .45);
+        task.ttlMinutes = Math.max(task.id.startsWith("urgent-") ? 150 : 220, Math.round(task.ttlMinutes * 4.8));
         relationshipKeys.forEach((key) => {
-          task[key] = scaleValue(task[key], 1.8);
+          task[key] = task[key] > 0 ? scaleValue(task[key], 1.5) : scaleValue(task[key], .9);
         });
         if (task.penalty) {
           Object.keys(task.penalty).forEach((key) => {
-            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .75 : 2);
+            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .45 : .75);
           });
         }
       });
@@ -2047,44 +2145,75 @@
       return id;
     }
 
-    async function postSurveyRow(body) {
-      return fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_PUBLISHABLE_KEY,
-          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify(body)
-      });
+    async function upsertSurveyRow(body) {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+      try {
+        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE + "?on_conflict=session_id", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+            "Prefer": "resolution=merge-duplicates,return=minimal"
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal
+        });
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
     }
 
     async function submitSurveyToSupabase(mode, payload, comparison = {}) {
       const answers = payload.answers;
-      const body = {
-        session_id: getSurveySessionId(),
-        phase: mode,
-        q1: answers[0],
-        q2: answers[1],
-        q3: answers[2],
-        q4: answers[3],
-        q5: answers[4],
-        average_score: payload.average,
-        pre_average_score: comparison.preAverage ?? null,
-        post_average_score: comparison.postAverage ?? null,
-        average_change: comparison.averageChange ?? null,
-        game_completed: state.completed,
-        game_rest_attempts: state.restAttempts,
-        game_interruptions: state.interruptions,
-        game_fatigue: state.fatigue,
-        game_child: state.child,
-        game_boss: state.boss,
-        game_parent_relationship: state.parentRel,
-        client_saved_at: payload.savedAt
-      };
+      const sessionId = getSurveySessionId();
+      const body = mode === "post"
+        ? {
+            session_id: sessionId,
+            post_q1: answers[0],
+            post_q2: answers[1],
+            post_q3: answers[2],
+            post_q4: answers[3],
+            post_q5: answers[4],
+            post_average_score: payload.average,
+            average_change: comparison.averageChange ?? null,
+            playtest_feedback: payload.feedback || null,
+            game_completed: state.completed,
+            game_rest_attempts: state.restAttempts,
+            game_interruptions: state.interruptions,
+            game_fatigue: state.fatigue,
+            game_child: state.child,
+            game_boss: state.boss,
+            game_parent_relationship: state.parentRel,
+            post_saved_at: payload.savedAt,
+            client_saved_at: payload.savedAt,
+            updated_at: new Date().toISOString()
+          }
+        : {
+            session_id: sessionId,
+            age_group: payload.demographics.age_group,
+            gender: payload.demographics.gender,
+            family_status: payload.demographics.family_status,
+            pre_q1: answers[0],
+            pre_q2: answers[1],
+            pre_q3: answers[2],
+            pre_q4: answers[3],
+            pre_q5: answers[4],
+            pre_average_score: payload.average,
+            pre_saved_at: payload.savedAt,
+            client_saved_at: payload.savedAt,
+            updated_at: new Date().toISOString(),
+            phase: "pre",
+            q1: answers[0],
+            q2: answers[1],
+            q3: answers[2],
+            q4: answers[3],
+            q5: answers[4],
+            average_score: payload.average
+          };
 
-      let response = await postSurveyRow(body);
+      const response = await upsertSurveyRow(body);
 
       if (!response.ok) {
         let detail = "";
@@ -2093,42 +2222,89 @@
         } catch (error) {
           detail = "";
         }
-        const canRetryWithOldColumns = response.status === 400
-          && detail.includes("PGRST204")
-          && (detail.includes("game_boss") || detail.includes("game_parent_relationship"));
-        if (canRetryWithOldColumns) {
-          const fallbackBody = { ...body };
-          delete fallbackBody.game_boss;
-          delete fallbackBody.game_parent_relationship;
-          response = await postSurveyRow(fallbackBody);
-          if (response.ok) {
-            console.warn("Supabase survey table is missing new game metric columns. Saved survey without boss/parent relationship metrics.");
-            return;
-          }
-          try {
-            detail = await response.text();
-          } catch (error) {
-            detail = "";
-          }
-        }
         throw new Error("HTTP " + response.status + (detail ? ": " + detail : ""));
       }
+    }
+
+    function renderDemographicQuestions() {
+      const container = $("demographicQuestions");
+      container.innerHTML = "";
+      const title = document.createElement("div");
+      title.className = "survey-subsection-title";
+      title.textContent = "基础信息";
+      container.appendChild(title);
+      const grid = document.createElement("div");
+      grid.className = "field-grid";
+      const stored = getStoredSurvey(SURVEY_DEMOGRAPHICS_KEY) || {};
+      demographicFields.forEach((field) => {
+        const card = document.createElement("div");
+        card.className = "field-card";
+        const label = document.createElement("label");
+        label.setAttribute("for", field.id);
+        label.textContent = field.label;
+        const select = document.createElement("select");
+        select.id = field.id;
+        select.name = field.id;
+        select.required = true;
+        field.options.forEach(([value, text]) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = text;
+          if (stored[field.id] === value) option.selected = true;
+          select.appendChild(option);
+        });
+        card.appendChild(label);
+        card.appendChild(select);
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
+
+    function renderPostFeedbackQuestion() {
+      const container = $("postFeedbackQuestions");
+      container.innerHTML = "";
+      const title = document.createElement("div");
+      title.className = "survey-subsection-title";
+      title.textContent = "试玩反馈";
+      const card = document.createElement("div");
+      card.className = "field-card full";
+      const label = document.createElement("label");
+      label.setAttribute("for", "playtestFeedback");
+      label.textContent = "玩完之后，你觉得谁最受影响？你最想删掉哪一项任务？";
+      const textarea = document.createElement("textarea");
+      textarea.id = "playtestFeedback";
+      textarea.name = "playtestFeedback";
+      textarea.required = true;
+      textarea.placeholder = "可以写：孩子、父母、老人，或我最想删掉加班/陪诊/家长群……";
+      const stored = getStoredSurvey(SURVEY_FEEDBACK_KEY);
+      if (stored && stored.text) textarea.value = stored.text;
+      card.appendChild(label);
+      card.appendChild(textarea);
+      container.appendChild(title);
+      container.appendChild(card);
     }
 
     function renderSurvey(mode) {
       surveyMode = mode;
       const isPost = mode === "post";
       $("surveyEyebrow").textContent = isPost ? "试玩后小问卷" : "试玩前小问卷";
-      $("surveyTitle").textContent = isPost ? "再回答同样的 5 个问题" : "先回答 5 个很短的问题";
+      $("surveyTitle").textContent = isPost ? "再回答同样的 5 个问题，并写下试玩反馈" : "先回答基础信息和 5 个很短的问题";
       $("surveyIntro").textContent = isPost
-        ? "题目和前测完全一样，用来比较试玩前后的理解变化。"
-        : "这些题没有标准答案，只用来比较你试玩前后的理解有没有变化。";
+        ? "题目和前测完全一样，用来比较试玩前后的理解变化；最后请写一句试玩感受。"
+        : "基础信息不会用于识别你是谁，只帮助课堂研究理解不同用户的反馈。";
       $("surveySubmitBtn").textContent = isPost ? "提交后测并查看变化" : "提交并进入试玩";
       $("surveySubmitBtn").disabled = false;
       $("surveyStatus").textContent = "";
       $("surveyStatus").className = "survey-status";
       $("surveyResult").hidden = true;
       $("surveyResult").textContent = "";
+      $("demographicQuestions").innerHTML = "";
+      $("postFeedbackQuestions").innerHTML = "";
+      if (isPost) {
+        renderPostFeedbackQuestion();
+      } else {
+        renderDemographicQuestions();
+      }
 
       const stored = getStoredSurvey(isPost ? SURVEY_POST_KEY : SURVEY_PRE_KEY);
       const questions = $("surveyQuestions");
@@ -2173,6 +2349,24 @@
       });
     }
 
+    function collectDemographics() {
+      const values = {};
+      demographicFields.forEach((field) => {
+        const input = $(field.id);
+        values[field.id] = input ? input.value : "";
+      });
+      return values;
+    }
+
+    function demographicsComplete(values) {
+      return demographicFields.every((field) => values[field.id]);
+    }
+
+    function collectPostFeedback() {
+      const input = $("playtestFeedback");
+      return input ? input.value.trim() : "";
+    }
+
     async function submitSurvey(event) {
       event.preventDefault();
       const answers = collectSurveyAnswers();
@@ -2182,10 +2376,26 @@
         return;
       }
 
+      const demographics = surveyMode === "pre" ? collectDemographics() : getStoredSurvey(SURVEY_DEMOGRAPHICS_KEY);
+      if (surveyMode === "pre" && !demographicsComplete(demographics)) {
+        $("surveyStatus").className = "survey-status error";
+        $("surveyStatus").textContent = "请先把基础信息选完。";
+        return;
+      }
+
+      const feedback = surveyMode === "post" ? collectPostFeedback() : "";
+      if (surveyMode === "post" && !feedback) {
+        $("surveyStatus").className = "survey-status error";
+        $("surveyStatus").textContent = "请写一句试玩反馈。";
+        return;
+      }
+
       const payload = {
         answers,
         average: Number(average(answers).toFixed(2)),
-        savedAt: new Date().toLocaleString()
+        demographics,
+        feedback,
+        savedAt: new Date().toISOString()
       };
 
       $("surveySubmitBtn").disabled = true;
@@ -2194,6 +2404,17 @@
 
       if (surveyMode === "post") {
         localStorage.setItem(SURVEY_POST_KEY, JSON.stringify(payload));
+        localStorage.setItem(SURVEY_FEEDBACK_KEY, JSON.stringify({
+          text: feedback,
+          completed: state.completed,
+          restAttempts: state.restAttempts,
+          interruptions: state.interruptions,
+          fatigue: state.fatigue,
+          child: state.child,
+          boss: state.boss,
+          parentRel: state.parentRel,
+          savedAt: payload.savedAt
+        }));
         const pre = getStoredSurvey(SURVEY_PRE_KEY);
         const diff = pre ? Number((payload.average - pre.average).toFixed(2)) : null;
         try {
@@ -2207,7 +2428,7 @@
         } catch (error) {
           console.warn("Supabase post-survey submit failed:", error);
           $("surveyStatus").className = "survey-status error";
-          $("surveyStatus").textContent = "后测已保存在本机，但提交到 Supabase 失败。请确认问卷表已创建。";
+          $("surveyStatus").textContent = "后测已保存在本机，但提交到 Supabase 失败。请稍后检查数据库连接。";
         } finally {
           $("surveySubmitBtn").disabled = false;
         }
@@ -2223,6 +2444,7 @@
       }
 
       localStorage.setItem(SURVEY_PRE_KEY, JSON.stringify(payload));
+      localStorage.setItem(SURVEY_DEMOGRAPHICS_KEY, JSON.stringify(demographics));
       try {
         await submitSurveyToSupabase("pre", payload);
         $("surveyStatus").className = "survey-status ok";
@@ -2350,9 +2572,9 @@
     }
 
     function applyRelationDecay() {
-      applyMetricChanges({ child: -5, boss: -5, parentRel: -5 });
+      applyMetricChanges({ child: -1, boss: -1, parentRel: -1 });
       showTaskNotice("关系压力继续流失");
-      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 5。");
+      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 1。");
     }
 
     function expireTasks() {
@@ -2369,13 +2591,13 @@
 
     function activeTaskTarget() {
       const elapsed = Math.max(0, state.minutes - GAME_START_MINUTES);
-      return Math.min(12, 4 + Math.floor(elapsed / 35));
+      return Math.min(8, 3 + Math.floor(elapsed / 90));
     }
 
     function releaseTasks(count = 1, preferredScene = null, options = {}) {
       if (!state.started) return 0;
       let released = 0;
-      while (released < count && state.tasks.length < 12) {
+      while (released < count && state.tasks.length < 8) {
         let candidates = TASK_LIBRARY.filter((task) =>
           !state.tasks.some((activeTask) => activeTask.id === task.id) &&
           taskMatchesTime(task) &&
@@ -2411,8 +2633,8 @@
     function releaseScheduledTasks(options = {}) {
       if (isDayOver()) return 0;
       let released = 0;
-      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 12) {
-        released += releaseTasks(2, null, options);
+      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 8) {
+        released += releaseTasks(1, null, options);
         state.nextTaskReleaseAt += TASK_RELEASE_INTERVAL_MINUTES;
       }
       if (state.tasks.length < activeTaskTarget()) {
@@ -2444,7 +2666,7 @@
           setLog("时间来到 " + timeText() + "，新的任务进入清单。");
         }
         state.relationDecaySeconds += 1;
-        if (state.relationDecaySeconds >= 5) {
+        if (state.relationDecaySeconds >= 12) {
           state.relationDecaySeconds = 0;
           applyRelationDecay();
         }
@@ -2578,7 +2800,7 @@
       state.ended = false;
       resetParentDoll();
       $("endingBox").style.display = "none";
-      releaseTasks(3, "work");
+      releaseTasks(2, "work");
       releaseDueTasks("home");
       setLog("你是这一家的安排者。把今天过完。");
       startTimelineClock();
@@ -2672,7 +2894,7 @@
       state.completed += 1;
       releaseScheduledTasks({ blockedSpot: completedSpot });
       releaseDueTasks(task.scene, { blockedSpot: completedSpot });
-      if (state.completed % 2 === 0) releaseTasks(1, null, { urgentOnly: true, blockedSpot: completedSpot });
+      if (state.completed % 4 === 0) releaseTasks(1, null, { urgentOnly: true, blockedSpot: completedSpot });
       if (state.boss >= 100) showRestFailure("成功升职", "上司信任已经达到 100%。你获得了升职反馈，但这也说明工作期待会继续把时间拉走。", false);
       const line = lines[state.completed % lines.length];
       const prefix = source === "drag" ? "你把父母拖到任务点，完成了“" : "完成了“";
@@ -2980,27 +3202,6 @@
 
     }
 
-    function saveFeedback() {
-      const text = $("feedbackInput").value.trim();
-      if (!text) {
-        $("savedFeedback").textContent = "还没有填写反馈。";
-        return;
-      }
-      const payload = {
-        text,
-        completed: state.completed,
-        restAttempts: state.restAttempts,
-        interruptions: state.interruptions,
-        fatigue: state.fatigue,
-        child: state.child,
-        boss: state.boss,
-        parentRel: state.parentRel,
-        savedAt: new Date().toLocaleString()
-      };
-      localStorage.setItem("sandwichTimeFeedback", JSON.stringify(payload));
-      $("savedFeedback").textContent = "已保存到这台电脑的浏览器里：" + payload.savedAt;
-    }
-
     function addAiMessage(text, type = "assistant") {
       const message = document.createElement("p");
       message.className = "ai-msg" + (type === "user" ? " user" : type === "error" ? " error" : "");
@@ -3065,14 +3266,18 @@
     }
 
     function showPageForHash() {
-      const id = window.location.hash.replace("#", "");
+      let id = window.location.hash.replace("#", "");
       const researchIds = new Set(["researchStory", "concept", "design", "research", "paper"]);
       const preSurveyDone = Boolean(getStoredSurvey(SURVEY_PRE_KEY));
-      if ((id === "play" || id === "feedback") && !preSurveyDone) {
+      if (id === "feedback") {
+        window.location.hash = "postSurvey";
+        return;
+      }
+      if (id === "play" && !preSurveyDone) {
         window.location.hash = "survey";
         return;
       }
-      const page = id === "play" || id === "feedback" ? "play" : id === "survey" || id === "postSurvey" ? "survey" : researchIds.has(id) ? "research" : "home";
+      const page = id === "play" ? "play" : id === "survey" || id === "postSurvey" ? "survey" : researchIds.has(id) ? "research" : "home";
 
       document.body.dataset.page = page;
       $("survey").hidden = page !== "survey";
@@ -3100,7 +3305,6 @@
     $("agreeConsentBtn").addEventListener("click", acceptConsent);
     $("startBtn").addEventListener("click", startGame);
     $("resetBtn").addEventListener("click", resetGame);
-    $("saveFeedbackBtn").addEventListener("click", saveFeedback);
     $("finishExperienceBtn").addEventListener("click", goToPostSurvey);
     $("awarenessSurvey").addEventListener("submit", submitSurvey);
     $("pressureAlertClose").addEventListener("click", () => {
@@ -3141,15 +3345,6 @@
       }
     });
 
-    const saved = localStorage.getItem("sandwichTimeFeedback");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        $("savedFeedback").textContent = "上次保存的反馈：" + parsed.text;
-      } catch (error) {
-        localStorage.removeItem("sandwichTimeFeedback");
-      }
-    }
     enableParentDrag();
     window.addEventListener("hashchange", showPageForHash);
     showPageForHash();
