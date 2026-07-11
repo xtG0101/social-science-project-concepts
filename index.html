@@ -2164,17 +2164,20 @@
       return id;
     }
 
-    async function upsertSurveyRow(body) {
+    async function saveSurveyRow(mode, sessionId, body) {
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+      const isPostSurvey = mode === "post";
+      const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
+        + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
       try {
-        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE + "?on_conflict=session_id", {
-          method: "POST",
+        return await fetch(endpoint, {
+          method: isPostSurvey ? "PATCH" : "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_PUBLISHABLE_KEY,
             "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "resolution=merge-duplicates,return=minimal"
+            "Prefer": "return=minimal"
           },
           body: JSON.stringify(body),
           signal: controller.signal
@@ -2232,7 +2235,7 @@
             average_score: payload.average
           };
 
-      const response = await upsertSurveyRow(body);
+      const response = await saveSurveyRow(mode, sessionId, body);
 
       if (!response.ok) {
         let detail = "";
