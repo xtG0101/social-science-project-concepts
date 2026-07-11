@@ -142,14 +142,15 @@ drop policy if exists "Allow anonymous survey updates" on public.awareness_surve
 create policy "Allow anonymous survey upserts"
 on public.awareness_survey_submissions
 for insert
-to anon
+to anon, authenticated
 with check (true);
 
 create policy "Allow anonymous survey updates"
 on public.awareness_survey_submissions
 for update
-to anon
+to anon, authenticated
 using (true)
 with check (true);
 
-grant insert, update on public.awareness_survey_submissions to anon;
+grant usage on schema public to anon, authenticated;
+grant insert, update on public.awareness_survey_submissions to anon, authenticated;
