@@ -1641,25 +1641,6 @@
     </section>
 
     <section class="game-shell page-view" id="play" aria-label="夹心层世代一天体验">
-      <div class="game-head">
-        <div class="controls">
-          <button class="primary" id="startBtn">开始一天</button>
-          <button class="secondary" id="resetBtn">重新开始</button>
-          <label class="select-wrap">压力模式
-            <select id="modeSelect" aria-label="选择压力模式">
-              <option value="normal">普通的一天</option>
-              <option value="tight">任务更密的一天</option>
-              <option value="care">照护更多的一天</option>
-            </select>
-          </label>
-        </div>
-        <div class="play-steps" aria-label="玩法三步">
-          <div class="step-chip"><strong>1. 开始</strong>生成今天的任务清单。</div>
-          <div class="step-chip"><strong>2. 处理清单</strong>观察疲惫、孩子联结、上司信任和父母关系。</div>
-          <div class="step-chip"><strong>3. 尝试休息</strong>切到自我场景，拖到休息点，看看系统是否允许。</div>
-        </div>
-      </div>
-
       <div class="game-body">
         <div class="status-grid" aria-label="状态条">
           <div class="meter-card fatigue-card">
@@ -2550,7 +2531,7 @@
     }
 
     function taskMatchesMode(task) {
-      const mode = $("modeSelect").value;
+      const mode = $("modeSelect") ? $("modeSelect").value : "normal";
       if (mode === "care") return task.scene === "elder" || task.scene === "hospital" || Math.random() > .28;
       if (mode === "tight") return task.scene === "work" || Math.random() > .28;
       return true;
@@ -3363,12 +3344,12 @@
     }
 
     $("agreeConsentBtn").addEventListener("click", acceptConsent);
-    $("startBtn").addEventListener("click", startGame);
+    if ($("startBtn")) $("startBtn").addEventListener("click", startGame);
     $("gameRulesStart").addEventListener("click", () => {
       hideGameRules();
       startGame();
     });
-    $("resetBtn").addEventListener("click", resetGame);
+    if ($("resetBtn")) $("resetBtn").addEventListener("click", resetGame);
     $("finishExperienceBtn").addEventListener("click", goToPostSurvey);
     $("awarenessSurvey").addEventListener("submit", submitSurvey);
     $("pressureAlertClose").addEventListener("click", () => {
@@ -3402,7 +3383,7 @@
     document.querySelectorAll(".scene-tabs button").forEach((button) => {
       button.addEventListener("click", () => changeScene(button.dataset.scene));
     });
-    $("modeSelect").addEventListener("change", () => {
+    if ($("modeSelect")) $("modeSelect").addEventListener("change", () => {
       if (state.started) {
         setLog("压力模式改变了。下一次重新开始时，清单密度会随之变化。");
         render();
