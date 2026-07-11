@@ -1843,7 +1843,7 @@
           当用户问“为什么不能休息”，AI 会说“休息没有被取消，只是被重新排序”，从而暴露清单背后的道德压力。
         </div>
       </div>
-      <div class="quote">游戏设计原则：不应该轻松赢。玩家理解机制后可以艰难撑过一天，但通关仍然带着代价：你可能维持了家庭、工作和照护，却几乎没有真正属于自己的时间。</div>
+      <div class="quote">游戏设计原则：不能正常赢。若有一刻“像自己”，也应是极小、短暂、或带代价的。比如独自喝十分钟咖啡，但其他角色状态继续恶化。</div>
     </section>
 
     <section class="section" id="research">
@@ -1977,7 +1977,7 @@
     const GAME_DAY_MINUTES = 24 * 60;
     const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
     const GAME_MINUTES_PER_REAL_SECOND = 5;
-    const TASK_RELEASE_INTERVAL_MINUTES = 18;
+    const TASK_RELEASE_INTERVAL_MINUTES = 12;
     const surveyQuestions = [
       "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
       "我认为很多上有老人、下有孩子、同时还要工作的人，都会面临类似的时间压力。",
@@ -2064,14 +2064,14 @@
         return Math.sign(value) * Math.max(1, Math.round(Math.abs(value) * factor));
       };
       TASK_LIBRARY.forEach((task) => {
-        task.fatigue = scaleValue(task.fatigue, .45);
-        task.ttlMinutes = Math.max(task.id.startsWith("urgent-") ? 150 : 220, Math.round(task.ttlMinutes * 4.8));
+        task.fatigue = scaleValue(task.fatigue, .65);
+        task.ttlMinutes = Math.max(task.id.startsWith("urgent-") ? 120 : 180, Math.round(task.ttlMinutes * 4));
         relationshipKeys.forEach((key) => {
-          task[key] = task[key] > 0 ? scaleValue(task[key], 1.5) : scaleValue(task[key], .9);
+          task[key] = scaleValue(task[key], 1.8);
         });
         if (task.penalty) {
           Object.keys(task.penalty).forEach((key) => {
-            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .45 : .75);
+            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .75 : 2);
           });
         }
       });
@@ -2572,9 +2572,9 @@
     }
 
     function applyRelationDecay() {
-      applyMetricChanges({ child: -1, boss: -1, parentRel: -1 });
+      applyMetricChanges({ child: -5, boss: -5, parentRel: -5 });
       showTaskNotice("关系压力继续流失");
-      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 1。");
+      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 5。");
     }
 
     function expireTasks() {
@@ -2591,13 +2591,13 @@
 
     function activeTaskTarget() {
       const elapsed = Math.max(0, state.minutes - GAME_START_MINUTES);
-      return Math.min(8, 3 + Math.floor(elapsed / 90));
+      return Math.min(12, 4 + Math.floor(elapsed / 35));
     }
 
     function releaseTasks(count = 1, preferredScene = null, options = {}) {
       if (!state.started) return 0;
       let released = 0;
-      while (released < count && state.tasks.length < 8) {
+      while (released < count && state.tasks.length < 12) {
         let candidates = TASK_LIBRARY.filter((task) =>
           !state.tasks.some((activeTask) => activeTask.id === task.id) &&
           taskMatchesTime(task) &&
@@ -2633,8 +2633,8 @@
     function releaseScheduledTasks(options = {}) {
       if (isDayOver()) return 0;
       let released = 0;
-      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 8) {
-        released += releaseTasks(1, null, options);
+      while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 12) {
+        released += releaseTasks(2, null, options);
         state.nextTaskReleaseAt += TASK_RELEASE_INTERVAL_MINUTES;
       }
       if (state.tasks.length < activeTaskTarget()) {
@@ -2666,7 +2666,7 @@
           setLog("时间来到 " + timeText() + "，新的任务进入清单。");
         }
         state.relationDecaySeconds += 1;
-        if (state.relationDecaySeconds >= 12) {
+        if (state.relationDecaySeconds >= 5) {
           state.relationDecaySeconds = 0;
           applyRelationDecay();
         }
@@ -2800,7 +2800,7 @@
       state.ended = false;
       resetParentDoll();
       $("endingBox").style.display = "none";
-      releaseTasks(2, "work");
+      releaseTasks(3, "work");
       releaseDueTasks("home");
       setLog("你是这一家的安排者。把今天过完。");
       startTimelineClock();
@@ -2894,7 +2894,7 @@
       state.completed += 1;
       releaseScheduledTasks({ blockedSpot: completedSpot });
       releaseDueTasks(task.scene, { blockedSpot: completedSpot });
-      if (state.completed % 4 === 0) releaseTasks(1, null, { urgentOnly: true, blockedSpot: completedSpot });
+      if (state.completed % 2 === 0) releaseTasks(1, null, { urgentOnly: true, blockedSpot: completedSpot });
       if (state.boss >= 100) showRestFailure("成功升职", "上司信任已经达到 100%。你获得了升职反馈，但这也说明工作期待会继续把时间拉走。", false);
       const line = lines[state.completed % lines.length];
       const prefix = source === "drag" ? "你把父母拖到任务点，完成了“" : "完成了“";
