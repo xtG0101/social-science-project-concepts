@@ -1026,6 +1026,30 @@
       color: var(--ink);
       font-weight: 700;
     }
+    .game-rules-card {
+      width: min(640px, 100%);
+      text-align: left;
+    }
+    .game-rules-card strong {
+      text-align: center;
+    }
+    .game-rules-card p {
+      margin: 0 0 12px;
+    }
+    .game-rules-card ul {
+      margin: 0;
+      padding-left: 20px;
+      color: rgba(255,255,255,.84);
+      line-height: 1.55;
+    }
+    .game-rules-card li {
+      margin: 7px 0;
+    }
+    .game-rules-card button {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
     .task-notice {
       position: fixed;
       left: 50%;
@@ -1945,6 +1969,21 @@
     </div>
   </div>
 
+  <div class="pressure-alert" id="gameRulesAlert" aria-live="polite" aria-hidden="true">
+    <div class="pressure-alert-card game-rules-card">
+      <strong>今天的目标：把这一天过完</strong>
+      <p>你要操纵一位夹心层世代成员，体验她在工作、孩子、父母照护和自我休息之间被不断拉扯的一天。</p>
+      <ul>
+        <li>你的目标不是完美通关，而是在一天结束前尽量维持四个指标：疲惫值、孩子联结、上司信任、与父母关系。</li>
+        <li>疲惫值越高越危险；孩子联结、上司信任、与父母关系越低越危险。疲惫值高于 90%，或任一关系/信任指标低于 10%，会触发一次终极警告。</li>
+        <li>收到 3 次终极警告后，游戏会直接结束，并生成这一天的结局。</li>
+        <li>任务会跟着时间线陆续出现。你可以拖动夹心层世代人物到发光任务点完成任务，也可以根据任务性质切换到工作、家庭、老人照护、医院或自我场景。</li>
+        <li>休息不是普通清单任务。你需要切到“自我”场景，把人物拖到休息点；是否能休息成功，要看当时的指标状态。</li>
+      </ul>
+      <button id="gameRulesStart" type="button">确定，开始一天</button>
+    </div>
+  </div>
+
   <div class="pressure-alert" id="restFailureAlert" aria-live="assertive" aria-hidden="true">
     <div class="pressure-alert-card">
       <strong id="restFailureTitle">休息失败</strong>
@@ -2112,6 +2151,7 @@
       timer: null,
       clockTimer: null,
       dragging: false,
+      rulesSeen: false,
       pressureAlertShown: false,
       restSucceeded: false,
       ended: false
@@ -2468,6 +2508,10 @@
         return;
       }
       window.location.hash = "postSurvey";
+      showPageForHash();
+      window.requestAnimationFrame(() => {
+        $("survey").scrollIntoView({ block: "start", behavior: "auto" });
+      });
     }
 
     function acceptConsent() {
@@ -2776,6 +2820,7 @@
 
     function startGame() {
       state.started = true;
+      state.rulesSeen = true;
       state.scene = "home";
       state.fatigue = 28;
       state.child = 76;
@@ -2805,6 +2850,19 @@
       setLog("你是这一家的安排者。把今天过完。");
       startTimelineClock();
       render();
+    }
+
+    function showGameRules() {
+      if (state.started || state.rulesSeen) return;
+      const alert = $("gameRulesAlert");
+      alert.classList.add("show");
+      alert.setAttribute("aria-hidden", "false");
+    }
+
+    function hideGameRules() {
+      const alert = $("gameRulesAlert");
+      alert.classList.remove("show");
+      alert.setAttribute("aria-hidden", "true");
     }
 
     function resetGame() {
@@ -3287,6 +3345,9 @@
       if (page === "survey") {
         renderSurvey(id === "postSurvey" ? "post" : "pre");
       }
+      if (page === "play") {
+        window.setTimeout(showGameRules, 120);
+      }
 
       if (page === "research" && id === "researchStory") {
         setResearchOpen(true);
@@ -3304,6 +3365,10 @@
 
     $("agreeConsentBtn").addEventListener("click", acceptConsent);
     $("startBtn").addEventListener("click", startGame);
+    $("gameRulesStart").addEventListener("click", () => {
+      hideGameRules();
+      startGame();
+    });
     $("resetBtn").addEventListener("click", resetGame);
     $("finishExperienceBtn").addEventListener("click", goToPostSurvey);
     $("awarenessSurvey").addEventListener("submit", submitSurvey);
