@@ -3354,7 +3354,8 @@
       }
 
       window.requestAnimationFrame(() => {
-        const target = id ? $(id) : null;
+        const targetId = id === "postSurvey" ? "survey" : id;
+        const target = targetId ? $(targetId) : null;
         if (target && !target.hidden) {
           target.scrollIntoView({ block: "start", behavior: "auto" });
         } else {
