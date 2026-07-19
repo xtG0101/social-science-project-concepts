@@ -2161,29 +2161,43 @@
       return values.reduce((sum, value) => sum + value, 0) / values.length;
     }
 
+    function createSurveySessionId() {
+      return window.crypto && crypto.randomUUID
+        ? crypto.randomUUID()
+        : "survey-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
     function getSurveySessionId() {
       const saved = localStorage.getItem(SURVEY_SESSION_KEY);
       if (saved) return saved;
-      const id = window.crypto && crypto.randomUUID
-        ? crypto.randomUUID()
-        : "survey-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+      const id = createSurveySessionId();
       localStorage.setItem(SURVEY_SESSION_KEY, id);
+      return id;
+    }
+
+    function startNewSurveySession() {
+      const id = createSurveySessionId();
+      localStorage.setItem(SURVEY_SESSION_KEY, id);
+      localStorage.removeItem(SURVEY_POST_KEY);
+      localStorage.removeItem(SURVEY_FEEDBACK_KEY);
+      localStorage.removeItem(SURVEY_POST_SYNC_KEY);
       return id;
     }
 
     async function saveSurveyRow(mode, sessionId, body) {
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+      const isPostSurvey = mode === "post";
       const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
-        + "?on_conflict=session_id";
+        + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
       try {
         return await fetch(endpoint, {
-          method: "POST",
+          method: isPostSurvey ? "PATCH" : "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_PUBLISHABLE_KEY,
             "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "resolution=merge-duplicates,return=minimal"
+            "Prefer": "return=minimal"
           },
           body: JSON.stringify(body),
           signal: controller.signal
@@ -2473,6 +2487,7 @@
         return;
       }
 
+      startNewSurveySession();
       localStorage.setItem(SURVEY_PRE_KEY, JSON.stringify(payload));
       localStorage.setItem(SURVEY_DEMOGRAPHICS_KEY, JSON.stringify(demographics));
       try {
