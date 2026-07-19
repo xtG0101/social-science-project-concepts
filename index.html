@@ -3001,7 +3001,7 @@
       }
       if (!missing.length) {
         state.restSucceeded = true;
-        state.fatigue -= 25;
+        state.fatigue -= 35;
         state.child -= 8;
         state.boss -= 8;
         state.parentRel -= 8;
@@ -3013,10 +3013,6 @@
         render();
         return;
       }
-      state.fatigue += 4;
-      state.child -= 3;
-      state.boss -= 3;
-      state.parentRel -= 3;
       state.interruptions += 1;
       $("logBox").classList.add("warning");
       showRestFailure("休息失败", missing.join(" "));
