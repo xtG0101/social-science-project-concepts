@@ -2574,6 +2574,10 @@
       return spots.some((spot) => spot && spot.scene === task.scene && spot.position === task.position);
     }
 
+    function hasTaskAlreadyAppeared(task) {
+      return state.releasedTaskIds.includes(task.id);
+    }
+
     function copyTask(task) {
       return {
         ...task,
@@ -2650,6 +2654,7 @@
       let released = 0;
       while (released < count && state.tasks.length < 12) {
         let candidates = TASK_LIBRARY.filter((task) =>
+          !hasTaskAlreadyAppeared(task) &&
           !state.tasks.some((activeTask) => activeTask.id === task.id) &&
           taskMatchesTime(task) &&
           taskMatchesMode(task) &&
