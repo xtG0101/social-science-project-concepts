@@ -3035,9 +3035,7 @@
     function maybeShowPressureAlert() {
       if (!state.started) return;
       const levels = [
-        { value: 95, title: "红色警告：已经到极限了", text: "疲惫值超过 95%。身体已经被过度透支，终极警告会继续累计。" },
-        { value: 85, title: "橙色警告：疲惫正在逼近极限", text: "疲惫值超过 85%。系统提醒你需要休息，但休息条件可能仍然不允许。" },
-        { value: 70, title: "黄色警告：疲惫值已经超过 70%", text: "你已经明显需要休息了。可是在清单里，休息仍然要满足其他关系和工作条件。" }
+        { value: 95, title: "红色警告：已经到极限了", text: "疲惫值超过 95%。身体已经被过度透支，终极警告会继续累计。" }
       ];
       const level = levels.find((item) => state.fatigue >= item.value && !state.warningLevelsShown.includes(item.value));
       if (!level) return;
