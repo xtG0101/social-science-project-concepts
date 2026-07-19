@@ -1989,8 +1989,10 @@
     const SURVEY_POST_KEY = "sandwichTimeAwarenessPost";
     const SURVEY_DEMOGRAPHICS_KEY = "sandwichTimeDemographics";
     const SURVEY_FEEDBACK_KEY = "sandwichTimePostFeedback";
+    const SURVEY_POST_SYNC_KEY = "sandwichTimePostSupabaseSynced";
     const SURVEY_SESSION_KEY = "sandwichTimeAwarenessSessionId";
     const SURVEY_TABLE = "awareness_survey_submissions";
+    const SLIDE_DEMO_MODE = new URLSearchParams(window.location.search).get("slideDemo") === "1";
     const GAME_START_MINUTES = 7 * 60;
     const GAME_DAY_MINUTES = 24 * 60;
     const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
@@ -2085,11 +2087,16 @@
         task.fatigue = scaleValue(task.fatigue, .65);
         task.ttlMinutes = Math.max(task.id.startsWith("urgent-") ? 120 : 180, Math.round(task.ttlMinutes * 4));
         relationshipKeys.forEach((key) => {
-          task[key] = scaleValue(task[key], 1.8);
+          const value = task[key] || 0;
+          if (value < 0) {
+            task[key] = Math.max(-5, scaleValue(value, .35));
+          } else {
+            task[key] = scaleValue(value, 1.8);
+          }
         });
         if (task.penalty) {
           Object.keys(task.penalty).forEach((key) => {
-            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .75 : 2);
+            task.penalty[key] = scaleValue(task.penalty[key], key === "fatigue" ? .75 : 2.2);
           });
         }
       });
@@ -2167,17 +2174,16 @@
     async function saveSurveyRow(mode, sessionId, body) {
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 6000);
-      const isPostSurvey = mode === "post";
       const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
-        + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
+        + "?on_conflict=session_id";
       try {
         return await fetch(endpoint, {
-          method: isPostSurvey ? "PATCH" : "POST",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_PUBLISHABLE_KEY,
             "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "return=minimal"
+            "Prefer": "resolution=merge-duplicates,return=minimal"
           },
           body: JSON.stringify(body),
           signal: controller.signal
@@ -2190,6 +2196,7 @@
     async function submitSurveyToSupabase(mode, payload, comparison = {}) {
       const answers = payload.answers;
       const sessionId = getSurveySessionId();
+      const gameStats = comparison.gameStats || {};
       const body = mode === "post"
         ? {
             session_id: sessionId,
@@ -2201,13 +2208,13 @@
             post_average_score: payload.average,
             average_change: comparison.averageChange ?? null,
             playtest_feedback: payload.feedback || null,
-            game_completed: state.completed,
-            game_rest_attempts: state.restAttempts,
-            game_interruptions: state.interruptions,
-            game_fatigue: state.fatigue,
-            game_child: state.child,
-            game_boss: state.boss,
-            game_parent_relationship: state.parentRel,
+            game_completed: gameStats.completed ?? state.completed,
+            game_rest_attempts: gameStats.restAttempts ?? state.restAttempts,
+            game_interruptions: gameStats.interruptions ?? state.interruptions,
+            game_fatigue: gameStats.fatigue ?? state.fatigue,
+            game_child: gameStats.child ?? state.child,
+            game_boss: gameStats.boss ?? state.boss,
+            game_parent_relationship: gameStats.parentRel ?? state.parentRel,
             post_saved_at: payload.savedAt,
             client_saved_at: payload.savedAt,
             updated_at: new Date().toISOString()
@@ -2447,6 +2454,7 @@
           });
           $("surveyStatus").className = "survey-status ok";
           $("surveyStatus").textContent = "后测已保存并提交到 Supabase。";
+          localStorage.setItem(SURVEY_POST_SYNC_KEY, payload.savedAt);
         } catch (error) {
           console.warn("Supabase post-survey submit failed:", error);
           $("surveyStatus").className = "survey-status error";
@@ -2483,6 +2491,23 @@
       }
     }
 
+    async function retryLocalPostSurveySync() {
+      const post = getStoredSurvey(SURVEY_POST_KEY);
+      if (!post || localStorage.getItem(SURVEY_POST_SYNC_KEY) === post.savedAt) return;
+      const pre = getStoredSurvey(SURVEY_PRE_KEY);
+      const gameStats = getStoredSurvey(SURVEY_FEEDBACK_KEY) || {};
+      const diff = pre ? Number((post.average - pre.average).toFixed(2)) : null;
+      try {
+        await submitSurveyToSupabase("post", post, {
+          averageChange: diff,
+          gameStats
+        });
+        localStorage.setItem(SURVEY_POST_SYNC_KEY, post.savedAt);
+      } catch (error) {
+        console.warn("Deferred Supabase post-survey sync failed:", error);
+      }
+    }
+
     function goToPostSurvey() {
       if (!state.started) {
         $("finishExperienceStatus").className = "survey-status error";
@@ -2503,7 +2528,7 @@
       showPageForHash();
     }
 
-    if (localStorage.getItem(CONSENT_KEY) === "yes") {
+    if (SLIDE_DEMO_MODE || localStorage.getItem(CONSENT_KEY) === "yes") {
       document.body.classList.add("consent-ok");
       $("consentScreen").setAttribute("aria-hidden", "true");
     }
@@ -2598,9 +2623,9 @@
     }
 
     function applyRelationDecay() {
-      applyMetricChanges({ child: -5, boss: -5, parentRel: -5 });
+      applyMetricChanges({ child: -3, boss: -3, parentRel: -3 });
       showTaskNotice("关系压力继续流失");
-      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 5。");
+      setLog("时间没有停下：孩子联结、上司信任、与父母关系各下降 3。");
     }
 
     function expireTasks() {
@@ -2692,7 +2717,7 @@
           setLog("时间来到 " + timeText() + "，新的任务进入清单。");
         }
         state.relationDecaySeconds += 1;
-        if (state.relationDecaySeconds >= 5) {
+        if (state.relationDecaySeconds >= 10) {
           state.relationDecaySeconds = 0;
           applyRelationDecay();
         }
@@ -2836,6 +2861,10 @@
 
     function showGameRules() {
       if (state.started || state.rulesSeen) return;
+      if (SLIDE_DEMO_MODE) {
+        startGame();
+        return;
+      }
       const alert = $("gameRulesAlert");
       alert.classList.add("show");
       alert.setAttribute("aria-hidden", "false");
@@ -3313,7 +3342,7 @@
         window.location.hash = "postSurvey";
         return;
       }
-      if (id === "play" && !preSurveyDone) {
+      if (id === "play" && !preSurveyDone && !SLIDE_DEMO_MODE) {
         window.location.hash = "survey";
         return;
       }
@@ -3396,6 +3425,7 @@
     enableParentDrag();
     window.addEventListener("hashchange", showPageForHash);
     showPageForHash();
+    window.setTimeout(retryLocalPostSurveySync, 1200);
     render();
   </script>
 </body>
