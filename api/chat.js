@@ -36,6 +36,21 @@ Do not invent survey data, percentages beyond the provided game state, or medica
 Mention that the issue is structural, not a personal failure.
 Keep the ending 80-140 Chinese characters.`;
 
+const surveyReportPrompt = `You write short Chinese personalized reports for participants after they finish an experimental classroom web game about sandwich generation time poverty.
+
+You are a clear and warm research narrator, not the in-game pressure-system voice.
+Use only the provided pre/post survey answers, game experience, and written feedback.
+Do not invent sample sizes, study results, diagnoses, percentages, or claims beyond the participant's own provided data.
+Thank the participant for joining the experimental game.
+Explain how the game represented time poverty through task lists, scene switching, rest conditions, and competing work/child/elder responsibilities.
+Keep the report concise, specific, and readable for a general audience.`;
+
+function getSystemPrompt(mode) {
+  if (mode === "ending") return endingPrompt;
+  if (mode === "survey_report") return surveyReportPrompt;
+  return systemPrompt;
+}
+
 function sendJson(res, status, payload) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -76,7 +91,7 @@ module.exports = async function handler(req, res) {
   const message = String(body.message || "").trim();
   const mode = String(body.mode || "").trim();
   const gameState = body.gameState && typeof body.gameState === "object"
-    ? JSON.stringify(body.gameState).slice(0, 1200)
+    ? JSON.stringify(body.gameState).slice(0, 3500)
     : "{}";
 
   if (!message) {
@@ -94,7 +109,7 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: "deepseek-v4-flash",
         messages: [
-          { role: "system", content: mode === "ending" ? endingPrompt : systemPrompt },
+          { role: "system", content: getSystemPrompt(mode) },
           { role: "user", content: `Current game state: ${gameState}\n\nUser message: ${message}` },
         ],
         temperature: 0.65,

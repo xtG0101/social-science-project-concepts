@@ -1240,6 +1240,21 @@
       color: #263746;
       font-size: 14px;
     }
+    .survey-result h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+    .survey-result p {
+      margin: 0;
+      line-height: 1.75;
+    }
+    .survey-result .report-meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
     .survey-result[hidden] {
       display: none !important;
     }
@@ -1949,7 +1964,7 @@
         <li>疲惫值越高越危险；孩子联结、上司信任、与父母关系越低越危险。疲惫值高于 90%，或任一关系/信任指标低于 10%，会触发一次终极警告。</li>
         <li>收到 3 次终极警告后，游戏会直接结束，并生成这一天的结局。</li>
         <li>任务会跟着时间线陆续出现。你可以拖动夹心层世代人物到发光任务点完成任务，也可以根据任务性质切换到工作、家庭、老人照护、医院或自我场景。</li>
-        <li>休息不是普通清单任务。你需要切到“自我”场景，把人物拖到休息点；是否能休息成功，要看当时的指标状态。</li>
+        <li>休息不是普通清单任务。你需要切到“自我”场景，把人物拖到休息点；疲惫值超过 80 可以直接休息，否则孩子联结、上司信任、与父母关系都至少 70 才能休息。</li>
       </ul>
       <button id="gameRulesStart" type="button">确定，开始一天</button>
     </div>
@@ -2151,6 +2166,27 @@
       return values.reduce((sum, value) => sum + value, 0) / values.length;
     }
 
+    function formatSignedNumber(value) {
+      if (value === null || value === undefined || Number.isNaN(value)) return "无法计算";
+      return (value > 0 ? "+" : "") + value.toFixed(2);
+    }
+
+    function collectCurrentGameStats(savedAt = new Date().toISOString()) {
+      return {
+        text: collectPostFeedback(),
+        completed: state.completed,
+        restAttempts: state.restAttempts,
+        interruptions: state.interruptions,
+        ultimateWarnings: state.ultimateWarnings,
+        endingReason: state.endingReason || "",
+        fatigue: state.fatigue,
+        child: state.child,
+        boss: state.boss,
+        parentRel: state.parentRel,
+        savedAt
+      };
+    }
+
     function createSurveySessionId() {
       return window.crypto && crypto.randomUUID
         ? crypto.randomUUID()
@@ -2257,6 +2293,102 @@
         }
         throw new Error("HTTP " + response.status + (detail ? ": " + detail : ""));
       }
+    }
+
+    function getStrongestQuestionChange(pre, post) {
+      if (!pre || !post) return null;
+      return surveyQuestions
+        .map((question, index) => ({
+          question,
+          index: index + 1,
+          change: Number((post.answers[index] - pre.answers[index]).toFixed(2))
+        }))
+        .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))[0];
+    }
+
+    function buildReportPayload(pre, post, gameStats, averageChange) {
+      return {
+        preAverage: pre ? pre.average : null,
+        postAverage: post.average,
+        averageChange,
+        answersBefore: pre ? pre.answers : null,
+        answersAfter: post.answers,
+        strongestQuestionChange: getStrongestQuestionChange(pre, post),
+        writtenFeedback: post.feedback || "",
+        gameExperience: {
+          completedTasks: gameStats.completed,
+          restAttempts: gameStats.restAttempts,
+          interruptions: gameStats.interruptions,
+          ultimateWarnings: gameStats.ultimateWarnings,
+          endingReason: gameStats.endingReason,
+          finalFatigue: gameStats.fatigue,
+          finalChildConnection: gameStats.child,
+          finalBossTrust: gameStats.boss,
+          finalParentRelationship: gameStats.parentRel
+        }
+      };
+    }
+
+    function localPersonalReport(reportData) {
+      const change = reportData.averageChange;
+      const movement = change === null
+        ? "因为这台浏览器里没有找到前测记录，所以这次不能计算前后变化。"
+        : change > 0
+          ? "你的后测平均分比前测提高了 " + formatSignedNumber(change) + "，说明试玩后你对这个议题的理解更强了。"
+          : change === 0
+            ? "你的前后测平均分没有变化，但你的试玩反馈仍然会帮助我理解这个作品。"
+            : "你的后测平均分比前测下降了 " + formatSignedNumber(change) + "，这提醒我还需要把作品表达得更清楚。";
+      const strongest = reportData.strongestQuestionChange;
+      const strongestText = strongest
+        ? "变化最明显的是第 " + strongest.index + " 题（" + formatSignedNumber(strongest.change) + "），它对应的是：" + strongest.question
+        : "这次无法定位变化最大的题目。";
+      const experience = reportData.gameExperience;
+      const ending = experience.endingReason === "safe-day"
+        ? "你走完了这一天，但结尾仍然指向一个核心矛盾：维持一切往往以牺牲自己为代价。"
+        : "游戏提前结束，说明某个关系或身体指标已经被清单推到危险边缘。";
+      return "谢谢你参与这个实验性游戏。" + movement + " " + strongestText + " 你的游戏过程里完成了 " + experience.completedTasks + " 项任务，尝试休息 " + experience.restAttempts + " 次，被打断 " + experience.interruptions + " 次；最后疲惫值为 " + experience.finalFatigue + "%，孩子联结为 " + experience.finalChildConnection + "%，上司信任为 " + experience.finalBossTrust + "%，与父母关系为 " + experience.finalParentRelationship + "%。这个作品把时间困境做成清单、场景切换和休息条件：玩家看起来在选择，实际上不断被工作、育儿和养老责任重新排序。" + ending;
+    }
+
+    function showPersonalReport(reportText, reportData, sourceLabel) {
+      const result = $("surveyResult");
+      result.hidden = false;
+      result.innerHTML = "";
+      const title = document.createElement("h3");
+      title.textContent = "你的试玩报告";
+      const body = document.createElement("p");
+      body.textContent = reportText;
+      const meta = document.createElement("div");
+      meta.className = "report-meta";
+      meta.textContent = "前测平均分：" + (reportData.preAverage ?? "无法计算") + " / 5；后测平均分：" + reportData.postAverage + " / 5；整体变化：" + formatSignedNumber(reportData.averageChange) + "。报告来源：" + sourceLabel + "。";
+      result.appendChild(title);
+      result.appendChild(body);
+      result.appendChild(meta);
+    }
+
+    async function generatePersonalReportWithAi(reportData) {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "survey_report",
+          message: "请根据这位用户的前测、后测、游戏过程和文字反馈，写一段中文个性化报告。必须先感谢用户参与这个实验性游戏；说明TA的理解是否变化；结合游戏体验解释夹心层世代的时间困境如何通过清单、场景切换、休息条件和结构性责任呈现。不要编造研究样本数据，不要诊断任何疾病。120到180字。",
+          gameState: reportData
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.answer) throw new Error(data.error || "AI report failed");
+      return data.answer;
+    }
+
+    function renderPersonalReport(pre, post, gameStats, averageChange) {
+      const reportData = buildReportPayload(pre, post, gameStats, averageChange);
+      showPersonalReport(localPersonalReport(reportData), reportData, "本地生成");
+      if (window.location.protocol === "file:") return;
+      generatePersonalReportWithAi(reportData)
+        .then((answer) => showPersonalReport(answer, reportData, "AI 生成"))
+        .catch((error) => {
+          console.warn("AI personal report generation failed:", error);
+        });
     }
 
     function renderDemographicQuestions() {
@@ -2437,24 +2569,16 @@
 
       if (surveyMode === "post") {
         localStorage.setItem(SURVEY_POST_KEY, JSON.stringify(payload));
-        localStorage.setItem(SURVEY_FEEDBACK_KEY, JSON.stringify({
-          text: feedback,
-          completed: state.completed,
-          restAttempts: state.restAttempts,
-          interruptions: state.interruptions,
-          fatigue: state.fatigue,
-          child: state.child,
-          boss: state.boss,
-          parentRel: state.parentRel,
-          savedAt: payload.savedAt
-        }));
+        const gameStats = collectCurrentGameStats(payload.savedAt);
+        localStorage.setItem(SURVEY_FEEDBACK_KEY, JSON.stringify(gameStats));
         const pre = getStoredSurvey(SURVEY_PRE_KEY);
         const diff = pre ? Number((payload.average - pre.average).toFixed(2)) : null;
         try {
           await submitSurveyToSupabase("post", payload, {
             preAverage: pre ? pre.average : null,
             postAverage: payload.average,
-            averageChange: diff
+            averageChange: diff,
+            gameStats
           });
           $("surveyStatus").className = "survey-status ok";
           $("surveyStatus").textContent = "后测已保存并提交到 Supabase。";
@@ -2466,14 +2590,7 @@
         } finally {
           $("surveySubmitBtn").disabled = false;
         }
-        if (pre) {
-          const sign = diff > 0 ? "+" : "";
-          $("surveyResult").hidden = false;
-          $("surveyResult").textContent = "前测平均分 " + pre.average + "，后测平均分 " + payload.average + "，整体变化 " + sign + diff + "。每题也可以用“后测分数 - 前测分数”来算变化。";
-        } else {
-          $("surveyResult").hidden = false;
-          $("surveyResult").textContent = "后测已保存，但这台浏览器里没有找到前测记录，所以暂时不能自动计算变化。";
-        }
+        renderPersonalReport(pre, payload, gameStats, diff);
         return;
       }
 
@@ -2998,7 +3115,7 @@
       state.scene = "rest";
       state.restAttempts += 1;
       const missing = [];
-      const fatigueAllowsRest = state.fatigue > 90;
+      const fatigueAllowsRest = state.fatigue > 80;
       if (!fatigueAllowsRest) {
         if (state.child < 70) missing.push("孩子联结低于 70%，你先被推回家庭任务。");
         if (state.boss < 70) missing.push("上司信任低于 70%，工作期待还没有放你走。");
@@ -3013,7 +3130,7 @@
         state.minutes = Math.min(GAME_END_MINUTES, state.minutes + 10);
         $("logBox").classList.remove("warning");
         setLog(fatigueAllowsRest
-          ? "疲惫值已经超过 90%，系统终于不能再说你还可以撑。你休息了 10 分钟。"
+          ? "疲惫值已经超过 80%，系统终于不能再说你还可以撑。你休息了 10 分钟。"
           : "这一次你真的休息了 10 分钟。疲惫下降，但家庭、工作和照护期待也被短暂牺牲。");
         render();
         return;
