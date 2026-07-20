@@ -2998,9 +2998,8 @@
       state.scene = "rest";
       state.restAttempts += 1;
       const missing = [];
-      const exhaustionOverridesEverything = state.fatigue >= 100;
-      if (!exhaustionOverridesEverything) {
-        if (state.fatigue < 90) missing.push("疲惫值还没有达到 90%，系统认为你还可以继续撑。");
+      const fatigueAllowsRest = state.fatigue > 90;
+      if (!fatigueAllowsRest) {
         if (state.child < 70) missing.push("孩子联结低于 70%，你先被推回家庭任务。");
         if (state.boss < 70) missing.push("上司信任低于 70%，工作期待还没有放你走。");
         if (state.parentRel < 70) missing.push("与父母关系低于 70%，照护责任还没有放你走。");
@@ -3013,8 +3012,8 @@
         state.parentRel -= 8;
         state.minutes = Math.min(GAME_END_MINUTES, state.minutes + 10);
         $("logBox").classList.remove("warning");
-        setLog(exhaustionOverridesEverything
-          ? "疲惫值已经满格，系统终于不能再说你还可以撑。你休息了 10 分钟。"
+        setLog(fatigueAllowsRest
+          ? "疲惫值已经超过 90%，系统终于不能再说你还可以撑。你休息了 10 分钟。"
           : "这一次你真的休息了 10 分钟。疲惫下降，但家庭、工作和照护期待也被短暂牺牲。");
         render();
         return;
