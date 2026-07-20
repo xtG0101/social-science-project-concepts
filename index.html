@@ -2257,6 +2257,41 @@
       return id;
     }
 
+    function getSessionIdForPayload(payload, fallbackPayload = null) {
+      const id = payload?.sessionId || fallbackPayload?.sessionId || getSurveySessionId();
+      localStorage.setItem(SURVEY_SESSION_KEY, id);
+      return id;
+    }
+
+    function readSupabaseError(response) {
+      return response.text().catch(() => "");
+    }
+
+    function responseFromSupabaseError(status, detail) {
+      return new Response(detail || "", { status: status || 500 });
+    }
+
+    function isMissingSurveyRpcError(status, detail) {
+      return status === 404 || /submit_awareness_survey|PGRST202|Could not find the function|function .* does not exist/i.test(detail || "");
+    }
+
+    async function saveSurveyRowWithRpc(body, signal) {
+      const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/submit_awareness_survey", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({ p_payload: body }),
+        signal
+      });
+      if (response.ok) return response;
+      const detail = await readSupabaseError(response);
+      if (isMissingSurveyRpcError(response.status, detail)) return null;
+      return responseFromSupabaseError(response.status, detail);
+    }
+
     async function saveSurveyRow(mode, sessionId, body) {
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 6000);
@@ -2264,6 +2299,9 @@
       const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
         + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
       try {
+        const rpcResponse = await saveSurveyRowWithRpc(body, controller.signal);
+        if (rpcResponse) return rpcResponse;
+
         if (!isPostSurvey) {
           return await fetch(endpoint, {
             method: "POST",
@@ -2294,13 +2332,13 @@
         const contentRange = patchResponse.headers.get("content-range") || "";
         if (!/\/0$/.test(contentRange)) return patchResponse;
 
-        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE + "?on_conflict=session_id", {
+        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_PUBLISHABLE_KEY,
             "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "resolution=merge-duplicates,return=minimal"
+            "Prefer": "return=minimal"
           },
           body: JSON.stringify(body),
           signal: controller.signal
@@ -2312,8 +2350,11 @@
 
     async function submitSurveyToSupabase(mode, payload, comparison = {}) {
       const answers = payload.answers;
-      const sessionId = getSurveySessionId();
+      const prePayload = comparison.prePayload || getStoredSurvey(SURVEY_PRE_KEY);
+      const sessionId = getSessionIdForPayload(payload, prePayload);
       const gameStats = comparison.gameStats || {};
+      const demographics = payload.demographics || prePayload?.demographics || getStoredSurvey(SURVEY_DEMOGRAPHICS_KEY) || {};
+      const preAnswers = prePayload?.answers || null;
       const body = mode === "post"
         ? {
             session_id: sessionId,
@@ -2324,6 +2365,15 @@
             q4: answers[3],
             q5: answers[4],
             average_score: payload.average,
+            age_group: demographics.age_group || null,
+            gender: demographics.gender || null,
+            family_status: demographics.family_status || null,
+            pre_q1: preAnswers ? preAnswers[0] : null,
+            pre_q2: preAnswers ? preAnswers[1] : null,
+            pre_q3: preAnswers ? preAnswers[2] : null,
+            pre_q4: preAnswers ? preAnswers[3] : null,
+            pre_q5: preAnswers ? preAnswers[4] : null,
+            pre_average_score: prePayload?.average ?? null,
             post_q1: answers[0],
             post_q2: answers[1],
             post_q3: answers[2],
@@ -2339,6 +2389,7 @@
             game_child: gameStats.child ?? state.child,
             game_boss: gameStats.boss ?? state.boss,
             game_parent_relationship: gameStats.parentRel ?? state.parentRel,
+            pre_saved_at: prePayload?.savedAt ?? null,
             post_saved_at: payload.savedAt,
             client_saved_at: payload.savedAt,
             updated_at: new Date().toISOString()
@@ -2369,12 +2420,7 @@
       const response = await saveSurveyRow(mode, sessionId, body);
 
       if (!response.ok) {
-        let detail = "";
-        try {
-          detail = await response.text();
-        } catch (error) {
-          detail = "";
-        }
+        const detail = await readSupabaseError(response);
         throw new Error("HTTP " + response.status + (detail ? ": " + detail : ""));
       }
     }
@@ -2644,6 +2690,7 @@
         average: Number(average(answers).toFixed(2)),
         demographics,
         feedback,
+        sessionId: "",
         savedAt: new Date().toISOString()
       };
 
@@ -2652,16 +2699,18 @@
       $("surveyStatus").textContent = "正在保存...";
 
       if (surveyMode === "post") {
+        const pre = getStoredSurvey(SURVEY_PRE_KEY);
+        payload.sessionId = getSessionIdForPayload(payload, pre);
         localStorage.setItem(SURVEY_POST_KEY, JSON.stringify(payload));
         const gameStats = collectCurrentGameStats(payload.savedAt);
         localStorage.setItem(SURVEY_FEEDBACK_KEY, JSON.stringify(gameStats));
-        const pre = getStoredSurvey(SURVEY_PRE_KEY);
         const diff = pre ? Number((payload.average - pre.average).toFixed(2)) : null;
         try {
           await submitSurveyToSupabase("post", payload, {
             preAverage: pre ? pre.average : null,
             postAverage: payload.average,
             averageChange: diff,
+            prePayload: pre,
             gameStats
           });
           $("surveyStatus").className = "survey-status ok";
@@ -2678,7 +2727,7 @@
         return;
       }
 
-      startNewSurveySession();
+      payload.sessionId = startNewSurveySession();
       localStorage.setItem(SURVEY_PRE_KEY, JSON.stringify(payload));
       localStorage.setItem(SURVEY_DEMOGRAPHICS_KEY, JSON.stringify(demographics));
       try {
@@ -2701,11 +2750,13 @@
       const post = getStoredSurvey(SURVEY_POST_KEY);
       if (!post || localStorage.getItem(SURVEY_POST_SYNC_KEY) === post.savedAt) return;
       const pre = getStoredSurvey(SURVEY_PRE_KEY);
+      if (!post.sessionId && pre?.sessionId) post.sessionId = pre.sessionId;
       const gameStats = getStoredSurvey(SURVEY_FEEDBACK_KEY) || {};
       const diff = pre ? Number((post.average - pre.average).toFixed(2)) : null;
       try {
         await submitSurveyToSupabase("post", post, {
           averageChange: diff,
+          prePayload: pre,
           gameStats
         });
         localStorage.setItem(SURVEY_POST_SYNC_KEY, post.savedAt);

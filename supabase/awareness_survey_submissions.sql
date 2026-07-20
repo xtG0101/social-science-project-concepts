@@ -55,7 +55,13 @@ alter table public.awareness_survey_submissions
   add column if not exists post_q4 integer check (post_q4 between 1 and 5),
   add column if not exists post_q5 integer check (post_q5 between 1 and 5),
   add column if not exists post_average_score numeric(4, 2),
+  add column if not exists average_change numeric(4, 2),
   add column if not exists playtest_feedback text,
+  add column if not exists game_completed integer,
+  add column if not exists game_rest_attempts integer,
+  add column if not exists game_interruptions integer,
+  add column if not exists game_fatigue integer,
+  add column if not exists game_child integer,
   add column if not exists pre_saved_at text,
   add column if not exists post_saved_at text,
   add column if not exists updated_at timestamptz not null default now();
@@ -100,6 +106,7 @@ set
   post_q5 = source.q5,
   post_average_score = coalesce(source.post_average_score, source.average_score),
   average_change = source.average_change,
+  playtest_feedback = source.playtest_feedback,
   post_saved_at = coalesce(source.client_saved_at, target.post_saved_at),
   game_completed = source.game_completed,
   game_rest_attempts = source.game_rest_attempts,
@@ -111,7 +118,7 @@ set
 from (
   select distinct on (session_id)
     session_id, q1, q2, q3, q4, q5, average_score, post_average_score,
-    average_change, client_saved_at, game_completed, game_rest_attempts,
+    average_change, playtest_feedback, client_saved_at, game_completed, game_rest_attempts,
     game_interruptions, game_fatigue, game_child, game_boss, game_parent_relationship
   from public.awareness_survey_submissions
   where phase = 'post'
@@ -132,6 +139,135 @@ on public.awareness_survey_submissions (session_id);
 
 alter table public.awareness_survey_submissions
   drop column if exists game_self;
+
+create or replace function public.submit_awareness_survey(p_payload jsonb)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if nullif(p_payload->>'session_id', '') is null then
+    raise exception 'session_id is required';
+  end if;
+
+  insert into public.awareness_survey_submissions (
+    session_id,
+    phase,
+    q1,
+    q2,
+    q3,
+    q4,
+    q5,
+    average_score,
+    age_group,
+    gender,
+    family_status,
+    pre_q1,
+    pre_q2,
+    pre_q3,
+    pre_q4,
+    pre_q5,
+    pre_average_score,
+    post_q1,
+    post_q2,
+    post_q3,
+    post_q4,
+    post_q5,
+    post_average_score,
+    average_change,
+    playtest_feedback,
+    game_completed,
+    game_rest_attempts,
+    game_interruptions,
+    game_fatigue,
+    game_child,
+    game_boss,
+    game_parent_relationship,
+    pre_saved_at,
+    post_saved_at,
+    client_saved_at,
+    updated_at
+  )
+  values (
+    p_payload->>'session_id',
+    nullif(p_payload->>'phase', ''),
+    nullif(p_payload->>'q1', '')::integer,
+    nullif(p_payload->>'q2', '')::integer,
+    nullif(p_payload->>'q3', '')::integer,
+    nullif(p_payload->>'q4', '')::integer,
+    nullif(p_payload->>'q5', '')::integer,
+    nullif(p_payload->>'average_score', '')::numeric(4, 2),
+    nullif(p_payload->>'age_group', ''),
+    nullif(p_payload->>'gender', ''),
+    nullif(p_payload->>'family_status', ''),
+    nullif(p_payload->>'pre_q1', '')::integer,
+    nullif(p_payload->>'pre_q2', '')::integer,
+    nullif(p_payload->>'pre_q3', '')::integer,
+    nullif(p_payload->>'pre_q4', '')::integer,
+    nullif(p_payload->>'pre_q5', '')::integer,
+    nullif(p_payload->>'pre_average_score', '')::numeric(4, 2),
+    nullif(p_payload->>'post_q1', '')::integer,
+    nullif(p_payload->>'post_q2', '')::integer,
+    nullif(p_payload->>'post_q3', '')::integer,
+    nullif(p_payload->>'post_q4', '')::integer,
+    nullif(p_payload->>'post_q5', '')::integer,
+    nullif(p_payload->>'post_average_score', '')::numeric(4, 2),
+    nullif(p_payload->>'average_change', '')::numeric(4, 2),
+    nullif(p_payload->>'playtest_feedback', ''),
+    nullif(p_payload->>'game_completed', '')::integer,
+    nullif(p_payload->>'game_rest_attempts', '')::integer,
+    nullif(p_payload->>'game_interruptions', '')::integer,
+    nullif(p_payload->>'game_fatigue', '')::integer,
+    nullif(p_payload->>'game_child', '')::integer,
+    nullif(p_payload->>'game_boss', '')::integer,
+    nullif(p_payload->>'game_parent_relationship', '')::integer,
+    nullif(p_payload->>'pre_saved_at', ''),
+    nullif(p_payload->>'post_saved_at', ''),
+    nullif(p_payload->>'client_saved_at', ''),
+    coalesce(nullif(p_payload->>'updated_at', '')::timestamptz, now())
+  )
+  on conflict (session_id) do update set
+    phase = coalesce(excluded.phase, awareness_survey_submissions.phase),
+    q1 = coalesce(excluded.q1, awareness_survey_submissions.q1),
+    q2 = coalesce(excluded.q2, awareness_survey_submissions.q2),
+    q3 = coalesce(excluded.q3, awareness_survey_submissions.q3),
+    q4 = coalesce(excluded.q4, awareness_survey_submissions.q4),
+    q5 = coalesce(excluded.q5, awareness_survey_submissions.q5),
+    average_score = coalesce(excluded.average_score, awareness_survey_submissions.average_score),
+    age_group = coalesce(excluded.age_group, awareness_survey_submissions.age_group),
+    gender = coalesce(excluded.gender, awareness_survey_submissions.gender),
+    family_status = coalesce(excluded.family_status, awareness_survey_submissions.family_status),
+    pre_q1 = coalesce(excluded.pre_q1, awareness_survey_submissions.pre_q1),
+    pre_q2 = coalesce(excluded.pre_q2, awareness_survey_submissions.pre_q2),
+    pre_q3 = coalesce(excluded.pre_q3, awareness_survey_submissions.pre_q3),
+    pre_q4 = coalesce(excluded.pre_q4, awareness_survey_submissions.pre_q4),
+    pre_q5 = coalesce(excluded.pre_q5, awareness_survey_submissions.pre_q5),
+    pre_average_score = coalesce(excluded.pre_average_score, awareness_survey_submissions.pre_average_score),
+    post_q1 = coalesce(excluded.post_q1, awareness_survey_submissions.post_q1),
+    post_q2 = coalesce(excluded.post_q2, awareness_survey_submissions.post_q2),
+    post_q3 = coalesce(excluded.post_q3, awareness_survey_submissions.post_q3),
+    post_q4 = coalesce(excluded.post_q4, awareness_survey_submissions.post_q4),
+    post_q5 = coalesce(excluded.post_q5, awareness_survey_submissions.post_q5),
+    post_average_score = coalesce(excluded.post_average_score, awareness_survey_submissions.post_average_score),
+    average_change = coalesce(excluded.average_change, awareness_survey_submissions.average_change),
+    playtest_feedback = coalesce(excluded.playtest_feedback, awareness_survey_submissions.playtest_feedback),
+    game_completed = coalesce(excluded.game_completed, awareness_survey_submissions.game_completed),
+    game_rest_attempts = coalesce(excluded.game_rest_attempts, awareness_survey_submissions.game_rest_attempts),
+    game_interruptions = coalesce(excluded.game_interruptions, awareness_survey_submissions.game_interruptions),
+    game_fatigue = coalesce(excluded.game_fatigue, awareness_survey_submissions.game_fatigue),
+    game_child = coalesce(excluded.game_child, awareness_survey_submissions.game_child),
+    game_boss = coalesce(excluded.game_boss, awareness_survey_submissions.game_boss),
+    game_parent_relationship = coalesce(excluded.game_parent_relationship, awareness_survey_submissions.game_parent_relationship),
+    pre_saved_at = coalesce(excluded.pre_saved_at, awareness_survey_submissions.pre_saved_at),
+    post_saved_at = coalesce(excluded.post_saved_at, awareness_survey_submissions.post_saved_at),
+    client_saved_at = coalesce(excluded.client_saved_at, awareness_survey_submissions.client_saved_at),
+    updated_at = now();
+end;
+$$;
+
+revoke all on function public.submit_awareness_survey(jsonb) from public;
+grant execute on function public.submit_awareness_survey(jsonb) to anon, authenticated;
 
 alter table public.awareness_survey_submissions enable row level security;
 
