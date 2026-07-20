@@ -2189,15 +2189,15 @@
       const timeoutId = window.setTimeout(() => controller.abort(), 6000);
       const isPostSurvey = mode === "post";
       const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
-        + (isPostSurvey ? "?on_conflict=session_id" : "");
+        + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
       try {
         return await fetch(endpoint, {
-          method: "POST",
+          method: isPostSurvey ? "PATCH" : "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_PUBLISHABLE_KEY,
             "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": (isPostSurvey ? "resolution=merge-duplicates," : "") + "return=minimal"
+            "Prefer": "return=minimal"
           },
           body: JSON.stringify(body),
           signal: controller.signal
