@@ -297,3 +297,5 @@ with check (true);
 
 grant usage on schema public to anon, authenticated;
 grant select, insert, update on public.awareness_survey_submissions to anon, authenticated;
+
+notify pgrst, 'reload schema';
