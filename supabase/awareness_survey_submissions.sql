@@ -274,12 +274,19 @@ alter table public.awareness_survey_submissions enable row level security;
 drop policy if exists "Allow anonymous survey inserts" on public.awareness_survey_submissions;
 drop policy if exists "Allow anonymous survey upserts" on public.awareness_survey_submissions;
 drop policy if exists "Allow anonymous survey updates" on public.awareness_survey_submissions;
+drop policy if exists "Allow anonymous survey reads for updates" on public.awareness_survey_submissions;
 
 create policy "Allow anonymous survey upserts"
 on public.awareness_survey_submissions
 for insert
 to anon, authenticated
 with check (true);
+
+create policy "Allow anonymous survey reads for updates"
+on public.awareness_survey_submissions
+for select
+to anon, authenticated
+using (true);
 
 create policy "Allow anonymous survey updates"
 on public.awareness_survey_submissions
@@ -289,4 +296,4 @@ using (true)
 with check (true);
 
 grant usage on schema public to anon, authenticated;
-grant insert, update on public.awareness_survey_submissions to anon, authenticated;
+grant select, insert, update on public.awareness_survey_submissions to anon, authenticated;

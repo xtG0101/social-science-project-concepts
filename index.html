@@ -2332,7 +2332,7 @@
         const contentRange = patchResponse.headers.get("content-range") || "";
         if (!/\/0$/.test(contentRange)) return patchResponse;
 
-        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
+        const insertResponse = await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -2341,6 +2341,24 @@
             "Prefer": "return=minimal"
           },
           body: JSON.stringify(body),
+          signal: controller.signal
+        });
+        if (insertResponse.ok || !isPostSurvey || insertResponse.status !== 409) return insertResponse;
+
+        const recoveryBody = {
+          ...body,
+          session_id: sessionId + "-complete-" + Date.now(),
+          updated_at: new Date().toISOString()
+        };
+        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify(recoveryBody),
           signal: controller.signal
         });
       } finally {
