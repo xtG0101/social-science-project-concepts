@@ -2349,7 +2349,7 @@
       return "谢谢你参与这个实验性游戏。" + movement + " " + strongestText + " 你的游戏过程里完成了 " + experience.completedTasks + " 项任务，尝试休息 " + experience.restAttempts + " 次，被打断 " + experience.interruptions + " 次；最后疲惫值为 " + experience.finalFatigue + "%，孩子联结为 " + experience.finalChildConnection + "%，上司信任为 " + experience.finalBossTrust + "%，与父母关系为 " + experience.finalParentRelationship + "%。这个作品把时间困境做成清单、场景切换和休息条件：玩家看起来在选择，实际上不断被工作、育儿和养老责任重新排序。" + ending;
     }
 
-    function showPersonalReport(reportText, reportData, sourceLabel) {
+    function showPersonalReport(reportText, reportData) {
       const result = $("surveyResult");
       result.hidden = false;
       result.innerHTML = "";
@@ -2359,7 +2359,7 @@
       body.textContent = reportText;
       const meta = document.createElement("div");
       meta.className = "report-meta";
-      meta.textContent = "前测平均分：" + (reportData.preAverage ?? "无法计算") + " / 5；后测平均分：" + reportData.postAverage + " / 5；整体变化：" + formatSignedNumber(reportData.averageChange) + "。报告来源：" + sourceLabel + "。";
+      meta.textContent = "前测平均分：" + (reportData.preAverage ?? "无法计算") + " / 5；后测平均分：" + reportData.postAverage + " / 5；整体变化：" + formatSignedNumber(reportData.averageChange) + "。";
       result.appendChild(title);
       result.appendChild(body);
       result.appendChild(meta);
@@ -2382,10 +2382,10 @@
 
     function renderPersonalReport(pre, post, gameStats, averageChange) {
       const reportData = buildReportPayload(pre, post, gameStats, averageChange);
-      showPersonalReport(localPersonalReport(reportData), reportData, "本地生成");
+      showPersonalReport(localPersonalReport(reportData), reportData);
       if (window.location.protocol === "file:") return;
       generatePersonalReportWithAi(reportData)
-        .then((answer) => showPersonalReport(answer, reportData, "AI 生成"))
+        .then((answer) => showPersonalReport(answer, reportData))
         .catch((error) => {
           console.warn("AI personal report generation failed:", error);
         });
