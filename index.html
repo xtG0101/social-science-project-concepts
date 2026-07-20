@@ -908,6 +908,11 @@
       gap: 6px;
       margin-top: 8px;
     }
+    .task-list li.final-sleep-task {
+      border-color: #6b8f71;
+      background: #f3faf1;
+      box-shadow: inset 4px 0 0 #6b8f71;
+    }
     .impact-chip {
       border: 1px solid var(--line);
       border-radius: 999px;
@@ -1049,6 +1054,18 @@
       display: block;
       margin-left: auto;
       margin-right: auto;
+    }
+    .success-card {
+      background: #f8fbf5;
+      color: var(--ink);
+      border-color: #6b8f71;
+    }
+    .success-card p {
+      color: #46564a;
+    }
+    .success-card button {
+      background: var(--ink);
+      color: #fff;
     }
     .task-notice {
       position: fixed;
@@ -1986,6 +2003,14 @@
     </div>
   </div>
 
+  <div class="pressure-alert" id="challengeSuccessAlert" aria-live="assertive" aria-hidden="true">
+    <div class="pressure-alert-card success-card">
+      <strong>挑战成功：你度过了这一天</strong>
+      <p>时间到达 00:00。你终于把人物拖到了睡觉点，这一天没有被完美解决，但你确实撑到了最后。</p>
+      <button id="challengeSuccessContinue" type="button">查看这一天的结尾</button>
+    </div>
+  </div>
+
   <div class="task-notice" id="taskNotice" aria-live="polite"></div>
 
   <script>
@@ -2001,10 +2026,30 @@
     const SURVEY_TABLE = "awareness_survey_submissions";
     const SLIDE_DEMO_MODE = new URLSearchParams(window.location.search).get("slideDemo") === "1";
     const GAME_START_MINUTES = 7 * 60;
-    const GAME_DAY_MINUTES = 24 * 60;
-    const GAME_END_MINUTES = GAME_START_MINUTES + GAME_DAY_MINUTES;
+    const GAME_END_MINUTES = 24 * 60;
+    const GAME_DAY_MINUTES = GAME_END_MINUTES - GAME_START_MINUTES;
     const GAME_MINUTES_PER_REAL_SECOND = 5;
     const TASK_RELEASE_INTERVAL_MINUTES = 12;
+    const FINAL_SLEEP_TASK = {
+      id: "final-sleep",
+      title: "睡觉：结束这一天",
+      type: "最后一步",
+      note: "时间到达 00:00。把夹心层世代人物拖到睡觉点，确认她终于能停下来。",
+      scene: "rest",
+      position: "a",
+      hotspotLabel: "睡觉",
+      hotspotHint: "最后一步：挑战成功",
+      timeWindow: { start: 0, end: 0 },
+      urgency: "最终",
+      ttlMinutes: 999,
+      fatigue: 0,
+      child: 0,
+      boss: 0,
+      parentRel: 0,
+      minutes: 0,
+      penalty: {},
+      finalSleep: true
+    };
     const surveyQuestions = [
       "我认为夹心层世代的时间贫困是一个严重问题，而不只是“忙一点”而已。",
       "我认为很多上有老人、下有孩子、同时还要工作的人，都会面临类似的时间压力。",
@@ -2136,6 +2181,8 @@
       ultimateSignalArmed: { child: true, parentRel: true, boss: true, fatigue: true },
       endingReason: "",
       endingGenerated: false,
+      awaitingFinalSleep: false,
+      challengeSuccessShown: false,
       completed: 0,
       restAttempts: 0,
       interruptions: 0,
@@ -2742,8 +2789,25 @@
         ...task,
         runtimeId: task.id + "-" + Date.now() + "-" + Math.random().toString(16).slice(2),
         releasedAt: state.minutes,
-        expiresAt: Math.min(GAME_END_MINUTES, state.minutes + task.ttlMinutes)
+        expiresAt: task.finalSleep ? GAME_END_MINUTES + task.ttlMinutes : Math.min(GAME_END_MINUTES, state.minutes + task.ttlMinutes)
       };
+    }
+
+    function isFinalSleepTask(task) {
+      return Boolean(task && task.finalSleep);
+    }
+
+    function prepareFinalSleepTask() {
+      if (!state.started || state.ended || state.awaitingFinalSleep) return false;
+      if (!isDayOver()) return false;
+      stopTimelineClock();
+      state.minutes = GAME_END_MINUTES;
+      state.scene = "rest";
+      state.tasks = [copyTask(FINAL_SLEEP_TASK)];
+      state.awaitingFinalSleep = true;
+      showTaskNotice("最后一步：睡觉");
+      setLog("时间到达 00:00。今天最后一个任务出现了：把人物拖到“睡觉”点，结束这一天。");
+      return true;
     }
 
     function showTaskNotice(text) {
@@ -2793,9 +2857,9 @@
 
     function expireTasks() {
       if (!state.started) return;
-      const expired = state.tasks.filter((task) => state.minutes >= task.expiresAt);
+      const expired = state.tasks.filter((task) => !isFinalSleepTask(task) && state.minutes >= task.expiresAt);
       if (!expired.length) return;
-      state.tasks = state.tasks.filter((task) => state.minutes < task.expiresAt);
+      state.tasks = state.tasks.filter((task) => isFinalSleepTask(task) || state.minutes < task.expiresAt);
       expired.forEach((task) => {
         applyMetricChanges(task.penalty);
         showTaskNotice("任务过期：" + task.title);
@@ -2840,13 +2904,14 @@
     }
 
     function releaseDueTasks(preferredScene = null, options = {}) {
+      if (state.awaitingFinalSleep || isDayOver()) return 0;
       const needed = activeTaskTarget() - state.tasks.length;
       if (needed <= 0) return 0;
       return releaseTasks(needed, preferredScene, options);
     }
 
     function releaseScheduledTasks(options = {}) {
-      if (isDayOver()) return 0;
+      if (state.awaitingFinalSleep || isDayOver()) return 0;
       let released = 0;
       while (state.minutes >= state.nextTaskReleaseAt && state.tasks.length < 12) {
         released += releaseTasks(2, null, options);
@@ -2876,6 +2941,10 @@
         }
         state.minutes = Math.min(GAME_END_MINUTES, state.minutes + GAME_MINUTES_PER_REAL_SECOND);
         expireTasks();
+        if (prepareFinalSleepTask()) {
+          render();
+          return;
+        }
         const released = isDayOver() ? 0 : releaseScheduledTasks();
         if (released > 0) {
           setLog("时间来到 " + timeText() + "，新的任务进入清单。");
@@ -2939,9 +3008,12 @@
       }
       state.tasks.forEach((task) => {
         const li = document.createElement("li");
+        if (isFinalSleepTask(task)) li.className = "final-sleep-task";
         const text = document.createElement("div");
         text.innerHTML = "<div class='task-tag'></div><div class='task-title'></div><div class='task-meta'></div><div class='task-impact'></div>";
-        text.querySelector(".task-tag").textContent = task.urgency + " · " + task.type + " · " + minutesToTime(task.timeWindow.start) + "-" + minutesToTime(task.timeWindow.end) + " · " + Math.max(0, task.expiresAt - state.minutes) + " 分钟内处理";
+        text.querySelector(".task-tag").textContent = isFinalSleepTask(task)
+          ? "00:00 · 最后一步 · 拖到自我场景的睡觉点"
+          : task.urgency + " · " + task.type + " · " + minutesToTime(task.timeWindow.start) + "-" + minutesToTime(task.timeWindow.end) + " · " + Math.max(0, task.expiresAt - state.minutes) + " 分钟内处理";
         text.querySelector(".task-title").textContent = task.title;
         text.querySelector(".task-meta").textContent = task.note;
         const impacts = [
@@ -2952,6 +3024,7 @@
         ];
         const impactBox = text.querySelector(".task-impact");
         impacts.forEach(([label, value]) => {
+          if (isFinalSleepTask(task) && value === 0) return;
           const chip = document.createElement("span");
           chip.className = "impact-chip " + (value > 0 && label !== "疲惫值" || value < 0 && label === "疲惫值" ? "good" : value === 0 ? "" : "bad");
           chip.textContent = label + " " + (value > 0 ? "+" : "") + value;
@@ -2979,6 +3052,7 @@
       $("clockText").textContent = timeText();
       $("timelineNow").textContent = timeText();
       $("timelineFill").style.width = Math.min(100, Math.max(0, ((state.minutes - GAME_START_MINUTES) / GAME_DAY_MINUTES) * 100)) + "%";
+      maybeEnd();
       document.querySelectorAll(".scene-tabs button").forEach((button) => {
         button.classList.toggle("active", button.dataset.scene === state.scene);
       });
@@ -2986,7 +3060,6 @@
       renderTasks();
       updateHotspots();
       maybeShowUltimateWarning();
-      maybeEnd();
     }
 
     function startGame() {
@@ -3006,6 +3079,8 @@
       state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
       state.endingReason = "";
       state.endingGenerated = false;
+      state.awaitingFinalSleep = false;
+      state.challengeSuccessShown = false;
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
@@ -3014,6 +3089,10 @@
       state.ended = false;
       resetParentDoll();
       $("endingBox").style.display = "none";
+      $("finishExperienceStatus").textContent = "";
+      $("finishExperienceStatus").className = "survey-status";
+      $("challengeSuccessAlert").classList.remove("show");
+      $("challengeSuccessAlert").setAttribute("aria-hidden", "true");
       releaseTasks(3, "work");
       releaseDueTasks("home");
       setLog("你是这一家的安排者。把今天过完。");
@@ -3057,6 +3136,8 @@
       state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
       state.endingReason = "";
       state.endingGenerated = false;
+      state.awaitingFinalSleep = false;
+      state.challengeSuccessShown = false;
       state.completed = 0;
       state.restAttempts = 0;
       state.interruptions = 0;
@@ -3065,6 +3146,10 @@
       state.ended = false;
       resetParentDoll();
       $("endingBox").style.display = "none";
+      $("finishExperienceStatus").textContent = "";
+      $("finishExperienceStatus").className = "survey-status";
+      $("challengeSuccessAlert").classList.remove("show");
+      $("challengeSuccessAlert").setAttribute("aria-hidden", "true");
       setLog("第一步：点“开始一天”。试玩记录会出现在这里。");
       render();
     }
@@ -3080,8 +3165,13 @@
         hotspot.hidden = scene !== "rest" && !task;
         hotspot.dataset.taskRuntimeId = task ? task.runtimeId : "";
         if (scene === "rest") {
-          hotspot.innerHTML = (hotspot.dataset.position === "a" ? "睡觉 / 休息" : "安静角落") + "<small>拖到这里尝试休息</small>";
-          hotspot.setAttribute("aria-label", "尝试休息");
+          if (isFinalSleepTask(task)) {
+            hotspot.innerHTML = task.hotspotLabel + "<small>" + task.hotspotHint + "</small>";
+            hotspot.setAttribute("aria-label", task.title);
+          } else {
+            hotspot.innerHTML = (hotspot.dataset.position === "a" ? "睡觉 / 休息" : "安静角落") + "<small>拖到这里尝试休息</small>";
+            hotspot.setAttribute("aria-label", "尝试休息");
+          }
         } else if (task) {
           hotspot.innerHTML = task.hotspotLabel + "<small>" + task.hotspotHint + "</small>";
           hotspot.setAttribute("aria-label", task.title);
@@ -3098,6 +3188,11 @@
         return;
       }
       if (scene === "rest") {
+        const finalTask = findTaskForHotspot(scene, position);
+        if (isFinalSleepTask(finalTask)) {
+          completeFinalSleep();
+          return;
+        }
         attemptRest();
         return;
       }
@@ -3191,9 +3286,29 @@
       if (countAsFailure) state.interruptions += 0;
     }
 
+    function completeFinalSleep() {
+      if (!state.awaitingFinalSleep || state.ended) return;
+      state.tasks = [];
+      state.completed += 1;
+      state.challengeSuccessShown = true;
+      stopTimelineClock();
+      setLog("挑战成功：你把这一天撑到了 00:00，并终于完成了最后一个任务：睡觉。");
+      showTaskNotice("挑战成功");
+      render();
+      const alert = $("challengeSuccessAlert");
+      alert.classList.add("show");
+      alert.setAttribute("aria-hidden", "false");
+    }
+
+    function continueAfterChallengeSuccess() {
+      $("challengeSuccessAlert").classList.remove("show");
+      $("challengeSuccessAlert").setAttribute("aria-hidden", "true");
+      endGame("safe-day");
+    }
+
     function maybeEnd() {
       if (state.ended) return;
-      if (state.started && isDayOver()) endGame("safe-day");
+      if (state.started && isDayOver()) prepareFinalSleepTask();
     }
 
     function getUltimateSignals() {
@@ -3206,7 +3321,7 @@
     }
 
     function maybeShowUltimateWarning() {
-      if (!state.started || state.ended) return false;
+      if (!state.started || state.ended || state.awaitingFinalSleep) return false;
       const signals = getUltimateSignals();
       state.activeUltimateSignals = signals.map((signal) => signal.key);
       const activeKeys = new Set(state.activeUltimateSignals);
@@ -3239,7 +3354,7 @@
     function localEndingText(reason) {
       const parts = [];
       if (reason === "safe-day") {
-        parts.push("你安全走完了这一天。你维持了一切，除了你自己。");
+        parts.push("你成功度过了这一天。你维持了一切，除了你自己。");
       } else {
         parts.push("终极警告累计到 3 次，这一天被迫结束。");
       }
@@ -3276,7 +3391,7 @@
         const data = await response.json().catch(() => ({}));
         if (!response.ok || !data.answer) throw new Error(data.error || "AI ending failed");
         if (state.ended && state.endingReason === reason) {
-          $("endingSummary").textContent = data.answer + " " + finalStatsText();
+          $("endingSummary").textContent = data.answer + " " + finalStatsText() + " 请点击下方按钮填写后测，系统会根据你的前测、后测和游戏过程生成一份试玩报告。";
         }
       } catch (error) {
         console.warn("AI ending generation failed:", error);
@@ -3290,9 +3405,13 @@
       stopTimelineClock();
       $("ultimateAlert").classList.remove("show");
       $("ultimateAlert").setAttribute("aria-hidden", "true");
+      $("challengeSuccessAlert").classList.remove("show");
+      $("challengeSuccessAlert").setAttribute("aria-hidden", "true");
       $("endingBox").style.display = "block";
-      $("endingTitle").textContent = reason === "safe-day" ? "结尾：你维持了一切，除了你自己" : "结尾：终极警告已经到达上限";
-      $("endingSummary").textContent = localEndingText(reason) + " AI 正在尝试生成更完整的结局，如果失败，这段本地结局会保留。";
+      $("endingTitle").textContent = reason === "safe-day" ? "结尾：你成功度过了一天" : "结尾：终极警告已经到达上限";
+      $("endingSummary").textContent = localEndingText(reason) + " 请点击下方按钮填写后测，系统会根据你的前测、后测和游戏过程生成一份试玩报告。AI 正在尝试生成更完整的结局，如果失败，这段本地结局会保留。";
+      $("finishExperienceStatus").className = "survey-status ok";
+      $("finishExperienceStatus").textContent = "现在可以填写后测，记录你试玩后的理解变化。";
       $("endingBox").scrollIntoView({ block: "start", behavior: "smooth" });
       generateEndingWithAi(reason);
     }
@@ -3523,6 +3642,7 @@
       $("ultimateAlert").classList.remove("show");
       $("ultimateAlert").setAttribute("aria-hidden", "true");
     });
+    $("challengeSuccessContinue").addEventListener("click", continueAfterChallengeSuccess);
     $("aiHelpButton").addEventListener("click", () => {
       $("aiPanel").classList.toggle("open");
     });
