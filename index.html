@@ -2217,13 +2217,43 @@
       const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
         + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
       try {
-        return await fetch(endpoint, {
-          method: isPostSurvey ? "PATCH" : "POST",
+        if (!isPostSurvey) {
+          return await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_PUBLISHABLE_KEY,
+              "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify(body),
+            signal: controller.signal
+          });
+        }
+
+        const patchResponse = await fetch(endpoint, {
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_PUBLISHABLE_KEY,
             "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "return=minimal"
+            "Prefer": "return=minimal,count=exact"
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal
+        });
+        if (!patchResponse.ok) return patchResponse;
+
+        const contentRange = patchResponse.headers.get("content-range") || "";
+        if (!/\/0$/.test(contentRange)) return patchResponse;
+
+        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE + "?on_conflict=session_id", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+            "Prefer": "resolution=merge-duplicates,return=minimal"
           },
           body: JSON.stringify(body),
           signal: controller.signal
@@ -2240,6 +2270,13 @@
       const body = mode === "post"
         ? {
             session_id: sessionId,
+            phase: "post",
+            q1: answers[0],
+            q2: answers[1],
+            q3: answers[2],
+            q4: answers[3],
+            q5: answers[4],
+            average_score: payload.average,
             post_q1: answers[0],
             post_q2: answers[1],
             post_q3: answers[2],
