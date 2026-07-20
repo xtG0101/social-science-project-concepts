@@ -2343,24 +2343,7 @@
           body: JSON.stringify(body),
           signal: controller.signal
         });
-        if (insertResponse.ok || !isPostSurvey || insertResponse.status !== 409) return insertResponse;
-
-        const recoveryBody = {
-          ...body,
-          session_id: sessionId + "-complete-" + Date.now(),
-          updated_at: new Date().toISOString()
-        };
-        return await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_PUBLISHABLE_KEY,
-            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify(recoveryBody),
-          signal: controller.signal
-        });
+        return insertResponse;
       } finally {
         window.clearTimeout(timeoutId);
       }
@@ -2737,7 +2720,7 @@
         } catch (error) {
           console.warn("Supabase post-survey submit failed:", error);
           $("surveyStatus").className = "survey-status error";
-          $("surveyStatus").textContent = "后测已保存在本机，但提交到 Supabase 失败。请稍后检查数据库连接。";
+          $("surveyStatus").textContent = "后测已保存在本机，但没有写入 Supabase。请先在 Supabase SQL Editor 运行项目里的 awareness_survey_submissions.sql，避免产生重复行。";
         } finally {
           $("surveySubmitBtn").disabled = false;
         }

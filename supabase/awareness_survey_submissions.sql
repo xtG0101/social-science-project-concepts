@@ -140,6 +140,66 @@ on public.awareness_survey_submissions (session_id);
 alter table public.awareness_survey_submissions
   drop column if exists game_self;
 
+with complete_rows as (
+  select
+    *,
+    regexp_replace(session_id, '-complete-.*$', '') as base_session_id
+  from public.awareness_survey_submissions
+  where session_id like '%-complete-%'
+),
+latest_complete as (
+  select distinct on (base_session_id) *
+  from complete_rows
+  order by base_session_id, updated_at desc nulls last, created_at desc
+)
+update public.awareness_survey_submissions base
+set
+  phase = coalesce(latest.phase, base.phase),
+  q1 = coalesce(latest.q1, base.q1),
+  q2 = coalesce(latest.q2, base.q2),
+  q3 = coalesce(latest.q3, base.q3),
+  q4 = coalesce(latest.q4, base.q4),
+  q5 = coalesce(latest.q5, base.q5),
+  average_score = coalesce(latest.average_score, base.average_score),
+  age_group = coalesce(base.age_group, latest.age_group),
+  gender = coalesce(base.gender, latest.gender),
+  family_status = coalesce(base.family_status, latest.family_status),
+  pre_q1 = coalesce(base.pre_q1, latest.pre_q1),
+  pre_q2 = coalesce(base.pre_q2, latest.pre_q2),
+  pre_q3 = coalesce(base.pre_q3, latest.pre_q3),
+  pre_q4 = coalesce(base.pre_q4, latest.pre_q4),
+  pre_q5 = coalesce(base.pre_q5, latest.pre_q5),
+  pre_average_score = coalesce(base.pre_average_score, latest.pre_average_score),
+  post_q1 = coalesce(latest.post_q1, base.post_q1),
+  post_q2 = coalesce(latest.post_q2, base.post_q2),
+  post_q3 = coalesce(latest.post_q3, base.post_q3),
+  post_q4 = coalesce(latest.post_q4, base.post_q4),
+  post_q5 = coalesce(latest.post_q5, base.post_q5),
+  post_average_score = coalesce(latest.post_average_score, base.post_average_score),
+  average_change = coalesce(latest.average_change, base.average_change),
+  playtest_feedback = coalesce(latest.playtest_feedback, base.playtest_feedback),
+  game_completed = coalesce(latest.game_completed, base.game_completed),
+  game_rest_attempts = coalesce(latest.game_rest_attempts, base.game_rest_attempts),
+  game_interruptions = coalesce(latest.game_interruptions, base.game_interruptions),
+  game_fatigue = coalesce(latest.game_fatigue, base.game_fatigue),
+  game_child = coalesce(latest.game_child, base.game_child),
+  game_boss = coalesce(latest.game_boss, base.game_boss),
+  game_parent_relationship = coalesce(latest.game_parent_relationship, base.game_parent_relationship),
+  pre_saved_at = coalesce(base.pre_saved_at, latest.pre_saved_at),
+  post_saved_at = coalesce(latest.post_saved_at, base.post_saved_at),
+  client_saved_at = coalesce(latest.client_saved_at, base.client_saved_at),
+  updated_at = now()
+from latest_complete latest
+where base.session_id = latest.base_session_id;
+
+delete from public.awareness_survey_submissions duplicate
+where duplicate.session_id like '%-complete-%'
+  and exists (
+    select 1
+    from public.awareness_survey_submissions base
+    where base.session_id = regexp_replace(duplicate.session_id, '-complete-.*$', '')
+  );
+
 create or replace function public.submit_awareness_survey(p_payload jsonb)
 returns void
 language plpgsql
