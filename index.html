@@ -1940,14 +1940,6 @@
     </form>
   </aside>
 
-  <div class="pressure-alert" id="pressureAlert" aria-live="assertive" aria-hidden="true">
-    <div class="pressure-alert-card">
-      <strong>时间已经被挤满了</strong>
-      <p>疲惫、家庭关系和工作期待同时进入危险区。不是你不努力，是清单已经超过一个人能承受的范围。</p>
-      <button id="pressureAlertClose" type="button">继续回到清单</button>
-    </div>
-  </div>
-
   <div class="pressure-alert" id="gameRulesAlert" aria-live="polite" aria-hidden="true">
     <div class="pressure-alert-card game-rules-card">
       <strong>今天的目标：把这一天过完</strong>
@@ -2124,7 +2116,6 @@
       tasks: [],
       releasedTaskIds: [],
       nextTaskReleaseAt: GAME_START_MINUTES,
-      warningLevelsShown: [],
       ultimateWarnings: 0,
       activeUltimateSignals: [],
       ultimateSignalArmed: { child: true, parentRel: true, boss: true, fatigue: true },
@@ -2138,7 +2129,6 @@
       clockTimer: null,
       dragging: false,
       rulesSeen: false,
-      pressureAlertShown: false,
       restSucceeded: false,
       ended: false
     };
@@ -2841,7 +2831,7 @@
       updateStage();
       renderTasks();
       updateHotspots();
-      if (!maybeShowUltimateWarning()) maybeShowPressureAlert();
+      maybeShowUltimateWarning();
       maybeEnd();
     }
 
@@ -2857,7 +2847,6 @@
       state.tasks = [];
       state.releasedTaskIds = [];
       state.nextTaskReleaseAt = GAME_START_MINUTES + TASK_RELEASE_INTERVAL_MINUTES;
-      state.warningLevelsShown = [];
       state.ultimateWarnings = 0;
       state.activeUltimateSignals = [];
       state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
@@ -2867,7 +2856,6 @@
       state.restAttempts = 0;
       state.interruptions = 0;
       state.relationDecaySeconds = 0;
-      state.pressureAlertShown = false;
       state.restSucceeded = false;
       state.ended = false;
       resetParentDoll();
@@ -2910,7 +2898,6 @@
       state.tasks = [];
       state.releasedTaskIds = [];
       state.nextTaskReleaseAt = GAME_START_MINUTES;
-      state.warningLevelsShown = [];
       state.ultimateWarnings = 0;
       state.activeUltimateSignals = [];
       state.ultimateSignalArmed = { child: true, parentRel: true, boss: true, fatigue: true };
@@ -2920,7 +2907,6 @@
       state.restAttempts = 0;
       state.interruptions = 0;
       state.relationDecaySeconds = 0;
-      state.pressureAlertShown = false;
       state.restSucceeded = false;
       state.ended = false;
       resetParentDoll();
@@ -3052,26 +3038,6 @@
       if (countAsFailure) state.interruptions += 0;
     }
 
-    function maybeShowPressureAlert() {
-      if (!state.started) return;
-      const levels = [
-        { value: 95, title: "红色警告：已经到极限了", text: "疲惫值超过 95%。身体已经被过度透支，终极警告会继续累计。" }
-      ];
-      const level = levels.find((item) => state.fatigue >= item.value && !state.warningLevelsShown.includes(item.value));
-      if (!level) return;
-      state.warningLevelsShown.push(level.value);
-      const alert = $("pressureAlert");
-      alert.querySelector("strong").textContent = level.title;
-      alert.querySelector("p").textContent = level.text;
-      alert.style.background = level.value >= 95 ? "rgba(115,23,23,.88)" : level.value >= 85 ? "rgba(166,86,25,.84)" : "rgba(145,112,28,.78)";
-      alert.classList.add("show");
-      alert.setAttribute("aria-hidden", "false");
-      window.setTimeout(() => {
-        alert.classList.remove("show");
-        alert.setAttribute("aria-hidden", "true");
-      }, 3000);
-    }
-
     function maybeEnd() {
       if (state.ended) return;
       if (state.started && isDayOver()) endGame("safe-day");
@@ -3169,9 +3135,7 @@
       state.ended = true;
       state.endingReason = reason;
       stopTimelineClock();
-      $("pressureAlert").classList.remove("show");
       $("ultimateAlert").classList.remove("show");
-      $("pressureAlert").setAttribute("aria-hidden", "true");
       $("ultimateAlert").setAttribute("aria-hidden", "true");
       $("endingBox").style.display = "block";
       $("endingTitle").textContent = reason === "safe-day" ? "结尾：你维持了一切，除了你自己" : "结尾：终极警告已经到达上限";
@@ -3398,10 +3362,6 @@
     if ($("resetBtn")) $("resetBtn").addEventListener("click", resetGame);
     $("finishExperienceBtn").addEventListener("click", goToPostSurvey);
     $("awarenessSurvey").addEventListener("submit", submitSurvey);
-    $("pressureAlertClose").addEventListener("click", () => {
-      $("pressureAlert").classList.remove("show");
-      $("pressureAlert").setAttribute("aria-hidden", "true");
-    });
     $("restFailureClose").addEventListener("click", () => {
       $("restFailureAlert").classList.remove("show");
       $("restFailureAlert").setAttribute("aria-hidden", "true");
