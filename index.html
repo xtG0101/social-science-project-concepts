@@ -2991,6 +2991,7 @@
           stopTimelineClock();
           return;
         }
+        if (state.demoPaused) return;
         state.minutes = Math.min(GAME_END_MINUTES, state.minutes + GAME_MINUTES_PER_REAL_SECOND);
         expireTasks();
         if (prepareFinalSleepTask()) {
@@ -3117,6 +3118,7 @@
     function startGame() {
       state.started = true;
       state.rulesSeen = true;
+      state.demoPaused = false;
       state.scene = "home";
       state.fatigue = 28;
       state.child = 76;
@@ -3204,6 +3206,31 @@
       $("challengeSuccessAlert").setAttribute("aria-hidden", "true");
       setLog("第一步：点“开始一天”。试玩记录会出现在这里。");
       render();
+    }
+
+    function pausePosterDemo() {
+      if (!state.started || state.ended) return;
+      state.demoPaused = true;
+      setLog("展示暂停：这一天暂时停住。");
+      render();
+    }
+
+    function resumePosterDemo() {
+      if (!state.started || state.ended) return;
+      state.demoPaused = false;
+      startTimelineClock();
+      setLog("展示继续：清单重新开始推进。");
+      render();
+    }
+
+    function handlePosterDemoCommand(command) {
+      if (command === "start") {
+        if (!state.started || state.ended) startGame();
+        else resumePosterDemo();
+      }
+      if (command === "pause") pausePosterDemo();
+      if (command === "resume") resumePosterDemo();
+      if (command === "restart") startGame();
     }
 
     function findTaskForHotspot(scene, position) {
@@ -3682,6 +3709,10 @@
     $("gameRulesStart").addEventListener("click", () => {
       hideGameRules();
       startGame();
+    });
+    window.addEventListener("message", (event) => {
+      if (!event.data || event.data.source !== "poster-demo") return;
+      handlePosterDemoCommand(event.data.command);
     });
     if ($("resetBtn")) $("resetBtn").addEventListener("click", resetGame);
     $("finishExperienceBtn").addEventListener("click", goToPostSurvey);

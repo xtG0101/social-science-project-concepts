@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>夹心层世代时间困境 - 游戏展示</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #f7f5ef;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .demo-frame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+
+    .demo-controls {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 20;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid rgba(31, 34, 38, .16);
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 36px rgba(31, 34, 38, .12);
+    }
+
+    .demo-controls button {
+      border: 1px solid #20242a;
+      border-radius: 0;
+      background: #20242a;
+      color: #fff;
+      min-width: 104px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .demo-controls button.secondary {
+      background: #fff;
+      color: #20242a;
+    }
+
+    .demo-controls button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .pause-cover {
+      position: fixed;
+      inset: 0;
+      z-index: 12;
+      display: none;
+      place-items: center;
+      background: rgba(247, 245, 239, .55);
+      backdrop-filter: blur(3px);
+      pointer-events: none;
+    }
+
+    .pause-cover.show { display: grid; }
+
+    .pause-cover strong {
+      padding: 18px 26px;
+      background: #20242a;
+      color: #fff;
+      font-size: 28px;
+      letter-spacing: .04em;
+    }
+  </style>
+</head>
+<body>
+  <iframe class="demo-frame" id="demoFrame" title="夹心层世代时间困境游戏展示"></iframe>
+
+  <div class="pause-cover" id="pauseCover" aria-hidden="true">
+    <strong>展示暂停</strong>
+  </div>
+
+  <div class="demo-controls" aria-label="游戏展示控制">
+    <button id="startButton" type="button">开始游戏</button>
+    <button id="pauseButton" class="secondary" type="button" disabled>暂停游戏</button>
+  </div>
+
+  <script>
+    const localDemo = "index.html?slideDemo=1#play";
+    const onlineDemo = "https://social-science-project-concepts.vercel.app/?slideDemo=1#play";
+    const frame = document.getElementById("demoFrame");
+    const startButton = document.getElementById("startButton");
+    const pauseButton = document.getElementById("pauseButton");
+    const pauseCover = document.getElementById("pauseCover");
+    const isFile = window.location.protocol === "file:";
+    const isLocalhost = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+    const demoUrl = (isFile || isLocalhost) ? onlineDemo : localDemo;
+    let loaded = false;
+    let paused = false;
+
+    function sendCommand(command) {
+      frame.contentWindow?.postMessage({ source: "poster-demo", command }, "*");
+    }
+
+    function startDemo() {
+      pauseCover.classList.remove("show");
+      if (!loaded) {
+        frame.src = demoUrl;
+        loaded = true;
+        window.setTimeout(() => sendCommand("start"), 1400);
+      } else {
+        sendCommand(paused ? "resume" : "start");
+      }
+      paused = false;
+      startButton.textContent = "继续游戏";
+      pauseButton.disabled = false;
+      pauseButton.textContent = "暂停游戏";
+    }
+
+    function togglePause() {
+      if (!loaded) return;
+      paused = !paused;
+      pauseCover.classList.toggle("show", paused);
+      sendCommand(paused ? "pause" : "resume");
+      pauseButton.textContent = paused ? "继续游戏" : "暂停游戏";
+      startButton.textContent = paused ? "开始游戏" : "继续游戏";
+    }
+
+    startButton.addEventListener("click", startDemo);
+    pauseButton.addEventListener("click", togglePause);
+  </script>
+</body>
+</html>
