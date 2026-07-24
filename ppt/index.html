@@ -565,6 +565,7 @@
     }
 
     .demo-embed {
+      position: relative;
       border: 5px solid var(--ink);
       background: white;
       min-height: 0;
@@ -576,6 +577,60 @@
       height: 100%;
       border: 0;
       background: white;
+    }
+
+    .demo-embed-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(90deg, rgba(17,17,17,.04) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(17,17,17,.04) 1px, transparent 1px),
+        var(--paper);
+      background-size: 52px 52px;
+      color: var(--muted);
+      font-size: 30px;
+      font-weight: 900;
+      text-align: center;
+      padding: 36px;
+    }
+
+    .demo-embed-placeholder.hidden {
+      display: none;
+    }
+
+    .demo-controls {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      z-index: 5;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(17,17,17,.18);
+      box-shadow: 0 14px 34px rgba(17,17,17,.14);
+    }
+
+    .demo-controls button {
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: #fff;
+      font: 900 16px/1 Arial, Helvetica, sans-serif;
+      cursor: pointer;
+    }
+
+    .demo-controls button.secondary {
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .demo-controls button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
     }
 
     .background-slide {
@@ -804,6 +859,11 @@
         </div>
         <div class="demo-embed">
           <iframe id="demoFrame" title="Interactive artifact demo"></iframe>
+          <div class="demo-embed-placeholder" id="demoPlaceholder">Click “Start game” to load the live demo.</div>
+          <div class="demo-controls" aria-label="Demo controls">
+            <button id="demoStartButton" type="button">Start game</button>
+            <button id="demoPauseButton" class="secondary" type="button" disabled>Pause</button>
+          </div>
         </div>
       </div>
     </section>
@@ -894,14 +954,43 @@
     const counter = document.getElementById("counter");
     const progressBar = document.getElementById("progressBar");
     const demoFrame = document.getElementById("demoFrame");
+    const demoStartButton = document.getElementById("demoStartButton");
+    const demoPauseButton = document.getElementById("demoPauseButton");
+    const demoPlaceholder = document.getElementById("demoPlaceholder");
     let current = 0;
+    let demoLoaded = false;
+    let demoPaused = false;
+
+    function sendDemoCommand(command) {
+      demoFrame.contentWindow?.postMessage({ source: "poster-demo", command }, "*");
+    }
+
+    function startOrRestartDemo() {
+      if (!demoLoaded) {
+        demoFrame.src = window.DEMO_URL;
+        demoLoaded = true;
+        demoPlaceholder.classList.add("hidden");
+        window.setTimeout(() => sendDemoCommand("start"), 1400);
+      } else {
+        sendDemoCommand("restart");
+      }
+      demoPaused = false;
+      demoStartButton.textContent = "Restart day";
+      demoPauseButton.disabled = false;
+      demoPauseButton.textContent = "Pause";
+    }
+
+    function toggleDemoPause() {
+      if (!demoLoaded) return;
+      demoPaused = !demoPaused;
+      sendDemoCommand(demoPaused ? "pause" : "resume");
+      demoPauseButton.textContent = demoPaused ? "Resume" : "Pause";
+      demoStartButton.textContent = "Restart day";
+    }
 
     function showSlide(index) {
       current = Math.max(0, Math.min(slides.length - 1, index));
       slides.forEach((slide, i) => slide.classList.toggle("active", i === current));
-      if (slides[current].contains(demoFrame) && !demoFrame.src) {
-        demoFrame.src = window.DEMO_URL;
-      }
       counter.textContent = `${current + 1} / ${slides.length}`;
       progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
       document.title = `${slides[current].dataset.title} — Sandwich Generation Defense`;
@@ -912,6 +1001,8 @@
 
     document.getElementById("nextBtn").addEventListener("click", next);
     document.getElementById("prevBtn").addEventListener("click", prev);
+    demoStartButton.addEventListener("click", startOrRestartDemo);
+    demoPauseButton.addEventListener("click", toggleDemoPause);
     document.addEventListener("keydown", (event) => {
       if (["ArrowRight", "PageDown", " "].includes(event.key)) {
         event.preventDefault();
