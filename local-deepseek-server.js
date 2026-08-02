@@ -3,7 +3,10 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = Number(process.env.PORT || 5173);
-const API_KEY = process.env.DEEPSEEK_API_KEY;
+const API_KEY = String(process.env.DEEPSEEK_API_KEY || "")
+  .trim()
+  .replace(/^["']|["']$/g, "")
+  .replace(/[^\x21-\x7e]/g, "");
 const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 
 const MIME_TYPES = {
@@ -15,6 +18,7 @@ const MIME_TYPES = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
 };
 
 function sendJson(res, status, payload) {
@@ -65,6 +69,29 @@ How to answer:
 - Do not ask for private information.
 - If the user appears to be discussing real personal distress rather than the game, step out of character and answer supportively.`;
 
+const endingPrompt = `You write short Chinese endings for an interactive social science demo about sandwich generation time poverty.
+
+You are not the pressure-system voice in this mode. You are a clear narrator.
+Use the final game numbers to describe consequences for the parent, child, boss/work, and aging parents.
+Do not invent survey data, percentages beyond the provided game state, or medical certainty.
+Mention that the issue is structural, not a personal failure.
+Keep the ending 80-140 Chinese characters.`;
+
+const surveyReportPrompt = `You write short Chinese personalized reports for participants after they finish an experimental classroom web game about sandwich generation time poverty.
+
+You are a clear and warm research narrator, not the in-game pressure-system voice.
+Use only the provided pre/post survey answers, game experience, and written feedback.
+Do not invent sample sizes, study results, diagnoses, percentages, or claims beyond the participant's own provided data.
+Thank the participant for joining the experimental game.
+Explain how the game represented time poverty through task lists, scene switching, rest conditions, and competing work/child/elder responsibilities.
+Keep the report concise, specific, and readable for a general audience.`;
+
+function getSystemPrompt(mode) {
+  if (mode === "ending") return endingPrompt;
+  if (mode === "survey_report") return surveyReportPrompt;
+  return systemPrompt;
+}
+
 async function handleChat(req, res) {
   if (!API_KEY) {
     sendJson(res, 500, { error: "本地服务还没有设置 DEEPSEEK_API_KEY。" });
@@ -80,8 +107,9 @@ async function handleChat(req, res) {
   }
 
   const message = String(parsed.message || "").trim();
+  const mode = String(parsed.mode || "").trim();
   const gameState = parsed.gameState && typeof parsed.gameState === "object"
-    ? JSON.stringify(parsed.gameState).slice(0, 1200)
+    ? JSON.stringify(parsed.gameState).slice(0, 3500)
     : "{}";
   if (!message) {
     sendJson(res, 400, { error: "请先输入问题。" });
@@ -98,9 +126,10 @@ async function handleChat(req, res) {
       body: JSON.stringify({
         model: "deepseek-v4-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: getSystemPrompt(mode) },
           { role: "user", content: `Current game state: ${gameState}\n\nUser message: ${message}` },
         ],
+        thinking: { type: "disabled" },
         temperature: 0.65,
         max_tokens: 500,
       }),
@@ -114,8 +143,10 @@ async function handleChat(req, res) {
       return;
     }
 
+    const messageContent = data.choices?.[0]?.message?.content;
+    const reasoningContent = data.choices?.[0]?.message?.reasoning_content;
     sendJson(res, 200, {
-      answer: data.choices?.[0]?.message?.content || "AI 没有返回内容。",
+      answer: messageContent || reasoningContent || "",
     });
   } catch (error) {
     sendJson(res, 502, { error: "无法连接 DeepSeek API。" });
@@ -125,7 +156,7 @@ async function handleChat(req, res) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (req.method === "POST" && url.pathname === "/api/deepseek-chat") {
+  if (req.method === "POST" && (url.pathname === "/api/chat" || url.pathname === "/api/deepseek-chat")) {
     await handleChat(req, res);
     return;
   }
@@ -156,5 +187,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Local site running at http://localhost:${PORT}`);
-  console.log("DeepSeek chat endpoint: /api/deepseek-chat");
+  console.log("DeepSeek chat endpoint: /api/chat");
 });

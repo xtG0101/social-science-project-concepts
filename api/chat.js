@@ -112,6 +112,7 @@ module.exports = async function handler(req, res) {
           { role: "system", content: getSystemPrompt(mode) },
           { role: "user", content: `Current game state: ${gameState}\n\nUser message: ${message}` },
         ],
+        thinking: { type: "disabled" },
         temperature: 0.65,
         max_tokens: 500,
       }),
@@ -125,8 +126,10 @@ module.exports = async function handler(req, res) {
       return;
     }
 
+    const messageContent = data.choices?.[0]?.message?.content;
+    const reasoningContent = data.choices?.[0]?.message?.reasoning_content;
     sendJson(res, 200, {
-      answer: data.choices?.[0]?.message?.content || "AI 没有返回内容。",
+      answer: messageContent || reasoningContent || "",
     });
   } catch (error) {
     console.error("DeepSeek API connection failed", {

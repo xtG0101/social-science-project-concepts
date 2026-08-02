@@ -2271,20 +2271,52 @@
       return new Response(detail || "", { status: status || 500 });
     }
 
+    function wait(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }
+
+    async function fetchSupabase(url, options = {}) {
+      let lastError = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const response = await fetchWithTimeout(url, options);
+          if (response.status < 500) return response;
+          lastError = response;
+        } catch (error) {
+          lastError = error;
+        }
+        await wait(700);
+      }
+      if (lastError instanceof Response) return lastError;
+      throw lastError || new Error("Supabase request failed");
+    }
+
     function isMissingSurveyRpcError(status, detail) {
       return status === 404 || /submit_awareness_survey|PGRST202|Could not find the function|function .* does not exist/i.test(detail || "");
     }
 
-    async function saveSurveyRowWithRpc(body, signal) {
-      const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/submit_awareness_survey", {
+    async function saveSurveyRowWithRpc(body) {
+      const response = await fetchSupabase(SUPABASE_URL + "/rest/v1/rpc/submit_awareness_survey", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "apikey": SUPABASE_PUBLISHABLE_KEY,
           "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY
         },
-        body: JSON.stringify({ p_payload: body }),
-        signal
+        body: JSON.stringify({ p_payload: body })
       });
       if (response.ok) return response;
       const detail = await readSupabaseError(response);
@@ -2293,60 +2325,19 @@
     }
 
     async function saveSurveyRow(mode, sessionId, body) {
-      const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), 6000);
-      const isPostSurvey = mode === "post";
-      const endpoint = SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE
-        + (isPostSurvey ? "?session_id=eq." + encodeURIComponent(sessionId) : "");
-      try {
-        const rpcResponse = await saveSurveyRowWithRpc(body, controller.signal);
-        if (rpcResponse) return rpcResponse;
+      const rpcResponse = await saveSurveyRowWithRpc(body);
+      if (rpcResponse) return rpcResponse;
 
-        if (!isPostSurvey) {
-          return await fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "apikey": SUPABASE_PUBLISHABLE_KEY,
-              "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-              "Prefer": "return=minimal"
-            },
-            body: JSON.stringify(body),
-            signal: controller.signal
-          });
-        }
-
-        const patchResponse = await fetch(endpoint, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_PUBLISHABLE_KEY,
-            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "return=minimal,count=exact"
-          },
-          body: JSON.stringify(body),
-          signal: controller.signal
-        });
-        if (!patchResponse.ok) return patchResponse;
-
-        const contentRange = patchResponse.headers.get("content-range") || "";
-        if (!/\/0$/.test(contentRange)) return patchResponse;
-
-        const insertResponse = await fetch(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_PUBLISHABLE_KEY,
-            "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify(body),
-          signal: controller.signal
-        });
-        return insertResponse;
-      } finally {
-        window.clearTimeout(timeoutId);
-      }
+      return await fetchSupabase(SUPABASE_URL + "/rest/v1/" + SURVEY_TABLE + "?on_conflict=session_id", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          "Prefer": "resolution=merge-duplicates,return=minimal"
+        },
+        body: JSON.stringify(body)
+      });
     }
 
     async function submitSurveyToSupabase(mode, payload, comparison = {}) {
